@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="68" height="72" viewBox="0 0 68 72">
+  <style type="text/css">.st0{fill:#FFF100;} .st1{fill:#FFFFFF;} .st2{fill:#9A9FA7;stroke:#9A9FA7;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;} .st3{fill:none;stroke:#000000;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;} .st4{fill:none;stroke:#FFF100;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;} .st5{fill:none;stroke:#000000;stroke-width:2;}</style>
+  <desc>Created with Sketch.</desc>
+  <g id="Group-18-Copy-10">
+    <g id="phone">
+      <path id="Path" class="st0" d="M18.5 3h32c1.1 0 2 .9 2 2v62c0 1.1-.9 2-2 2h-32c-1.1 0-2-.9-2-2v-62c0-1.1.9-2 2-2z"></path>
+      <path id="Rectangle-19" class="st1" d="M19.5 10.9h29c1.7 0 3 1.3 3 3v56.2h-35v-56.2c0-1.7 1.3-3 3-3z"></path>
+      <path id="Rectangle-20" class="st2" d="M20.5 42.4h16v22.7h-16z"></path>
+      <path id="Rectangle-20-Copy-2" class="st2" d="M41.5 42.4h10v22.7h-10z"></path>
+      <path id="Rectangle-20-Copy" class="st2" d="M20.5 17.3h8v7.9h-8z"></path>
+      <path id="Line" class="st3" d="M21.1 33.6h25.7"></path>
+      <path id="Line_1_" class="st4" d="M39.5 24.7h6.7"></path>
+    </g>
+    <path id="Rectangle-8" class="st5" d="M17.5 2h33c1.1 0 2 .9 2 2v64c0 1.1-.9 2-2 2h-33c-1.1 0-2-.9-2-2v-64c0-1.1.9-2 2-2z"></path>
+  </g>
+</svg>

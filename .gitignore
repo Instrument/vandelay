@@ -1,3 +1,21 @@
-# Craft Storage (cache) [http://buildwithcraft.com/help/craft-storage-gitignore]
+# Craft runtime and backups folders
+# ----------------------------------------------------------------------
 /craft/storage/*
 !/craft/storage/logo/*
+
+# Uploaded files
+# ----------------------------------------------------------------------
+node_modules/
+data/
+
+# Misc files
+# ----------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+
+libs
