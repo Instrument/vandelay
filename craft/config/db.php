@@ -6,7 +6,7 @@ return array(
 		'database' => 'snapcraft',
 		'server' => 'localhost',
 	),
-	'snapchat.craft.dev' => array(
+	'craft.dev' => array(
 		'user' => 'homestead',
 		'password' => 'secret',
 	)
