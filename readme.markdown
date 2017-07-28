@@ -18,6 +18,16 @@ chmod -R 744 storage/
 ```
 3. [Connect Craft](https://github.com/Instrument/snapchat-craft/wiki/03.-Craft-Connection) to your local server.
 
+## Project Dashboard
+Once craft is in place and the database is imported, you can see your craft dashboard at:
+```
+snapchat.craft.dev/admin
+```
+Login Credentials:
+```
+user: admin
+pw: b0njovi!
+```
 For local server development and Craft connection instructions, [refer to our Wiki](https://github.com/Instrument/snapchat-craft/wiki). 
 
 ## Craft CMS Documentation
