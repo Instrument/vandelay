@@ -3,6 +3,7 @@
 A Craft CMS backend for Snapchat For Business
 
 ## Installation Instructions
+(Requires a local PHP server // [Learn how to set one up](https://github.com/Instrument/snapchat-craft/wiki))
 1. Clone the repo into the root of your project
 2. Make sure these folders' permissions are set to 744
 ```
