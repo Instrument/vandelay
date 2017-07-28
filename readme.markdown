@@ -3,6 +3,7 @@
 A Craft CMS backend for Snapchat For Business
 
 ## Installation Instructions
+(Setup requires a local PHP server // [Learn how to set one up](https://github.com/Instrument/snapchat-craft/wiki))
 1. Clone the repo into the root of your project
 2. Make sure these folders' permissions are set to 744
 ```
@@ -17,6 +18,7 @@ chmod -R 744 config/
 chmod -R 744 storage/
 ```
 3. [Connect Craft](https://github.com/Instrument/snapchat-craft/wiki/03.-Craft-Connection) to your local server.
+4. Finally, [import the most recent project database](https://github.com/Instrument/snapchat-craft/wiki/04.-Import-database)
 
 ## Project Dashboard
 Once craft is in place and the database is imported, you can see your craft dashboard at:
