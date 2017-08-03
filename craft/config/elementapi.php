@@ -134,7 +134,6 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                  } else {
                     if($handle === 'linkInfo') {
                       if ($entry[$handle]->type === 'entry') {
-                        var_dump($entry[$handle]->entry->attributes['uri']);
                         $render['uri'] = $entry[$handle]->entry->attributes['uri'];
                       }
                     }
