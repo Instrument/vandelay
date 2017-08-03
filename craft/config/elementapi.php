@@ -132,7 +132,13 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                  } else if ($type == "Table") {
                      $render[$handle] = $entry[$handle];
                  } else {
-                     $render[$handle] = $itemsRaw[$handle];
+                    if($handle === 'linkInfo') {
+                      if ($entry[$handle]->type === 'entry') {
+                        var_dump($entry[$handle]->entry->attributes['uri']);
+                        $render['uri'] = $entry[$handle]->entry->attributes['uri'];
+                      }
+                    }
+                    $render[$handle] = $itemsRaw[$handle];
                  }
            } else {
                $render[$handle] = $itemsRaw[$handle];
