@@ -58,7 +58,9 @@ function normalizeEntry($entry) {
     return $normalized;
 }
 
-function getValues($entry, $fields = []) {
+$GLOBALS['currSection'] = -1;
+
+function getValues($entry, $fields = [], $nestedNeo = false) {
     $items=[];
     $render = [];
     $itemsRaw = [];
@@ -67,7 +69,7 @@ function getValues($entry, $fields = []) {
              $itemsRaw[$key] = $value;
         }
     }
-
+    
     if (isset($entry['type']['handle'])) {
         $render['type'] = $entry['type']['handle'];
     }
@@ -77,7 +79,7 @@ function getValues($entry, $fields = []) {
         if (array_key_exists($handle, $itemsRaw) && (isset($fields[$handle]) || $fields == [])) {
             $type = $value->field->type;
             $render[$handle] = [];
-           if ($type == 'Neo' || $type == 'Matrix') {
+           if ($type == 'Matrix') {
                foreach ($entry[$handle] as $key1 => $value1) {
                    $newFields = [];
                    if (isset($fields[$handle])) {
@@ -85,15 +87,38 @@ function getValues($entry, $fields = []) {
                             $newFields = $fields[$handle];
                        }
                    }
-                    $render[$handle][] = getValues($entry[$handle][$key1], $newFields);
+                   $vals = getValues($entry[$handle][$key1], $newFields);
+                   $vals['handle'] = $handle;
+                   $render[$handle][] = $vals;
                 }
-           } else if ($type == 'Assets') {
+            } else if ($type == 'Neo') {
+                foreach ($entry[$handle] as $key1 => $value1) {
+                    $newFields = [];
+                    if (isset($fields[$handle])) {
+                        if ($fields[$handle] !== true) {
+                            $newFields = $fields[$handle];
+                        }
+                    }
+                    
+                    $vals = getValues($entry[$handle][$key1], $newFields, true);
+                    $vals['handle'] = $handle;
+                    if (isset($vals['sectionTitle'])) {
+                        $GLOBALS['currSection']++;
+                        $render[$handle][$GLOBALS['currSection']] = getValues($entry[$handle][$key1], $newFields, true);
+                        $render[$handle][$GLOBALS['currSection']]['elements'] = [];
+                    } else {
+                        $vals2 = getValues($entry[$handle][$key1], $newFields, true);
+                        $vals2['type'] = $entry[$handle][$key1]->type->handle;
+                        $render[$handle][$GLOBALS['currSection']]['elements'][] = $vals2;
+                    }
+                }
+            } else if ($type == 'Assets') {
                if ($entry[$handle][0]) {
-                   $render[$handle]['kind'] = $entry[$handle][0]->kind;
-                   $render[$handle]['url'] = $entry[$handle][0]->url;
-                   $render[$handle]['width'] = $entry[$handle][0]->width;
-                   $render[$handle]['height'] = $entry[$handle][0]->height;
-           $render[$handle]['title'] = $entry[$handle][0]->title;
+                    $render[$handle]['kind'] = $entry[$handle][0]->kind;
+                    $render[$handle]['url'] = $entry[$handle][0]->url;
+                    $render[$handle]['width'] = $entry[$handle][0]->width;
+                    $render[$handle]['height'] = $entry[$handle][0]->height;
+                    $render[$handle]['title'] = $entry[$handle][0]->title;
                }
            } else if ($type == 'Entries') {
                $render[$handle]['type'] = $type;
