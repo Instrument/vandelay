@@ -107,6 +107,9 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                         $render[$handle][$GLOBALS['currSection']] = getValues($entry[$handle][$key1], $newFields, true);
                         $render[$handle][$GLOBALS['currSection']]['elements'] = [];
                     } else {
+                        if ($vals['handle'] === 'footerLinks') {
+                          $GLOBALS['currSection']++;
+                        }
                         $vals2 = getValues($entry[$handle][$key1], $newFields, true);
                         $vals2['type'] = $entry[$handle][$key1]->type->handle;
                         $render[$handle][$GLOBALS['currSection']]['elements'][] = $vals2;
