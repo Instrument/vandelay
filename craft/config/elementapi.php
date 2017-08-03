@@ -166,8 +166,8 @@ return [
             'elementType' => 'Entry',
             'paginate' => false,
             'criteria' => [
-                'section' => 'landing',
-                'locale' => 'de'
+                'section' => 'siteNavigation',
+                'locale' => 'en'
             ],
             'transformer' => function(EntryModel $entry) {
                 return getValues($entry);
@@ -208,7 +208,8 @@ return [
               'section' => $section,
               'id' => isset($params['id']) ? $params['id'] : null,
               'slug' => isset($params['slug']) ? $params['slug'] : null,
-              'uri' => isset($params['uri']) ? $params['uri'] : null
+              'uri' => isset($params['uri']) ? $params['uri'] : null,
+              'locale' => isset($params['locale']) ? $params['locale'] : 'en_us'
             ],
             'paginate' => true,
             'elementsPerPage' => 100,
