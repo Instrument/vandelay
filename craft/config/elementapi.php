@@ -233,6 +233,58 @@ return [
                 return getValues($entry, $fields);
               }
             ];
+        },
+        'category/<slug:[a-zA-Z0-9]*>.json' => function($slug) {
+            $params = craft()->request->getQuery();
+            return [
+            'elementType' => 'Category',
+            'criteria' => [
+              'group' => $slug,
+            ],
+            'paginate' => true,
+            'elementsPerPage' => 100,
+            'transformer' => function(CategoryModel $entry) use (&$params) {
+                $fieldsRaw = isset($params['fields']) ? explode(',', $params['fields']) : [];
+                $fields = [];
+
+                foreach($fieldsRaw as $item) {
+                    $temp = &$fields;
+
+                    foreach(explode('.', $item) as $key) {
+                        $temp = &$temp[$key];
+                    }
+
+                    $temp = array();
+                }
+                return getValues($entry, $fields);
+              }
+            ];
+        },
+        'globals/<slug:[a-zA-Z0-9]*>.json' => function($slug) {
+            $params = craft()->request->getQuery();
+            return [
+            'elementType' => 'GlobalSet',
+            'criteria' => [
+              'handle' => $slug,
+            ],
+            'paginate' => true,
+            'elementsPerPage' => 100,
+            'transformer' => function(GlobalSetModel $entry) use (&$params) {
+                $fieldsRaw = isset($params['fields']) ? explode(',', $params['fields']) : [];
+                $fields = [];
+
+                foreach($fieldsRaw as $item) {
+                    $temp = &$fields;
+
+                    foreach(explode('.', $item) as $key) {
+                        $temp = &$temp[$key];
+                    }
+
+                    $temp = array();
+                }
+                return getValues($entry, $fields);
+              }
+            ];
         }
     ]
 ];
