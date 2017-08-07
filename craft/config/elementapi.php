@@ -136,6 +136,7 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                      $render[$handle] = $entry[$handle];
                  } else {
                     if($handle === 'linkInfo' || $handle === 'button') {
+                      $render['buttonStyle'] = $entry->type->handle;
                       if ($entry[$handle]->type === 'entry') {
                         $render['uri'] = $entry[$handle]->entry->attributes['uri'];
                       }
