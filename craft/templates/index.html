@@ -20,8 +20,12 @@
 {% extends "_layout" %}
 
 {% block content %}
-	<h1>{{ entry.title }}</h1>
-
+	<h1>JSON Data:</h1>
+	<a href="/api/pages.json" class="link" style="display:block;">Pages</a>
+	<a href="/api/successStories.json" class="link" style="display:block;">Success Stories</a>
+	<a href="/api/successStoriesEntries.json" class="link" style="display:block;">Success Stories Entries</a>
+	<a href="/api/blog.json" class="link" style="display:block;">Blog Page</a>
+	<a href="/api/blogEntries.json" class="link" style="display:block;">Blog Entries</a>
 	{{ entry.body }}
 
 	<h2>Recent News</h2>
