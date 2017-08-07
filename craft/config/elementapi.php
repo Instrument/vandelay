@@ -53,8 +53,8 @@ function normalizeEntry($entry) {
             );
             $normalized["_title"] = $entry->title;
         }
-    }
 
+    }
     return $normalized;
 }
 
@@ -135,7 +135,7 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                  } else if ($type == "Table") {
                      $render[$handle] = $entry[$handle];
                  } else {
-                    if($handle === 'linkInfo') {
+                    if($handle === 'linkInfo' || $handle === 'button') {
                       if ($entry[$handle]->type === 'entry') {
                         $render['uri'] = $entry[$handle]->entry->attributes['uri'];
                       }
