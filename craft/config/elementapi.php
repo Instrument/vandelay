@@ -143,7 +143,6 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                     }
                     if($handle === 'mainNavigationCta' && $entry[$handle]->attributes['type'] === 'entry') {
                       $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
-                      // var_dump($entry[$handle]->entry->content->attributes['page_uri']);
                     }
                     $render[$handle] = $itemsRaw[$handle];
                  }
