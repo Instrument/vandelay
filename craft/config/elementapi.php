@@ -116,12 +116,24 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                     }
                 }
             } else if ($type == 'Assets') {
-               if ($entry[$handle][0]) {
-                    $render[$handle]['kind'] = $entry[$handle][0]->kind;
-                    $render[$handle]['url'] = $entry[$handle][0]->url;
-                    $render[$handle]['width'] = $entry[$handle][0]->width;
-                    $render[$handle]['height'] = $entry[$handle][0]->height;
-                    $render[$handle]['title'] = $entry[$handle][0]->title;
+              
+              if (count($entry[$handle]) === 1 && $entry[$handle][0]) {
+                $render[$handle]['kind'] = $entry[$handle][0]->kind;
+                $render[$handle]['url'] = $entry[$handle][0]->url;
+                $render[$handle]['width'] = $entry[$handle][0]->width;
+                $render[$handle]['height'] = $entry[$handle][0]->height;
+                $render[$handle]['title'] = $entry[$handle][0]->title;
+              } else if (count($entry[$handle]) > 1) {
+                $assets = [];
+                foreach ($entry[$handle] as $key1 => $value1) {
+                  $assets[$key1] = [];
+                  $assets[$key1]['kind'] = $value1->kind;
+                  $assets[$key1]['url'] = $value1->url;
+                  $assets[$key1]['width'] = $value1->width;
+                  $assets[$key1]['height'] = $value1->height;
+                  $assets[$key1]['title'] = $value1->title;
+                }
+                $render[$handle] = $assets;
                }
            } else if ($type == 'Entries') {
                $render[$handle]['type'] = $type;
