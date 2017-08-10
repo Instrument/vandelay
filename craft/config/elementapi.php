@@ -154,8 +154,15 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                         $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->attributes['uri'];
                       }
                     }
-                    if($handle === 'mainNavigationCta' && $entry[$handle]->attributes['type'] === 'entry') {
+                    if(($handle === 'mainNavigationCta') && $entry[$handle]->attributes['type'] === 'entry') {
                       $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
+                    }
+                    if($handle === 'primaryCta' || $handle === 'secondaryLink') {
+                      if (isset($entry[$handle]->attributes)) {
+                        if ($entry[$handle]->attributes['type'] === 'entry') {
+                          $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
+                        }
+                      }
                     }
                     $render[$handle] = $itemsRaw[$handle];
                  }
