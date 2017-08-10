@@ -92,6 +92,7 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                    $render[$handle][] = $vals;
                 }
             } else if ($type == 'Neo') {
+                $GLOBALS['currSection'] = -1;
                 foreach ($entry[$handle] as $key1 => $value1) {
                     $newFields = [];
                     if (isset($fields[$handle])) {
