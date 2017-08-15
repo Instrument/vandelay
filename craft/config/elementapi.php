@@ -145,7 +145,7 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                }
            } else if ($type == 'Categories') {
               foreach ($entry[$handle] as $key1 => $value1) {
-                 $render[$handle]['data'][$key1]['data'] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : []);
+                 $render[$handle]['data'][$key1] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : []);
               }
            } else if ($itemsRaw[$handle] !== NULL) {
                  if ($type == "Lightswitch") {
