@@ -76,10 +76,11 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
 
     foreach ($entry->fieldLayout->fields as $key => $value) {
         $handle = $value->field->handle;
+
         if (array_key_exists($handle, $itemsRaw) && (isset($fields[$handle]) || $fields == [])) {
             $type = $value->field->type;
             $render[$handle] = [];
-           if ($type == 'Matrix') {
+            if ($type == 'Matrix') {
                foreach ($entry[$handle] as $key1 => $value1) {
                    $newFields = [];
                    if (isset($fields[$handle])) {
@@ -142,6 +143,10 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                    $render[$handle]['data'][$key1]['slug'] = $value1['slug'];
                    $render[$handle]['data'][$key1]['data'] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : []);
                }
+           } else if ($type == 'Categories') {
+              foreach ($entry[$handle] as $key1 => $value1) {
+                 $render[$handle]['data'][$key1]['data'] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : []);
+              }
            } else if ($itemsRaw[$handle] !== NULL) {
                  if ($type == "Lightswitch") {
                      $render[$handle] = $itemsRaw[$handle] == "0" ? false : true;
