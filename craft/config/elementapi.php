@@ -156,7 +156,12 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                     if($handle === 'linkInfo' || $handle === 'button') {
                       $render['buttonStyle'] = $entry->type->handle;
                       if ($entry[$handle]->type === 'entry') {
-                        $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->attributes['uri'];
+                        if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
+                          $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
+                        } else {
+                          $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->attributes['slug'];  
+                        }
+                        
                       }
                     }
                     if(($handle === 'mainNavigationCta') && $entry[$handle]->attributes['type'] === 'entry') {
