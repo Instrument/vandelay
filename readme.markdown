@@ -28,7 +28,7 @@ snapchat.craft.dev/admin
 Login Credentials:
 ```
 user: admin
-pw: b0njovi!
+pw: b0nj0vi!
 ```
 For local server development and Craft connection instructions, [refer to our Wiki](https://github.com/Instrument/snapchat-craft/wiki). 
 
