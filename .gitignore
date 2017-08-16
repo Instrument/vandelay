@@ -1,8 +1,7 @@
 # Craft runtime and backups folders
 # ----------------------------------------------------------------------
-/craft/storage/*
-!/craft/storage/logo/*
-!/craft/storage/userphotos/
+/craft/storage/runtime/*
+/craft/storage/backups/*
 
 # Uploaded files
 # ----------------------------------------------------------------------
