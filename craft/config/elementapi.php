@@ -300,6 +300,7 @@ return [
             'elementType' => 'Category',
             'criteria' => [
               'group' => $slug,
+              'id' => isset($params['id']) ? $params['id'] : null,
             ],
             'paginate' => true,
             'elementsPerPage' => 100,
