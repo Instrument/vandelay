@@ -46,6 +46,18 @@ function normalizeEntry($entry) {
             }
 
             $normalized[$handle] = $entriesData;
+        } elseif ($classHandle == 'Neo') {
+          $blockIds = $entry[$handle]->ids();
+          $entriesData->_type = $classHandle;
+          $entriesData->_data = new \stdClass();
+          $entriesData->_ids = $blockIds;
+
+          $blocks = [];
+          foreach ($blockIds as $idx => $id) {
+              $block = craft()->neo->getBlockById($id);
+              $entriesData->_data->$id = normalizeEntry($block);
+          }
+          $normalized[$handle] = $entriesData;  
         } else {
             $normalized[$handle] = array(
                 '_type' => $classHandle,
@@ -60,7 +72,7 @@ function normalizeEntry($entry) {
 
 $GLOBALS['currSection'] = -1;
 
-function getValues($entry, $fields = [], $nestedNeo = false) {
+function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false) {
     $items=[];
     $render = [];
     $itemsRaw = [];
@@ -73,6 +85,7 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
     if (isset($entry['type']['handle'])) {
         $render['type'] = $entry['type']['handle'];
     }
+    // $render['shouldNormalize'] = $normalized;
 
     foreach ($entry->fieldLayout->fields as $key => $value) {
         $handle = $value->field->handle;
@@ -88,9 +101,10 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                             $newFields = $fields[$handle];
                        }
                    }
-                   $vals = getValues($entry[$handle][$key1], $newFields);
+                   $vals = getValues($entry[$handle][$key1], $newFields); // , false, $normalized);
                    $vals['handle'] = $handle;
                    $render[$handle][] = $vals;
+                   $render['normalized'] = normalizeEntry($entry);
                 }
             } else if ($type == 'Neo') {
                 $GLOBALS['currSection'] = -1;
@@ -102,19 +116,22 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                         }
                     }
                     
-                    $vals = getValues($entry[$handle][$key1], $newFields, true);
+                    $vals = getValues($entry[$handle][$key1], $newFields); // , true, $normalized);
                     $vals['handle'] = $handle;
                     if (isset($vals['sectionTitle'])) {
                         $GLOBALS['currSection']++;
-                        $render[$handle][$GLOBALS['currSection']] = getValues($entry[$handle][$key1], $newFields, true);
+
+                        $render[$handle][$GLOBALS['currSection']] = getValues($entry[$handle][$key1], $newFields, true); // , $normalized);
                         $render[$handle][$GLOBALS['currSection']]['elements'] = [];
+                        $render[$handle][$GLOBALS['currSection']]['normalized-neo-1'] = normalizeEntry($entry);
                     } else {
                         if ($vals['handle'] === 'footerLinks') {
                           $GLOBALS['currSection']++;
                         }
-                        $vals2 = getValues($entry[$handle][$key1], $newFields, true);
+                        $vals2 = getValues($entry[$handle][$key1], $newFields, true); // , $normalized);
                         $vals2['type'] = $entry[$handle][$key1]->type->handle;
                         $render[$handle][$GLOBALS['currSection']]['elements'][] = $vals2;
+                        // $render[$handle][$GLOBALS['currSection']]['normalized-neo-2'] = normalizeEntry($entry);
                     }
                 }
             } else if ($type == 'Assets') {
@@ -125,6 +142,7 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                 $render[$handle]['width'] = $entry[$handle][0]->width;
                 $render[$handle]['height'] = $entry[$handle][0]->height;
                 $render[$handle]['title'] = $entry[$handle][0]->title;
+                $render['normalized-asset-1'] = normalizeEntry($entry);
               } else if (count($entry[$handle]) > 1) {
                 $assets = [];
                 foreach ($entry[$handle] as $key1 => $value1) {
@@ -134,6 +152,7 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                   $assets[$key1]['width'] = $value1->width;
                   $assets[$key1]['height'] = $value1->height;
                   $assets[$key1]['title'] = $value1->title;
+                  $assets[$key1]['normalized-asset-2'] = normalizeEntry($value1);
                 }
                 $render[$handle] = $assets;
                }
@@ -141,11 +160,11 @@ function getValues($entry, $fields = [], $nestedNeo = false) {
                $render[$handle]['type'] = $type;
                foreach ($entry[$handle] as $key1 => $value1) {
                    $render[$handle]['data'][$key1]['slug'] = $value1['slug'];
-                   $render[$handle]['data'][$key1]['data'] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : []);
+                   $render[$handle]['data'][$key1]['data'] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : []); // , false, $normalized);
                }
            } else if ($type == 'Categories') {
               foreach ($entry[$handle] as $key1 => $value1) {
-                 $render[$handle][$key1] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : []);
+                 $render[$handle][$key1] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : []); //, false, $normalized);
               }
            } else if ($itemsRaw[$handle] !== NULL) {
                  if ($type == "Lightswitch") {
@@ -239,6 +258,7 @@ return [
         },
         'api/<section:[a-zA-Z0-9]*>.json' => function($section) {
             $params = craft()->request->getQuery();
+            
             return [
             'elementType' => 'Entry',
             'criteria' => [
@@ -253,7 +273,7 @@ return [
             'transformer' => function(EntryModel $entry) use (&$params) {
                 $fieldsRaw = isset($params['fields']) ? explode(',', $params['fields']) : [];
                 $fields = [];
-
+                $normalized = isset($params['normalize']); //  && $params['normalize'] == 'true';
                 foreach($fieldsRaw as $item) {
                     $temp = &$fields;
 
@@ -264,7 +284,7 @@ return [
                     $temp = array();
                 }
 
-                return getValues($entry, $fields);
+                return getValues($entry, $fields, false, $normalized);
               }
             ];
         },
@@ -280,7 +300,7 @@ return [
             'transformer' => function(CategoryModel $entry) use (&$params) {
                 $fieldsRaw = isset($params['fields']) ? explode(',', $params['fields']) : [];
                 $fields = [];
-
+                $normalized = isset($params['normalize']);
                 foreach($fieldsRaw as $item) {
                     $temp = &$fields;
 
@@ -290,7 +310,7 @@ return [
 
                     $temp = array();
                 }
-                return getValues($entry, $fields);
+                return getValues($entry, $fields, false, $normalized);
               }
             ];
         },
@@ -306,7 +326,7 @@ return [
             'transformer' => function(GlobalSetModel $entry) use (&$params) {
                 $fieldsRaw = isset($params['fields']) ? explode(',', $params['fields']) : [];
                 $fields = [];
-
+                $normalized = isset($params['normalize']);
                 foreach($fieldsRaw as $item) {
                     $temp = &$fields;
 
@@ -316,7 +336,7 @@ return [
 
                     $temp = array();
                 }
-                return getValues($entry, $fields);
+                return getValues($entry, $fields, false, $normalized);
               }
             ];
         }
