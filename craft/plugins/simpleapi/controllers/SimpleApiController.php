@@ -2,28 +2,13 @@
 
 namespace Craft;
 
-require_once(__DIR__ . '/../vendor/autoload.php');
-
-use \Firebase\JWT\JWT;
-
 class SimpleApiController extends BaseController
 {
-  private $PUBLIC_KEY = null;
-
   protected $allowAnonymous = true;
 
-  function __construct() {
-    $this->PUBLIC_KEY = file_get_contents(__DIR__ . '/../../../config/cert/key.pub');
-    if (empty($this->PUBLIC_KEY)) {
-      throw new \Exception('Public key missing from config/cert');
-    }
-  }
-
-  public function getRequestJson() {
-    $output = json_decode(craft()->request->rawBody, true);
-    if (!$output) {
-      throw new Exception('Invalid JSON Request');
-    }
+  public function un_cereal_ize() {
+    $string = craft()->request->rawBody;
+    parse_str($string, $output);
     return $output;
   }
 
@@ -75,7 +60,6 @@ class SimpleApiController extends BaseController
       return $pagevalue[$handle];
     }
   }
-
   public function getEntryDetails($entry) {
     $page = array();
     $fields = $entry->getFieldLayout()->getFields();
@@ -90,7 +74,10 @@ class SimpleApiController extends BaseController
     }
     return $page;
   }
-
+  public function returnEntry($id) {
+    $entry = craft()->entries->getEntryById($id);
+    return $this->getEntryDetails($entry);
+  }
   public function saveTag($data) {
     // First check if the tag already exists
     $criteria = craft()->elements->getCriteria(ElementType::Tag);
@@ -110,7 +97,6 @@ class SimpleApiController extends BaseController
       }
     }
   }
-
   public function saveImage($image_url) {
     $imageInfo = pathinfo($image_url);
     // Download image to temp folder
@@ -128,7 +114,6 @@ class SimpleApiController extends BaseController
       return $response->getDataItem('fileId');
     }
   }
-
   public function saveMatrix($block, $data) {
     foreach ($data as $key => $value) {
       // Upload an image from a URL if the field handle is image
@@ -142,245 +127,118 @@ class SimpleApiController extends BaseController
     $success = craft()->matrix->saveBlock($block);
     return $block;
   }
+  public function updateEntry($entry) {
 
-  public function updateEntry($entry, $user) {
-    $post_data = $this->getRequestJson();
+    $post_data = $this->un_cereal_ize();
     $post_fields = $post_data["fields"];
-    $shouldArchive = isset($post_data["archive"]) && boolval($post_data["archive"]);
-
-    if ($shouldArchive) {
-      $entry->enabled = false;
-    }
-
-    $shouldArchive = isset($post_data["archive"]) && boolval($post_data["archive"]);
-
-    if ($shouldArchive) {
-      $entry->enabled = false;
-    }
 
     $fields = $entry->getFieldLayout()->getFields();
     $matrices = array();
-
-    $matrixFields = array();
-
+    // Populates entry fields from post request
+    // Ignores data included in post request that entry does not support
     foreach ($fields as $field) {
       $data = $field->getField();
       $handle = $data->handle;
-
-      if (!isset($post_fields[$handle])) {
-        continue;
-      }
-
-      $value = $post_fields[$handle];
-
-      // We need to defer saving matrix fields until after we've saved the entry
-      // so that we may link it to the entry->id
-      if ($data->type == 'Matrix') {
-        $matrixFields[] = $field;
-      } else {
-        $entry->getContent()->setAttribute($handle, $value);
-      }
-    }
-
-    $saved = craft()->entries->saveEntry($entry);
-
-    if (!$saved) {
-      error_log('Failed save.');
-      error_log(print_r($entry->allErrors, true));
-
-      return $this->returnJson(array(
-        'status' => 500,
-        'message' => 'There was an error saving the record.',
-        'errors' => $entry->allErrors
-      ));
-    }
-
-    foreach ($matrixFields as $field) {
-      $data = $field->getField();
-      $handle = $data->handle;
-      $value = $post_fields[$handle];
-
-      $blocks = [];
-      foreach ($value as $idx => $blockData) {
-
-        $blockId = $blockData["id"];
-        $foundBlock = null;
-        if (substr( $blockId, 0, 4 ) === "_NEW") {
-          $newBlock = new MatrixBlockModel();
-          $newBlock->fieldId = $data->id;
-          $newBlock->ownerId = $entry->id;
-
-          // Currently only supporting single-blockType matrix
-          $newBlock->typeId = craft()->matrix->getBlockTypesByFieldId($data->id)[0]->id;
-
-          // We need to update the fields BEFORE we save in case some fields are required.
-          foreach ($blockData["_fields"] as $fieldName => $innerData) {
-            $newBlock->getContent()->setAttribute($fieldName, $innerData);
+      if (isset($post_fields[$handle])) {
+        $value = $post_fields[$handle];
+        if ($data->type == 'Matrix') {
+          //Save matrix field data to array to save after entry creation
+          $matrices[] = $data;          
+        } elseif ($data->type == 'Tags') {
+          // Accepts an array of tags by title
+          // Looks for tag group ID
+          $tagGroup = craft()->tags->getTagGroupByHandle($handle);
+          $tag_ids = array();
+          foreach ($post_fields[$handle] as $value) {
+            $tag = [
+              'title' => $value,
+              'groupId' => $tagGroup->id
+            ];
+            $tag_ids[] = $this->saveTag($tag);
           }
-
-          $success = craft()->matrix->saveBlock($newBlock);
-
-          if (!$success) {
-            throw new Exception('Something went wrong saving block data');
-          }
-          $foundBlock = $newBlock;
+          $entry->getContent()->setAttribute($handle, $tag_ids);
         } else {
-          $foundBlock = craft()->matrix->getBlockById($blockId);
-
-          foreach ($blockData["_fields"] as $fieldName => $innerData) {
-            $foundBlock->getContent()->setAttribute($fieldName, $innerData);
-          }
+          $entry->getContent()->setAttribute($handle, $value);  
         }
-
-        if (!$foundBlock) {
-          log("Invalid blockId: " . $blockId);
-          continue;
-        }
-
-        $blocks[] = $foundBlock;
-
       }
-      $entry->getContent()->setAttribute($handle, $blocks);
     }
-
     $saved = craft()->entries->saveEntry($entry);
+    if ($saved) {
+      // On success, populate MatrixBlockModel with matrix data and the returned entry ID
+      foreach ($matrices as $key => $field) {
+        foreach ($post_fields[$field->handle] as $value) {
 
-    if (!$saved) {
-      return $this->returnJson(array(
-        'status' => 500,
-        'message' => 'There was an error saving the record.',
-        'errors' => $entry->allErrors
-      ));
+          $block = new MatrixBlockModel();
+          $blockType = craft()->matrix->getBlockTypesByFieldId($field->id);
+          $block->fieldId = $field->id;
+          $block->typeId = $blockType[0]->id;
+          $block->ownerId = $entry->id;
+
+          $this->saveMatrix($block, $value);
+        }
+      }
+      return $entry;
     }
-
-    return $this->returnJson(array(
-      'status' => 200,
-      'message' => 'Saved!',
-      'id' => $entry->id
-    ));
+    return $post_fields;
   }
-
-  public function addEntry($user) {
+  public function addEntry(array $variables = array()) {
     $this->requirePostRequest();
-    $post_data = $this->getRequestJson();
-
+    //Parse serialized data
+    $post_data = $this->un_cereal_ize();
+    $fields = $post_data["fields"];
     //Populate new Craft EntryModel with post data
-    $section = craft()->sections->getSectionByHandle('projects');
+    $section = craft()->sections->getSectionById((int)$post_data["sectionId"]);
     $type = craft()->sections->getEntryTypesBySectionId($section->id);
     $entry = new EntryModel();
     $entry->sectionId = (int)$section->id;
     $entry->typeId    = (int)$type[0]->id;
-    $entry->authorId  = $user->id;
+    $entry->authorId  = (int)$post_data["authorId"];
     $entry->enabled   = true;
-
-    return $this->updateEntry($entry, $user);
-  }
-
-  public function handlePostRequest($variables, $user) {
-    $data = null;
-    if (isset($variables['id'])) {
-      $entry = craft()->entries->getEntryById($variables['id']);
-      $data = $this->updateEntry($entry, $user);
-
+    $matrices = [];
+    if (isset($fields["title"])) {
+      $entry->getContent()->setAttribute('title', $fields["title"]);
+    }
+    $saved = $this->updateEntry($entry);
+    if ($saved) {
+      $this->returnJson(array(
+        'data' => $entry,
+        'status' => 200
+      ));
     } else {
-      $data = $this->addEntry($user);
+      $this->returnJson(array(
+        'status' => 500,
+        'message' => 'There was an error saving the record.',
+        'data_received' => $post_data
+      ));
     }
   }
-
-  public function createOrUpdateUser($userData) {
-    $user = craft()->users->getUserByEmail($userData->email);
-    if (!empty($user)) {
-      return $user;
-    }
-
-    // make user here based on onelogin creds
-    $firstName = $userData->firstName;
-    $lastName = $userData->lastName;
-    $user = new UserModel();
-
-    $user->username   = $userData->email;
-    $user->email      = $userData->email;
-    $user->firstName  = $firstName;
-    $user->lastName   = $lastName;
-    $user->admin      = false;
-
-    $hasMinimumPermissions = false;
-    foreach ($userData->groups as $idx => $value) {
-      if ($value === 'Admin') {
-        $user->admin = true;
-        $hasMinimumPermissions = true;
-      }
-
-      if ($value === 'portalEditor' || $value === 'superEditor') {
-        $hasMinimumPermissions = true;
-      }
-    }
-
-    if ($hasMinimumPermissions === false) {
-      throw new Exception('Invalid user permissions');
-    }
-
-    $result = craft()->users->saveUser($user);
-
-    if (!$result) {
-      error_log(print_r($user->allErrors, true));
-      throw new \Exception('Something went wrong creating a new user');
-    }
-
-    return $user;
+  public function handlePostRequest($variables) {
+    if (isset($variables['id'])) {
+      $this->updateEntry($variables);
+    } else {
+      $this->addEntry();
+    } 
   }
-
+  public function handleGetRequest($variables) {
+    if (isset($variables['id'])) {
+      $result = $this->returnEntry($variables['id']);
+      $this->returnJson(array(
+        'status' => 200,
+        'entry' => $result
+      ));
+    } else {
+      $this->returnJson(array(
+        'status' => 500,
+        'message' => 'ID parameter missing from request.'
+      ));
+    }
+  }
   public function actionHandleEntry(array $variables = array()) {
-    $jwt = null;
-    if (isset($_SERVER['HTTP_JWT'])) {
-      $jwt = $_SERVER['HTTP_JWT'];
+    if (craft()->request->isPostRequest()) {
+      $this->handlePostRequest($variables);
     }
-
-    $decoded = null;
-    try {
-      $decoded = JWT::decode($jwt, $this->PUBLIC_KEY, array('RS256'));
-    } catch (\Exception $e) {
-      return $this->returnUnauthorized();
+    if (craft()->request->isGetRequest()) {
+      $this->handleGetRequest($variables);
     }
-
-    if (empty($decoded)) { return $this->returnUnauthorized(); }
-
-    if (!craft()->request->isPostRequest()) { return $this->returnUnknownRequest(); }
-
-    try {
-      $user = $this->createOrUpdateUser($decoded);
-    } catch (\Exception $e) {
-      return $this->returnUnauthorized();
-    }
-
-    try {
-      return $this->handlePostRequest($variables, $user);
-    } catch (\Exception $e) {
-      return $this->returnUnknownError($e);
-    }
-
   }
-
-  public function returnUnauthorized() {
-    return $this->returnJson(array(
-      'status' => 500,
-      'message' => 'Unauthorized Request'
-    ));
-  }
-
-  public function returnUnknownRequest() {
-    return $this->returnJson(array(
-      'status' => 500,
-      'message' => 'Unknown Request Type'
-    ));
-  }
-
-  public function returnUnknownError($details) {
-    return $this->returnJson(array(
-      'status' => 500,
-      'message' => 'Unknown Error',
-      'details' => $details,
-    ));
-  }
-
 }
