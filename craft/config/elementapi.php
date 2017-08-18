@@ -58,6 +58,12 @@ function normalizeEntry($entry) {
               $entriesData->_data->$id = normalizeEntry($block);
           }
           $normalized[$handle] = $entriesData;  
+        }  elseif ($classHandle == 'Assets') {
+            $entryIds = $entry[$handle]->ids();
+            $normalized[$handle] = array(
+                '_type' => $classHandle,
+                '_ids' => $entryIds,
+            );
         } else {
             $normalized[$handle] = array(
                 '_type' => $classHandle,
