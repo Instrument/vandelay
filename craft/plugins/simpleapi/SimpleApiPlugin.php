@@ -5,14 +5,6 @@ namespace Craft;
 
 class SimpleApiPlugin extends BasePlugin
 {
-    static public function getEntryCacheKey($stringable) {
-        return 'elementapi_projects_Entry_' . $stringable;
-    }
-
-    static public function getLookupCacheKey($stringable) {
-        return 'elementapi_projects_lookup_' . $stringable;
-    }
-
     /**
      * Get Name
      *
@@ -52,24 +44,6 @@ class SimpleApiPlugin extends BasePlugin
     {
         return 'http://instrument.com';
     }
-
-    public function init() {
-        craft()->on('entries.saveEntry', function(Event $event) {
-            $entry = $event->params['entry'];
-            $key = SimpleApiPlugin::getEntryCacheKey($entry->id);
-            craft()->cache->delete($key);
-
-            $lookups = craft()->cache->get(SimpleApiPlugin::getLookupCacheKey($entry->id));
-
-            if (!is_array($lookups)) {
-                $lookups = [];
-            }
-            foreach ($lookups as $lookupId) {
-                craft()->cache->delete($lookupId);
-            }
-        });
-    }
-
     /**
      * Register Site Routes
      *
@@ -78,11 +52,9 @@ class SimpleApiPlugin extends BasePlugin
     public function registerSiteRoutes()
     {
 
-        // WARNING: If you're adding a new endpoint, make sure you're considering authorization.
-        // In the endpoints below, we're validating a JWT.
         return [
-            'simpleapi/Entry/(?P<id>[0-9]+)' => array('action' => 'simpleApi/handleEntry'),
-            'simpleapi/Entry' => array('action' => 'simpleApi/handleEntry')
+            'api/Entry/(?P<id>[0-9]+)' => array('action' => 'simpleApi/handleEntry'),
+            'api/Entry' => array('action' => 'simpleApi/handleEntry'),
         ];
     }
 }
