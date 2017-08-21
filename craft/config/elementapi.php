@@ -92,10 +92,11 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
         $render['type'] = $entry['type']['handle'];
     }
     // $render['shouldNormalize'] = $normalized;
-
+    if ($normalized) {
+      $render['normalized'] = normalizeEntry($entry);  
+    }
     foreach ($entry->fieldLayout->fields as $key => $value) {
         $handle = $value->field->handle;
-
         if (array_key_exists($handle, $itemsRaw) && (isset($fields[$handle]) || $fields == [])) {
             $type = $value->field->type;
             $render[$handle] = [];
@@ -110,7 +111,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                    $vals = getValues($entry[$handle][$key1], $newFields); // , false, $normalized);
                    $vals['handle'] = $handle;
                    $render[$handle][] = $vals;
-                   $render['normalized'] = normalizeEntry($entry);
+                   // $render['normalized'] = normalizeEntry($entry);
                 }
             } else if ($type == 'Neo') {
                 $GLOBALS['currSection'] = -1;
@@ -129,7 +130,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
 
                         $render[$handle][$GLOBALS['currSection']] = getValues($entry[$handle][$key1], $newFields, true); // , $normalized);
                         $render[$handle][$GLOBALS['currSection']]['elements'] = [];
-                        $render[$handle][$GLOBALS['currSection']]['normalized-neo-1'] = normalizeEntry($entry);
+                        // $render[$handle][$GLOBALS['currSection']]['normalized-neo-1'] = normalizeEntry($entry);
                     } else {
                         if ($vals['handle'] === 'footerLinks') {
                           $GLOBALS['currSection']++;
@@ -148,7 +149,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                 $render[$handle]['width'] = $entry[$handle][0]->width;
                 $render[$handle]['height'] = $entry[$handle][0]->height;
                 $render[$handle]['title'] = $entry[$handle][0]->title;
-                $render['normalized-asset-1'] = normalizeEntry($entry);
+                // $render['normalized-asset-1'] = normalizeEntry($entry);
               } else if (count($entry[$handle]) > 1) {
                 $assets = [];
                 foreach ($entry[$handle] as $key1 => $value1) {
@@ -158,7 +159,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                   $assets[$key1]['width'] = $value1->width;
                   $assets[$key1]['height'] = $value1->height;
                   $assets[$key1]['title'] = $value1->title;
-                  $assets[$key1]['normalized-asset-2'] = normalizeEntry($value1);
+                  // $assets[$key1]['normalized-asset-2'] = normalizeEntry($value1);
                 }
                 $render[$handle] = $assets;
                }
