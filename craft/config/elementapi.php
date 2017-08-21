@@ -185,7 +185,9 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                         if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
                         } else {
-                          $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->attributes['slug'];  
+                          if (isset($entry[$handle]->entry->attributes['slug'])) {
+                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->attributes['slug'];
+                          }
                         }
                         
                       }

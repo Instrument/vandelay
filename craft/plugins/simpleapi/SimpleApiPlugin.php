@@ -53,8 +53,9 @@ class SimpleApiPlugin extends BasePlugin
     {
 
         return [
-            'api/Entry/(?P<id>[0-9]+)' => array('action' => 'simpleApi/handleEntry'),
-            'api/Entry' => array('action' => 'simpleApi/handleEntry'),
+            'simpleapi/Entry/(?P<id>[0-9]+)' => array('action' => 'simpleApi/handleEntry'),
+            'simpleapi/Entry' => array('action' => 'simpleApi/handleEntry'),
+            'simpleapi/Singles' => array('action' => 'simpleApi/getSingles'),
         ];
     }
 }
