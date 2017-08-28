@@ -11,7 +11,21 @@ class SimpleApiController extends BaseController
     parse_str($string, $output);
     return $output;
   }
-
+  public function actionGetSingles() {
+    $sections = craft()->sections->getAllSections();
+    $singles = [];
+    $cnt = 0;
+    foreach($sections as $key => $value) {
+      if ($value->attributes['type'] == "single") {
+        $singles[$cnt] = $value->attributes['handle'];
+        $cnt++;
+      }
+    }
+    $this->returnJson(array(
+      'status' => 200,
+      'entry' => $singles
+    ));
+  }
   public function handleFieldType($pagevalue, $data) {
     $handle = $data->handle;
     if($data->type == 'Matrix'){
@@ -131,7 +145,7 @@ class SimpleApiController extends BaseController
 
     $post_data = $this->un_cereal_ize();
     $post_fields = $post_data["fields"];
-
+    $entry->getContent()->title = $post_data["title"];
     $fields = $entry->getFieldLayout()->getFields();
     $matrices = array();
     // Populates entry fields from post request
@@ -214,7 +228,8 @@ class SimpleApiController extends BaseController
   }
   public function handlePostRequest($variables) {
     if (isset($variables['id'])) {
-      $this->updateEntry($variables);
+      $entry = craft()->entries->getEntryById($variables['id']);
+      $this->updateEntry($entry);
     } else {
       $this->addEntry();
     } 
