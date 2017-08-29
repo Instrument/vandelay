@@ -4,7 +4,7 @@ return array(
     'omitScriptNameInUrls' => true,
     'limitAutoSlugsToAscii' => true,
 		'defaultWeekStartDay' => 0,
-		'enableCsrfProtection' => true,
+		'enableCsrfProtection' => false,
 		'cpTrigger' => 'admin',
   ),
   'snapchat.craft.dev' => array(

@@ -10,7 +10,7 @@ function transformForAutocomplete($entry) {
     ];
 }
 
-function normalizeEntry($entry) {
+function normalizeEntry($entry) { // TODO come back and make sure customText fields get updated to customText_loc
     $normalized = [];
 
     foreach ($entry->getFieldLayout()->fields as $idx => $fieldLayoutField) {
@@ -179,29 +179,38 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                  } else if ($type == "Table") {
                      $render[$handle] = $entry[$handle];
                  } else {
-                    if($handle === 'linkInfo' || $handle === 'button') {
+                    if (isset($entry[$handle]->attributes['customText'])) {
+                      $itemsRaw[$handle]['customText_loc'] = $entry[$handle]->attributes['customText'];
+                      unset($itemsRaw[$handle]['customText']);
+                    }
+                    if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink_loc' || $handle === 'linkInfo_loc' || $handle === 'button_loc') {
                       $render['buttonStyle'] = $entry->type->handle;
                       if ($entry[$handle]->type === 'entry') {
                         if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
+                        } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) { // TODO update to remove the _loc
+                          $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];  
                         } else {
                           if (isset($entry[$handle]->entry->attributes['slug'])) {
                             $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->attributes['slug'];
                           }
                         }
-                        
                       }
                     }
-                    if(($handle === 'mainNavigationCta') && $entry[$handle]->attributes['type'] === 'entry') {
-                      $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
-                    }
-                    if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton') {
-                      if (isset($entry[$handle]->attributes)) {
-                        if ($entry[$handle]->attributes['type'] === 'entry') {
-                          $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
-                        }
+                    if(($handle === 'mainNavigationCta' || $handle === 'mainNavigationCta_loc') && $entry[$handle]->attributes['type'] === 'entry') { // TODO update to remove the _loc from mainNavigationCta_loc from craft
+                      if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
+                        $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
+                      } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) { // TODO pdate to remove _loc from page_uri in craft
+                        $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                       }
                     }
+                    // if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton') {
+                    //   if (isset($entry[$handle]->attributes)) {
+                    //     if ($entry[$handle]->attributes['type'] === 'entry') {
+                    //       $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
+                    //     }
+                    //   }
+                    // }
                     $render[$handle] = $itemsRaw[$handle];
                  }
            } else {
