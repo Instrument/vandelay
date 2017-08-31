@@ -3,15 +3,19 @@
 usage() { 
     echo "Uh oh!" 1>&2
     echo "This script provisions a Cloud SQL instance and a Google Compute Engine instance from scratch. All options are required." 1>&2
-    echo "Usage details: $0 -e <GCE instance name> -s <Cloud SQL instance name> -u <db admin username> -p <admin password>" 1>&2
+    echo "Usage details: $0 -a <GCE admin username> -e <GCE instance name> -s <Cloud SQL instance name> -u <db admin username> -p <admin password>" 1>&2
     echo ""
-    echo "For example, $0 -e myubuntu -s mydbserver -u craftuser -p supersecurepassword" 1>&2
+    echo "For example, $0 -a gceuser -e myubuntu -s mydbserver -u craftuser -p supersecurepassword" 1>&2
     echo ""; exit 0
 }
 
 
-while getopts ":e:s:u:p:" o; do
+while getopts ":a:e:s:u:p:" o; do
         case "${o}" in
+        a)
+            gce_username=${OPTARG}
+            [[ -n "$gce_username" ]] || usage
+            ;;
         e)
             gce_name=${OPTARG}
             [[ -n "$gce_name" ]] || usage
@@ -36,7 +40,7 @@ done
 shift $((OPTIND-1))
 
 
-if [ -z "$gce_name" ] || [ -z "$sql_instance_name" ] || [ -z "$sql_username" ] || [ -z "$sql_password" ]; then
+if [ -z "$gce_username" ] || [ -z "$gce_name" ] || [ -z "$sql_instance_name" ] || [ -z "$sql_username" ] || [ -z "$sql_password" ]; then
     usage
 else
 
@@ -97,11 +101,17 @@ else
 
     
     # copy the deploy files up to your new GCE
-    gcloud compute scp xfr inger_klekacz@$gce_name:~/ --recurse
-    gcloud compute scp bashrc inger_klekacz@$gce_name:~/.bashrc
+    gcloud compute scp xfr $gce_username@$gce_name:~/ --recurse
+    gcloud compute scp bashrc $gce_username@$gce_name:~/.bashrc
 
     # give further instructions
-    echo "Okay. Good job. Now SSH into that bad boy with: gcloud compute ssh [your gcloud username]@$gce_name" 1>&2
+
+    echo ".........DONE........" 1>&2
+    echo "!!!!!! IMPORTANT INFO BELOW !!!!!" 1>&2
+    echo "Web server IP address ($gce_name): $gce_ip " 1>&2
+    echo "Cloud SQL Instance IP address: $sql_ip" 1>&2
+    echo "" 1>&2
+    echo "Okay. Good job. Now SSH into that bad boy with: gcloud compute ssh $gce_username@$gce_name" 1>&2
     echo "Once you're in there, type: cd ~/xfr/; sudo -E ./install.sh" 1>&2
 
 fi
