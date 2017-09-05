@@ -206,13 +206,17 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                         $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                       }
                     }
-                    // if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton') {
-                    //   if (isset($entry[$handle]->attributes)) {
-                    //     if ($entry[$handle]->attributes['type'] === 'entry') {
-                    //       $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
-                    //     }
-                    //   }
-                    // }
+                    if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton') {
+                      if (isset($entry[$handle]->attributes)) {
+                        if ($entry[$handle]->attributes['type'] === 'entry') {
+                          if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
+                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];    
+                          } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) {
+                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
+                          }
+                        }
+                      }
+                    }
                     $render[$handle] = $itemsRaw[$handle];
                  }
            } else {
