@@ -1,4 +1,5 @@
 {
-	"buttons": ["bold"],
+	"buttons": ["format", "bold", "link"],
+	"formatting": ["h2", "p"],
 	"plugins": ["scriptbuttons"]
 }
