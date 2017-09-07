@@ -183,7 +183,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                       $itemsRaw[$handle]['customText_loc'] = $entry[$handle]->attributes['customText'];
                       unset($itemsRaw[$handle]['customText']);
                     }
-                    if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button') {
+                    if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem') {
                       $render['buttonStyle'] = $entry->type->handle;
                     //   if ($entry[$handle]) {
                         if ($entry[$handle]->type === 'entry') {
