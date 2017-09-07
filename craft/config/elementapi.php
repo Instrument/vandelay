@@ -132,7 +132,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                         $render[$handle][$GLOBALS['currSection']]['elements'] = [];
                         // $render[$handle][$GLOBALS['currSection']]['normalized-neo-1'] = normalizeEntry($entry);
                     } else {
-                        if ($vals['handle'] === 'footerLinks') {
+                        if ($vals['handle'] === 'footerLinks' || $vals['handle'] === 'entryBuilder' || $vals['handle'] === 'primaryNavigation') {
                           $GLOBALS['currSection']++;
                         }
                         $vals2 = getValues($entry[$handle][$key1], $newFields, true); // , $normalized);
@@ -183,7 +183,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                       $itemsRaw[$handle]['customText_loc'] = $entry[$handle]->attributes['customText'];
                       unset($itemsRaw[$handle]['customText']);
                     }
-                    if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button') {
+                    if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem') {
                       $render['buttonStyle'] = $entry->type->handle;
                     //   if ($entry[$handle]) {
                         if ($entry[$handle]->type === 'entry') {
@@ -206,13 +206,17 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                         $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                       }
                     }
-                    // if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton') {
-                    //   if (isset($entry[$handle]->attributes)) {
-                    //     if ($entry[$handle]->attributes['type'] === 'entry') {
-                    //       $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
-                    //     }
-                    //   }
-                    // }
+                    if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton') {
+                      if (isset($entry[$handle]->attributes)) {
+                        if ($entry[$handle]->attributes['type'] === 'entry') {
+                          if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
+                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];    
+                          } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) {
+                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
+                          }
+                        }
+                      }
+                    }
                     $render[$handle] = $itemsRaw[$handle];
                  }
            } else {
