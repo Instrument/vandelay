@@ -132,7 +132,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                         $render[$handle][$GLOBALS['currSection']]['elements'] = [];
                         // $render[$handle][$GLOBALS['currSection']]['normalized-neo-1'] = normalizeEntry($entry);
                     } else {
-                        if ($vals['handle'] === 'footerLinks' || $vals['handle'] === 'entryBuilder' || $vals['handle'] === 'primaryNavigation') {
+                        if ($vals['handle'] === 'footerLinks' || $vals['handle'] === 'entryBuilder' || $vals['handle'] === 'primaryNavigation' || $vals['handle'] === 'storyBuilder') {
                           $GLOBALS['currSection']++;
                         }
                         $vals2 = getValues($entry[$handle][$key1], $newFields, true); // , $normalized);
