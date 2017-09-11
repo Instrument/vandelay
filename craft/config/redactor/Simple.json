@@ -1,5 +1,15 @@
 {
 	"buttons": ["format", "bold", "link"],
-	"formatting": ["h2", "p"],
+	"formatting": ["p"],
+	"formattingAdd": {
+		"headline-add": {
+			"title": "Headline",
+			"args": ["h3", "class", "block-headline"]
+		},
+		"quote-author-add": {
+			"title": "Quote Author",
+			"args": ["cite", "class", "block-quote-author"]
+		}
+	},
 	"plugins": ["scriptbuttons"]
 }
