@@ -236,7 +236,10 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
         $render['title'] = $entry['title'];
       }
     }
-
+    if (isset($entry->type) && isset($entry->section)) {
+      $entryType = $entry->type;
+      $render['entryType'] = $entryType->handle;
+    }
     return $render;
 }
 
