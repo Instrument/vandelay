@@ -239,6 +239,9 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
     if (isset($entry->type) && isset($entry->section)) {
       $entryType = $entry->type;
       $render['entryType'] = $entryType->handle;
+      if (isset($entry->attributes['postDate'])) {
+        $render['postDate'] = $entry->attributes['postDate']->getTimestamp();  
+      }
     }
     return $render;
 }
