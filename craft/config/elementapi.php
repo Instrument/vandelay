@@ -233,7 +233,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
 
     if (isset($entry->title)) {
       if ($entry['title'] != '') {
-        $render['title'] = $entry['title'];
+        $render['title_loc'] = $entry['title'];
       }
     }
     if (isset($entry->type) && isset($entry->section)) {
