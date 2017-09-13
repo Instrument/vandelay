@@ -12,7 +12,6 @@ return array(
   'smartResizeEnabled' => true,
   'removeMetadata' => false,
   'position' => '50% 50%',
-  // 'hashRemoteUrl' => true,
   
   'jpegoptimEnabled' => true,
   'optipngEnabled' => true,
