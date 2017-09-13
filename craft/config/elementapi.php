@@ -135,10 +135,13 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                         if ($vals['handle'] === 'footerLinks' || $vals['handle'] === 'entryBuilder' || $vals['handle'] === 'primaryNavigation' || $vals['handle'] === 'storyBuilder') {
                           $GLOBALS['currSection']++;
                         }
-                        $vals2 = getValues($entry[$handle][$key1], $newFields, true); // , $normalized);
+                        $vals2 = getValues($entry[$handle][$key1], $newFields, true);
                         $vals2['type'] = $entry[$handle][$key1]->type->handle;
-                        $render[$handle][$GLOBALS['currSection']]['elements'][] = $vals2;
-                        // $render[$handle][$GLOBALS['currSection']]['normalized-neo-2'] = normalizeEntry($entry);
+                        if ($handle === 'entryBuilder' || $handle === 'storyBuilder' || $handle === 'blogBuilder') {
+                          $render[$handle][$GLOBALS['currSection']] = $vals2;
+                        } else {
+                          $render[$handle][$GLOBALS['currSection']]['elements'][] = $vals2;
+                        }
                     }
                 }
             } else if ($type == 'Assets') {
