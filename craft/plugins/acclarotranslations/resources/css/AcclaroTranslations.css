@@ -1,0 +1,349 @@
+.acclarotranslations-element-index table.data {
+    min-width: 720px;
+}
+
+.acclarotranslations-element-index .toolbar {
+    display: none;
+}
+
+.acclarotranslations-element-index > .btn.big.submit.add {
+    margin-bottom: 2em;
+}
+
+.acclarotranslations-element-index-header {
+    min-height: 45px;
+}
+
+.acclarotranslations-element-index-header h2 {
+    margin: 0;
+    font-size: 1.5em;
+    padding-top: 5px;
+}
+
+.acclarotranslations-element-index-header .buttons {
+    margin-bottom: 0;
+}
+
+.acclarotranslations-order-step-intro {
+    margin: 0 0 2em;
+}
+
+.acclarotranslations-order-step table.data {
+    margin: 0 0 2em;
+    width: 60%;
+    min-width: 720px;
+}
+
+.acclarotranslations-order-step table.data caption {
+    text-align: left;
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 2em;
+}
+
+.acclarotranslations-order-step-btngroup {
+    display: table;
+    width: 60%;
+    min-width: 720px;
+    margin: 0 0 2em;
+}
+
+.acclarotranslations-order-step-btngroup ul {
+    display: table-row;
+    padding: 0;
+    margin: 0;
+}
+
+.acclarotranslations-order-step-btngroup li {
+    display: table-cell;
+    padding: 0;
+    margin: 0;
+    width: 25%;
+}
+
+.acclarotranslations-order-step-btngroup .btn {
+    width: 90%;
+}
+
+.acclarotranslations-order-step-btngroup .btn.disabled {
+    pointer-events: none;
+}
+
+.acclarotranslations-order-step-btngroup .btn:not(.disabled):not(.prev) {
+    background: #5286d9;
+    color: #fff;
+    pointer-events: none;
+    cursor: default;
+}
+
+.acclarotranslations-order-step {
+    display: none;
+}
+
+.acclarotranslations-order-step.active {
+    display: block;
+}
+
+.acclarotranslations-dropdown {
+    position: relative;
+}
+
+.acclarotranslations-dropdown ul {
+    display: none;
+    max-height: 300px;
+    position: absolute;
+    overflow-y: scroll;
+    width: 100%;
+}
+
+.acclarotranslations-dropdown:hover ul {
+    display: block;
+}
+
+.acclarotranslations-dropdown ul li a,
+.acclarotranslations-dropdown ul li input {
+    display: block;
+    width: 100%;
+}
+
+.acclarotranslations-dropdown > .btn.disabled {
+    pointer-events: none;
+}
+
+.acclarotranslations-translator-settings {
+    background-image: linear-gradient(#f7f7f8, #f4f5f6);
+    padding: 2em 1em;
+    margin: 0 0 2em;
+    max-width: 720px;
+    display: none;
+}
+
+.acclarotranslations-translator-logo-acclaro {
+    background: url(../images/logo-acclaro.png) no-repeat 0 0;
+    background-size: 192px 55px;
+    width: 192px;
+    height: 55px;
+}
+
+.acclarotranslations-version-header {
+    font-size: 1.0769em;
+    line-height: 2;
+    color: #8f98a3;
+}
+
+.acclarotranslations-about {
+    max-width: 720px;
+}
+
+.acclarotranslations-about-header {
+    font-size: 2.25em;
+    line-height: 1.2;
+    margin-bottom: 0;
+}
+
+.acclarotranslations-about-logo {
+    background: url(../images/logo-acclaro.png) no-repeat 0 0;
+    background-size: 239px 68px;
+    width: 239px;
+    height: 68px;
+    float: right;
+}
+
+.acclarotranslations-about-author {
+    margin: 0;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.acclarotranslations-about-version {
+    margin: 0;
+}
+
+.acclarotranslations-about-text {
+    margin: 4em 0 0;
+}
+
+.acclarotranslations-about-copyright {
+    margin: 4em 0 0;
+}
+
+.acclarotranslations-order-detail-summary {
+    float: left;
+    width: 50%;
+    margin-right: 10%;
+}
+
+.acclarotranslations-order-detail-summary h2 {
+    font-size: 1.5em;
+    margin-top: 0;
+}
+
+.acclarotranslations-order-detail-summary table.data {
+    width: 100%;
+    margin: 0 0 4em;
+}
+
+.acclarotranslations-order-detail-entries {
+    width: 40%;
+}
+
+.acclarotranslations-order-detail-entries h2 {
+    font-size: 1.5em;
+    margin-top: 0;
+}
+
+.acclarotranslations-order-detail-entries table.data {
+    width: 100%;
+    margin: 0 0 2em;
+}
+
+.acclarotranslations-order-reporting {
+    background-image: linear-gradient(#f7f7f8, #f4f5f6);
+    padding: 2em;
+    margin: 0 0 2em;
+    display: inline-block;
+}
+
+.acclarotranslations-order-reporting .btn {
+    display: inline-block;
+}
+
+.acclarotranslations-order-reporting table {
+    margin: 0 0 1em;
+}
+
+.acclarotranslations-order-reporting table label {
+    padding: 1em 1em 1em 0;
+    display: block;
+}
+
+.acclarotranslations-order-reporting table td {
+    vertical-align: middle;
+}
+
+.acclarotranslations-order-reporting table .datewrapper,
+.acclarotranslations-order-reporting table .select,
+.acclarotranslations-order-reporting table select {
+    width: 100%;
+}
+
+.acclarotranslations-complete-orders-indicator {
+    float: right;
+    display: inline-block;
+    padding: 0;
+    min-height: 22px;
+    border: none;
+    position: relative;
+    top: -38px;
+    margin: 0 0 -22px;
+}
+
+.acclarotranslations-lock {
+    font-size: 96px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -48px;
+    margin-left: 79px;
+    z-index: 1;
+}
+
+.acclarotranslations-lock:before {
+    content: 't';
+}
+
+.redactor-box.disabled:before {
+    content: '\00a0';
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    z-index: 99999999;
+}
+
+@media only screen and (max-width: 992px) {
+    .acclarotranslations-lock {
+        margin-left: -31px;
+    }
+}
+
+#nav li a.acclarotranslations-complete-orders-indicator {
+    display: inline-block;
+    min-height: 22px;
+    margin: 0 0 -22px;
+    padding: 0;
+}
+
+.acclarotranslations-complete-orders-indicator [data-icon="newstamp"] {
+    top: 8px;
+    right: 14px;
+    position: absolute;
+    font-size: 22px;
+    color: #5286d9;
+}
+
+.acclarotranslations-complete-orders-indicator [data-icon="newstamp"] > span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #333f4d;
+    font-size: 11px;
+    line-height: 22px;
+    width: 100%;
+    text-align: center;
+}
+
+.acclarotranslations-loader {
+    float: left;
+    white-space: nowrap;
+    padding-top: 2px;
+}
+
+.acclarotranslations-loader .spinner{
+    margin-top: 6px;
+    margin-right: 4px;
+}
+
+.ui-datepicker-calendar td > span.ui-state-default {
+    border-radius: 2px;
+    display: block;
+    width: 26px;
+    line-height: 26px;
+    text-align: center;
+    color: #8f98a3;
+}
+
+@media only screen and (max-width: 720px) {
+    .acclarotranslations-order-step-btngroup {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .acclarotranslations-order-step-btngroup ul {
+        display: block;
+    }
+
+    .acclarotranslations-order-step-btngroup li {
+        display: block;
+        margin: 0 0 1em;
+        width: 100%;
+    }
+
+    .acclarotranslations-order-step-btngroup .btn {
+        width: 100%;
+    }
+
+    .acclarotranslations-element-index table.data {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .acclarotranslations-order-step table.data {
+        min-width: 0;
+        width: 100%;
+    }
+}

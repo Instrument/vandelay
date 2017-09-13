@@ -1,0 +1,57 @@
+{% extends '_layouts/elementindex' %}
+
+{% import 'acclarotranslations/_macros' as macros %}
+
+{% set tabs = adminTabs %}
+{% set selectedTab = 'orders' %}
+
+{% set title = 'Translations'|t %}
+{% set extraPageHeaderHtml = '<small class="acclarotranslations-version-header">' ~ 'Version'|t ~ ' ' ~ pluginVersion ~ '</small>' %}
+
+{% set elementType = 'AcclaroTranslations_Order' %}
+
+{% includeJsResource "acclarotranslations/js/OrderIndex.js" %}
+{% includeCssResource "acclarotranslations/css/AcclaroTranslations.css" %}
+
+{% set crumbs = [
+    { label: 'Translations'|t, url: url('acclarotranslations') },
+    { label: 'Orders'|t, url: 'javascript:void(0)' },
+] %}
+
+{% block content %}
+
+<div class="acclarotranslations-element-index">
+
+    <h1>{{ 'Orders'|t }}</h1>
+
+    {#
+    <div class="acclarotranslations-order-reporting">
+        <h2>
+            {{ 'Order Reporting'|t }}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            {% if searchParams is not empty %}
+            <a href="{{ url('acclarotranslations/orders/reporting', searchParams) }}" class="btn submit">{{ 'Refine Search'|t }}</a>
+            {% else %}
+            <a href="{{ url('acclarotranslations/orders/reporting') }}" class="btn submit">{{ 'Search'|t }}</a>
+            {% endif %}
+        </h2>
+    </div>
+    #}
+
+    {{ parent() }}
+
+    {{ macros.setElementIndexSource('*') }}
+
+</div>
+
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block initJs %}
+    Craft.elementIndex = Craft.createElementIndex('AcclaroTranslations_Order', $('#main'), {
+        context:        'index',
+        storageKey:     'elementindex.AcclaroTranslations_Order',
+        criteria:       {{ {localeEnabled:null}|merge(searchParams)|json_encode|raw }}
+    });
+{% endblock %}

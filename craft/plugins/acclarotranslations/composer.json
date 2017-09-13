@@ -1,0 +1,20 @@
+{
+    "autoload": {
+        "classmap": [
+            "./AcclaroTranslationsPlugin.php",
+            "consolecommands/",
+            "controllers/",
+            "elementtypes/",
+            "models/",
+            "records/",
+            "services/",
+            "tools/"
+        ],
+        "psr-4": {
+            "Craft\\AcclaroTranslations\\": "src/"
+        }
+    },
+    "require": {
+        "pimple/pimple": "^3.0"
+    }
+}
