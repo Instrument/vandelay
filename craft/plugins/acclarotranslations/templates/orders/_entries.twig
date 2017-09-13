@@ -1,0 +1,114 @@
+{% extends '_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+
+{% set tabs = adminTabs %}
+{% set selectedTab = 'orders' %}
+
+{% set title = 'Translations'|t %}
+{% set extraPageHeaderHtml = '<small class="acclarotranslations-version-header">' ~ 'Version'|t ~ ' ' ~ pluginVersion ~ '</small>' %}
+
+{% includeJsResource "acclarotranslations/js/OrderEntries.js" %}
+{% includeCssResource "acclarotranslations/css/AcclaroTranslations.css" %}
+
+{% set crumbs = [
+    { label: 'Translations'|t, url: url('acclarotranslations') },
+    { label: 'Orders'|t, url: url('acclarotranslations/orders') },
+    { label: order.title|t, url: url('acclarotranslations/orders/detail/'~orderId) },
+    { label: 'Order Entries'|t, url: 'javascript:void(0)' },
+] %}
+
+{% block content %}
+    <h1>{{ order.title }}</h1>
+
+    <form method="post" accept-charset="UTF-8">
+        {{ getCsrfInput() }}
+
+        {{ forms.hidden({
+            name: 'action',
+            value: 'acclaroTranslations/publishEntries',
+        }) }}
+
+        {{ forms.hidden({
+            name: 'orderId',
+            value: order.id,
+        }) }}
+
+        <div class="elementindex">
+            <div class="main">
+                {% if order.status == 'complete' %}
+                <div class="toolbar">
+                    <div class="buttons right">
+                        <input type="submit" class="btn submit disabled acclarotranslations-publish-selected-btn form-submit" data-confirm="{{ 'Are you sure you want to publish these entries?'|t }}" disabled="disabled" value="{{ 'Publish selected'|t }}">
+                    </div>
+                </div>
+                {% endif %}
+                <div class="elements">
+                    <div class="tableview">
+                        <table class="data fullwidth">
+                            <thead>
+                                <tr>
+                                    {% if order.status == 'complete' %}
+                                    <td class="thin checkbox-cell acclarotranslations-checkbox-cell">
+                                        <input class="checkbox" id="element-0" type="checkbox">
+                                        <label class="checkbox" for="element-0"></label>
+                                    </td>
+                                    {% endif %}
+                                    <th scope="col">{{ 'Title'|t }}</th>
+                                    <th scope="col">{{ 'Section'|t }}</th>
+                                    <th scope="col">{{ 'Source Language'|t }}</th>
+                                    <th scope="col">{{ 'Target Language(s)'|t }}</th>
+                                    <th scope="col">{{ 'Status'|t }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for element in elements %}
+                                <tr>
+                                    {% if order.status == 'complete' %}
+                                    <td class="thin checkbox-cell acclarotranslations-checkbox-cell">
+                                        <input class="checkbox" id="element-{{ element.id }}" type="checkbox" name="elements[]" value="{{ element.id }}"{% if isElementPublished[element.id] %} disabled="disabled"{% endif %}>
+                                        <label class="checkbox" for="element-{{ element.id }}"></label>
+                                    </td>
+                                    {% endif %}
+                                    <td>
+                                        <div class="element small hasstatus">
+                                            <span class="status {{ (element.elementType == 'GlobalSet') ? 'green' : element.status }}"></span>
+                                            <div class="label">
+                                                <span class="title">
+                                                    <a href="{{ element.cpEditUrl }}">{{ element.title ?? element.name }}</a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ element.elementType == 'GlobalSet' ? 'Globals'|t : element.section.name }}</td>
+                                    <td>{{ craft.i18n.localeData.language(order.sourceLanguage) }}</td>
+                                    <td>
+                                    {% for file in files[element.id] %}
+                                        {% if not loop.first %}
+                                        <br>
+                                        {% endif %}
+                                        <a href="{{ fileUrls[file.id] }}">
+                                            {{ craft.i18n.localeData.language(file.targetLanguage) }}
+                                        </a>
+                                        {% if element.elementType != 'GlobalSet' %}
+                                        <a href="{{ webUrls[file.id] }}" target="_blank" data-icon="world" title="{{ 'Visit webpage'|t }}"></a>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </td>
+                                    <td>
+                                    {% for file in files[element.id] %}
+                                        {% if not loop.first %}
+                                        <br>
+                                        {% endif %}
+                                        <span class="status {{ file.statusColor }}"></span>{{ file.statusLabel }}
+                                    {% endfor %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}

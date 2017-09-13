@@ -1,0 +1,54 @@
+{% extends '_layouts/elementindex' %}
+
+{% import 'acclarotranslations/_macros' as macros %}
+
+{% set tabs = adminTabs %}
+{% set selectedTab = 'dashboard' %}
+
+{% set title = 'Translations'|t %}
+{% set extraPageHeaderHtml = '<small class="acclarotranslations-version-header">' ~ 'Version'|t ~ ' ' ~ pluginVersion ~ '</small>' %}
+
+{% set elementType = 'AcclaroTranslations_Order' %}
+
+{% includeJsResource "acclarotranslations/js/OrderIndex.js" %}
+{% includeCssResource "acclarotranslations/css/AcclaroTranslations.css" %}
+
+{% includecssresource 'css/settings.css' %}
+{% includejsresource 'js/settings.js' %}
+{% includeJsResource "acclarotranslations/js/SyncOrdersTool.js" %}
+
+{% set crumbs = [
+    { label: 'Translations'|t, url: 'javascript:void(0)' },
+] %}
+
+{% block content %}
+
+<div class="acclarotranslations-element-index">
+
+    <h1>{{ 'Dashboard'|t }}</h1>
+
+    <a class="btn big submit add icon btn-create-new-order" href="{{ url('acclarotranslations/orders/new') }}">{{ 'Create New Order'|t }}</a>
+
+    <div class="acclarotranslations-element-index-header">
+        <div class="buttons right">
+            <div class="btngroup">
+                <a class="btn submit" id="tool-{{ tool.getClassHandle() }}">{{ 'Sync'|t }}</a>
+                {% includejs 'new Craft.AcclaroTranslations.SyncOrdersTool("'~tool.getClassHandle()~'", '~tool.getOptionsHtml()|json_encode~', "'~tool.getButtonLabel()~'");' %}
+            </div>
+            <div class="btngroup">
+                <a class="btn submit" href="{{ url('acclarotranslations/orders') }}">{{ 'View All Orders'|t }}</a>
+            </div>
+        </div>
+
+        <h2>{{ 'In-progress Orders'|t }}</h2>
+    </div>
+
+    {{ macros.setElementIndexSource('in-progress') }}
+
+    {{ parent() }}
+
+</div>
+
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
