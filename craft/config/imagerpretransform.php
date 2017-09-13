@@ -1,32 +1,33 @@
 <?php
 return [
-    'transforms' => [
-        // Images source, with handle images
-        'images' => [
-            [
-                'width' => 1400,
-            ],
-            [
-                'width' => 800,
-            ],
-            [
-                'width' => 400
-            ],
+  'transforms' => [
+    'images' => [
+      [
+        'width' => function ($asset) {
+          if ($asset->width > 2000) {
+            return 2000;
+          } else {
+            return $asset->width;
+          }
+        }
+      ],
+      [
+        'width' => function ($asset) {
+          if ($asset->width > 2000) {
+            return 500;
+          } else {
+            return $asset->width / 2;
+          }
+        },
+      ],
+    ],
 
-            'defaults' => [
+    'global' => [
+      []
+    ],
 
-            ],
-
-            'configOverrides' => [
-                'resizeFilter'         => 'catrom',
-                'instanceReuseEnabled' => true,
-            ]
-        ],
-
-        'cards' => [
-            [
-                'width' => 600
-            ]
-        ]
+    'video' => [
+      []
     ]
+  ]
 ];

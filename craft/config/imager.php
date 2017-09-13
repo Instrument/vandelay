@@ -7,18 +7,15 @@ return array(
   'cacheDurationRemoteFiles' => 1209600, // 14 days
   'jpegQuality' => 80,
   'pngCompressionLevel' => 2,
-  'webpQuality' => 80,
-  'webpImagickOptions' => array(), // additional options you want to pass to Imagick via '$instance->setOption('webp:option', 'value')'.
   'interlace' => true, // false, true ('line'), 'none', 'line', 'plane', 'partition'
   'allowUpscale' => false,
   'smartResizeEnabled' => true,
   'removeMetadata' => false,
   'position' => '50% 50%',
+  // 'hashRemoteUrl' => true,
   
   'jpegoptimEnabled' => true,
   'optipngEnabled' => true,
-  'optipngPath' => '/usr/bin/optipng',
-  'optipngOptionString' => '-o5',
 
   'gcsEnabled' => false,
   'gcsAccessKey' => '',
