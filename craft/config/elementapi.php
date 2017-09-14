@@ -2,12 +2,43 @@
 namespace Craft;
 use craft;
 
+
 // Organize by section type and map to { label: title, value: id }
 function transformForAutocomplete($entry) {
     return [
         'label' => $entry->title,
         'value' => $entry->id
     ];
+}
+
+$currentSiteUrl = craft()->config->get('environmentVariables')['siteUrl'];
+
+function transform2x($asset, $siteUrl) {
+    $imageUrl = "";
+    if ($asset) {
+        craft()->config->set('generateTransformsBeforePageLoad', true);
+        if (craft()->plugins->getPlugin('Imager')) {
+            $image = craft()->imager->transformImage($asset, [
+                'width' => $asset->width,
+            ], null, null);
+            $imageUrl = $image->url;
+        }
+    }
+    return "$siteUrl$imageUrl";
+}
+
+function transform1x($asset, $siteUrl) {
+    $imageUrl = "";
+    if ($asset) {
+        craft()->config->set('generateTransformsBeforePageLoad', true);
+        if (craft()->plugins->getPlugin('Imager')) {
+            $image = craft()->imager->transformImage($asset, [
+                'width' => $asset->width / 2,
+            ], null, null);
+            $imageUrl = $image->url;
+        }
+    }
+    return "$siteUrl$imageUrl";
 }
 
 function normalizeEntry($entry) { // TODO come back and make sure customText fields get updated to customText_loc
@@ -82,6 +113,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
     $items=[];
     $render = [];
     $itemsRaw = [];
+    $currentSiteUrl = craft()->config->get('environmentVariables')['siteUrl'];
     if (isset($entry->content)) {
         foreach ($entry->content->attributes as $key => $value) {
              $itemsRaw[$key] = $value;
@@ -152,16 +184,24 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                 $render[$handle]['width'] = $entry[$handle][0]->width;
                 $render[$handle]['height'] = $entry[$handle][0]->height;
                 $render[$handle]['title'] = $entry[$handle][0]->title;
-                // $render['normalized-asset-1'] = normalizeEntry($entry);
+                if ($entry[$handle][0]->kind == 'image' && $entry[$handle][0]->extension != 'svg') {
+                    $render[$handle]['url2x'] = transform2x($entry[$handle][0], $currentSiteUrl);
+                    $render[$handle]['url1x'] = transform1x($entry[$handle][0], $currentSiteUrl);
+                }
+                // $rsender['normalized-aset-1'] = normalizeEntry($entry);
               } else if (count($entry[$handle]) > 1) {
                 $assets = [];
                 foreach ($entry[$handle] as $key1 => $value1) {
-                  $assets[$key1] = [];
-                  $assets[$key1]['kind'] = $value1->kind;
-                  $assets[$key1]['url'] = $value1->url;
-                  $assets[$key1]['width'] = $value1->width;
-                  $assets[$key1]['height'] = $value1->height;
-                  $assets[$key1]['title'] = $value1->title;
+                    $assets[$key1] = [];
+                    $assets[$key1]['kind'] = $value1->kind;
+                    $assets[$key1]['url'] = $value1->url;
+                    $assets[$key1]['width'] = $value1->width;
+                    $assets[$key1]['height'] = $value1->height;
+                    $assets[$key1]['title'] = $value1->title;
+                    if ($value1->kind == 'image' && $value1->extension != 'svg') {
+                        $assets[$key1]['url2x'] = transform2x($value1, $currentSiteUrl);
+                        $assets[$key1]['url1x'] = transform1x($value1, $currentSiteUrl);
+                    }
                   // $assets[$key1]['normalized-asset-2'] = normalizeEntry($value1);
                 }
                 $render[$handle] = $assets;

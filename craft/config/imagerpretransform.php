@@ -9,7 +9,7 @@ return [
           } else {
             return $asset->width;
           }
-        }
+        },
       ],
       [
         'width' => function ($asset) {
@@ -23,11 +23,15 @@ return [
     ],
 
     'global' => [
-      []
+      [
+        'noop' => true
+      ]
     ],
 
     'video' => [
-      []
+      [
+        'noop' => true
+      ]
     ]
   ]
 ];
