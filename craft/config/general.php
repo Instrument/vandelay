@@ -26,5 +26,13 @@ return array(
       'siteUrl'  => 'http://localhost:8888',
       'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
     )
+  ),
+  '35.199.148.117' => array(
+    'devMode' => true,
+    'siteUrl' => 'http://35.199.148.117',
+    'environmentVariables' => array(
+      'siteUrl'  => 'http://35.199.148.117',
+      'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
+    )
   )
 );

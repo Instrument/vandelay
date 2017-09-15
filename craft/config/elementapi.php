@@ -114,6 +114,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
     $render = [];
     $itemsRaw = [];
     $cdnUrl = craft()->config->get('environmentVariables')['gcsUrl'];
+    $imageExtensions = array("jpg", "jpeg", "png");
     if (isset($entry->content)) {
         foreach ($entry->content->attributes as $key => $value) {
              $itemsRaw[$key] = $value;
@@ -181,7 +182,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                 $render[$handle]['width'] = $entry[$handle][0]->width;
                 $render[$handle]['height'] = $entry[$handle][0]->height;
                 $render[$handle]['title'] = $entry[$handle][0]->title;
-                if ($entry[$handle][0]->kind == 'image' && $entry[$handle][0]->extension != 'svg') {
+                if (in_array(strtolower($entry[$handle][0]->extension), $imageExtensions)) {
                     $render[$handle]['url2x'] = transform2x($entry[$handle][0], $cdnUrl);
                     $render[$handle]['url1x'] = transform1x($entry[$handle][0], $cdnUrl);
                 }
@@ -195,7 +196,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                     $assets[$key1]['width'] = $value1->width;
                     $assets[$key1]['height'] = $value1->height;
                     $assets[$key1]['title'] = $value1->title;
-                    if ($value1->kind == 'image' && $value1->extension != 'svg') {
+                    if (in_array(strtolower($value1->extension), $imageExtensions)) {
                         $assets[$key1]['url2x'] = transform2x($value1, $cdnUrl);
                         $assets[$key1]['url1x'] = transform1x($value1, $cdnUrl);
                     }
