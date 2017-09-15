@@ -15,7 +15,8 @@ return array(
     'devMode' => true,
     'siteUrl' => 'http://snapchat.craft.dev',
     'environmentVariables' => array(
-      'siteUrl'  => 'http://snapchat.craft.dev',
+      'siteUrl' => 'http://snapchat.craft.dev',
+      'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
     )
   ),
   'localhost' => array(
@@ -23,6 +24,7 @@ return array(
     'siteUrl' => 'http://localhost:8888',
     'environmentVariables' => array(
       'siteUrl'  => 'http://localhost:8888',
+      'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
     )
   )
 );

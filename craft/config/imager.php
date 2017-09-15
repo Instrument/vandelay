@@ -16,11 +16,11 @@ return array(
   'jpegoptimEnabled' => true,
   'optipngEnabled' => true,
 
-  'gcsEnabled' => false,
-  'gcsAccessKey' => '',
-  'gcsSecretAccessKey' => '',
-  'gcsBucket' => '',
-  'gcsFolder' => '',
+  'gcsEnabled' => true,
+  'gcsAccessKey' => 'GOOGKW5BK37TY2HI3RAV',
+  'gcsSecretAccessKey' => 'DQhdBp2r+WJyg96lV3bG2bE1J9oZ/GA1r+Ru4zOd',
+  'gcsBucket' => 'snapcraft-assets',
+  'gcsFolder' => 'imager',
   'gcsCacheDuration' => 1209600, // 14 days for optimized files or when optimization is disabled
   'gcsCacheDurationNonOptimized' => 300, // 5 minutes for the non-optimized file when any optimization is enabled
 );

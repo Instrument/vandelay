@@ -11,7 +11,7 @@ function transformForAutocomplete($entry) {
     ];
 }
 
-$currentSiteUrl = craft()->config->get('environmentVariables')['siteUrl'];
+$cdnUrl = craft()->config->get('environmentVariables')['siteUrl'];
 
 function transform2x($asset, $siteUrl) {
     $imageUrl = "";
@@ -113,7 +113,7 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
     $items=[];
     $render = [];
     $itemsRaw = [];
-    $currentSiteUrl = craft()->config->get('environmentVariables')['siteUrl'];
+    $cdnUrl = craft()->config->get('environmentVariables')['gcsUrl'];
     if (isset($entry->content)) {
         foreach ($entry->content->attributes as $key => $value) {
              $itemsRaw[$key] = $value;
@@ -164,16 +164,13 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                         $render[$handle][$GLOBALS['currSection']]['elements'] = [];
                         // $render[$handle][$GLOBALS['currSection']]['normalized-neo-1'] = normalizeEntry($entry);
                     } else {
-                        if ($vals['handle'] === 'footerLinks' || $vals['handle'] === 'entryBuilder' || $vals['handle'] === 'primaryNavigation' || $vals['handle'] === 'storyBuilder' || $vals['handle'] === 'blogBuilder') {
+                        if ($vals['handle'] === 'footerLinks' || $vals['handle'] === 'entryBuilder' || $vals['handle'] === 'primaryNavigation' || $vals['handle'] === 'storyBuilder') {
                           $GLOBALS['currSection']++;
                         }
-                        $vals2 = getValues($entry[$handle][$key1], $newFields, true);
+                        $vals2 = getValues($entry[$handle][$key1], $newFields, true); // , $normalized);
                         $vals2['type'] = $entry[$handle][$key1]->type->handle;
-                        if ($handle === 'entryBuilder' || $handle === 'storyBuilder' || $handle === 'blogBuilder') {
-                          $render[$handle][$GLOBALS['currSection']] = $vals2;
-                        } else {
-                          $render[$handle][$GLOBALS['currSection']]['elements'][] = $vals2;
-                        }
+                        $render[$handle][$GLOBALS['currSection']]['elements'][] = $vals2;
+                        // $render[$handle][$GLOBALS['currSection']]['normalized-neo-2'] = normalizeEntry($entry);
                     }
                 }
             } else if ($type == 'Assets') {
@@ -185,8 +182,8 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                 $render[$handle]['height'] = $entry[$handle][0]->height;
                 $render[$handle]['title'] = $entry[$handle][0]->title;
                 if ($entry[$handle][0]->kind == 'image' && $entry[$handle][0]->extension != 'svg') {
-                    $render[$handle]['url2x'] = transform2x($entry[$handle][0], $currentSiteUrl);
-                    $render[$handle]['url1x'] = transform1x($entry[$handle][0], $currentSiteUrl);
+                    $render[$handle]['url2x'] = transform2x($entry[$handle][0], $cdnUrl);
+                    $render[$handle]['url1x'] = transform1x($entry[$handle][0], $cdnUrl);
                 }
                 // $rsender['normalized-aset-1'] = normalizeEntry($entry);
               } else if (count($entry[$handle]) > 1) {
@@ -199,8 +196,8 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
                     $assets[$key1]['height'] = $value1->height;
                     $assets[$key1]['title'] = $value1->title;
                     if ($value1->kind == 'image' && $value1->extension != 'svg') {
-                        $assets[$key1]['url2x'] = transform2x($value1, $currentSiteUrl);
-                        $assets[$key1]['url1x'] = transform1x($value1, $currentSiteUrl);
+                        $assets[$key1]['url2x'] = transform2x($value1, $cdnUrl);
+                        $assets[$key1]['url1x'] = transform1x($value1, $cdnUrl);
                     }
                   // $assets[$key1]['normalized-asset-2'] = normalizeEntry($value1);
                 }
@@ -276,16 +273,10 @@ function getValues($entry, $fields = [], $nestedNeo = false, $normalized = false
 
     if (isset($entry->title)) {
       if ($entry['title'] != '') {
-        $render['title_loc'] = $entry['title'];
+        $render['title'] = $entry['title'];
       }
     }
-    if (isset($entry->type) && isset($entry->section)) {
-      $entryType = $entry->type;
-      $render['entryType'] = $entryType->handle;
-      if (isset($entry->attributes['postDate'])) {
-        $render['postDate'] = $entry->attributes['postDate']->getTimestamp();  
-      }
-    }
+
     return $render;
 }
 
