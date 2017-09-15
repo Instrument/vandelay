@@ -5,7 +5,7 @@ return array(
   'cacheEnabled' => true,
   'cacheDuration' => 31536000, // 1 year
   'cacheDurationRemoteFiles' => 1209600, // 14 days
-  'jpegQuality' => 80,
+  'jpegQuality' => 85,
   'pngCompressionLevel' => 2,
   'interlace' => true, // false, true ('line'), 'none', 'line', 'plane', 'partition'
   'allowUpscale' => false,
