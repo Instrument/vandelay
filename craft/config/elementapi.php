@@ -190,10 +190,10 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                 $render[$handle]['width'] = $entry[$handle][0]->width;
                 $render[$handle]['height'] = $entry[$handle][0]->height;
                 $render[$handle]['title'] = $entry[$handle][0]->title;
-                if (in_array(strtolower($entry[$handle][0]->extension), $imageExtensions)) {
+                // if (in_array(strtolower($entry[$handle][0]->extension), $imageExtensions)) {
                     // $render[$handle]['url2x'] = transform2x($entry[$handle][0], $cdnUrl);
                     // $render[$handle]['url1x'] = transform1x($entry[$handle][0], $cdnUrl);
-                }
+                // }
                 // $rsender['normalized-aset-1'] = normalizeEntry($entry);
               } else if (count($entry[$handle]) > 1) {
                 $assets = [];
@@ -204,10 +204,10 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                     $assets[$key1]['width'] = $value1->width;
                     $assets[$key1]['height'] = $value1->height;
                     $assets[$key1]['title'] = $value1->title;
-                    if (in_array(strtolower($value1->extension), $imageExtensions)) {
+                    // if (in_array(strtolower($value1->extension), $imageExtensions)) {
                         // $assets[$key1]['url2x'] = transform2x($value1, $cdnUrl);
                         // $assets[$key1]['url1x'] = transform1x($value1, $cdnUrl);
-                    }
+                    // }
                   // $assets[$key1]['normalized-asset-2'] = normalizeEntry($value1);
                 }
                 $render[$handle] = $assets;
@@ -378,7 +378,7 @@ return [
               'locale' => isset($params['locale']) ? $params['locale'] : 'en_us'
             ],
             'paginate' => true,
-            'elementsPerPage' => isset($params['perpage']) ? (int)$params['perpage'] : 50,
+            'elementsPerPage' => isset($params['perpage']) ? (int)$params['perpage'] : 30,
             'transformer' => function(EntryModel $entry) use (&$params) {
                 $fieldsRaw = isset($params['fields']) ? explode(',', $params['fields']) : [];
                 $fields = [];
