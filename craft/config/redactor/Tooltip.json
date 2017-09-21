@@ -1,5 +1,5 @@
 {
     "buttons": [],
     "plugins": ["scriptbuttons", "limiter"],
-    "limiter": 140
+    "limiter": 200
 }
