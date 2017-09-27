@@ -263,7 +263,7 @@ class SimpleApiController extends BaseController
     if (isset($variables['id'])) {
       $result = $this->returnEntry($variables['id'], $variables['locale']);
       if (craft()->request->getParam('download')) {
-        $fname = $result['type'] . '-'. $result['slug'] .'.json';
+        $fname = $result['type'] . '-'. $result['slug'] . '-'. $variables['locale'] .'.json';
         $handle = fopen($fname,'w');
         fwrite($handle, json_encode($result));
         fclose($handle);
