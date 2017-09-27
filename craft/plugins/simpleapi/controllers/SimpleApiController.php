@@ -28,7 +28,7 @@ class SimpleApiController extends BaseController
   }
   public function handleFieldType($pagevalue, $data) {
     $handle = $data->handle;
-    if($data->type == 'Matrix'){
+    if($data->type == 'Matrix' || $data->type == 'Neo'){
       $matrixData = [];
       foreach($pagevalue[$handle] as $block => $value){
          $matrixFields = $value->getFieldLayout()->getFields();
@@ -70,7 +70,27 @@ class SimpleApiController extends BaseController
         $entries[] = $this->getEntryDetails($entry);
       }
       return $entries;
+    } elseif ($data->type == 'Categories') {
+      $cats = [];
+      if($pagevalue[$handle][0]){
+        foreach($pagevalue[$handle] as $cat) {
+          $cats[] = [
+            'id' => $cat->id,
+            'slug' => $cat->slug,
+            'title' => $cat->getTitle(),
+          ];
+        }
+      }
+      return $cats;
+    } elseif ($data->type == 'PlainText') {
+      return [
+        'text' => $pagevalue[$handle]
+      ];
     } else {
+      // $stuff = [
+      //   'type' => $data->type,
+      //   'value' => $pagevalue[$handle]
+      // ];
       return $pagevalue[$handle];
     }
   }
@@ -79,8 +99,8 @@ class SimpleApiController extends BaseController
     $fields = $entry->getFieldLayout()->getFields();
     $page['id'] = $entry->id;
     $page['title'] = $entry->title;
-    $page['url'] = $entry->url;
-    $page['type'] = $entry->type;
+    $page['slug'] = $entry->slug;
+    $page['type'] = $entry->type->handle;
     foreach($fields as $field){
       $data = $field->getField();
       $handle = $data->handle;
@@ -88,8 +108,8 @@ class SimpleApiController extends BaseController
     }
     return $page;
   }
-  public function returnEntry($id) {
-    $entry = craft()->entries->getEntryById($id);
+  public function returnEntry($id, $locale = null) {
+    $entry = craft()->entries->getEntryById($id, $locale);
     return $this->getEntryDetails($entry);
   }
   public function saveTag($data) {
@@ -226,9 +246,14 @@ class SimpleApiController extends BaseController
       ));
     }
   }
+  public function actionShowFields() {
+    $fields = craft()->fields->getFieldsWithContent();
+    // $fields = ['hi' => 'hi'];
+    $this->returnJson($fields);
+  }
   public function handlePostRequest($variables) {
     if (isset($variables['id'])) {
-      $entry = craft()->entries->getEntryById($variables['id']);
+      $entry = craft()->entries->getEntryById($variables['id'], $variables['locale']);
       $this->updateEntry($entry);
     } else {
       $this->addEntry();
@@ -236,7 +261,21 @@ class SimpleApiController extends BaseController
   }
   public function handleGetRequest($variables) {
     if (isset($variables['id'])) {
-      $result = $this->returnEntry($variables['id']);
+      $result = $this->returnEntry($variables['id'], $variables['locale']);
+      if (craft()->request->getParam('download')) {
+        $fname = $result['type'] . '-'. $result['slug'] .'.json';
+        $handle = fopen($fname,'w');
+        fwrite($handle, json_encode($result));
+        fclose($handle);
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename='.basename($fname));
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($fname));
+        readfile($fname);
+        exit;
+      }
       $this->returnJson(array(
         'status' => 200,
         'entry' => $result
