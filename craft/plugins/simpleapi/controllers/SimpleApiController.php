@@ -41,7 +41,7 @@ class SimpleApiController extends BaseController
       $locale = craft()->i18n->getPrimarySiteLocale();
       $fname = 'globals-'. $locale .'.json';
       $handle = fopen($fname,'w');
-      fwrite($handle, json_encode($entries));
+      fwrite($handle, json_encode($page));
       fclose($handle);
       header('Content-Type: application/octet-stream');
       header('Content-Disposition: attachment; filename='.basename($fname));
