@@ -12,29 +12,87 @@ class SimpleApiController extends BaseController
     return $output;
   }
   public function actionGetSingles() {
-    $sections = craft()->sections->getAllSections();
+    $singleSection = craft()->sections->getSectionsByType('single');
     $singles = [];
-    $cnt = 0;
-    foreach($sections as $key => $value) {
-      if ($value->attributes['type'] == "single") {
-        $singles[$cnt] = $value->attributes['handle'];
-        $cnt++;
-      }
+    foreach ($singleSection as $key => $value) {
+      $singles[] = $value['handle'];
     }
     $this->returnJson(array(
       'status' => 200,
       'entry' => $singles
     ));
   }
+  public function actionGetGlobals(array $variables = array()) {
+    $globals = craft()->globals->getAllSets();
+    $page = [];
+    foreach ($globals as $key => $value) {
+      $fields = $value->getFieldLayout()->getFields();
+      foreach($fields as $field){
+        $data = $field->getField();
+        $handle = $data->handle;
+        $pattern = '/\_(loc)/';
+        $loc_handle = preg_replace($pattern, "Loc", $handle);
+        if ($data->type !== 'Entries' && $data->type !== 'Assets') {
+          $page[$loc_handle] = $this->handleFieldType($value, $data);
+        }
+      }
+    }
+    if (craft()->request->getParam('download')) {
+      $locale = craft()->i18n->getPrimarySiteLocale();
+      $fname = 'globals-'. $locale .'.json';
+      $handle = fopen($fname,'w');
+      fwrite($handle, json_encode($page));
+      fclose($handle);
+      header('Content-Type: application/octet-stream');
+      header('Content-Disposition: attachment; filename='.basename($fname));
+      header('Expires: 0');
+      header('Cache-Control: must-revalidate');
+      header('Pragma: public');
+      header('Content-Length: ' . filesize($fname));
+      readfile($fname);
+      exit;
+    }
+    $this->returnJson($page);
+  }
+  public function actionGetSectionEntries(array $variables = array()) {
+    $criteria = craft()->elements->getCriteria(ElementType::Entry);
+    $criteria->section = $variables['section'];
+    $result = $criteria->find();
+    $entries = [];
+    foreach ($result as $key => $value) {
+      $entries[] = $this->getEntryDetails($value);
+    }
+    if (craft()->request->getParam('download')) {
+      $locale = craft()->i18n->getPrimarySiteLocale();
+      $fname = $variables['section'] . '-'. $locale .'.json';
+      $handle = fopen($fname,'w');
+      fwrite($handle, json_encode($entries));
+      fclose($handle);
+      header('Content-Type: application/octet-stream');
+      header('Content-Disposition: attachment; filename='.basename($fname));
+      header('Expires: 0');
+      header('Cache-Control: must-revalidate');
+      header('Pragma: public');
+      header('Content-Length: ' . filesize($fname));
+      readfile($fname);
+      exit;
+    }
+    $this->returnJson($entries);
+  }
   public function handleFieldType($pagevalue, $data) {
     $handle = $data->handle;
+    $pattern = '/\_(loc)/';
+    $loc_handle = preg_replace($pattern, "Loc", $handle);
     if($data->type == 'Matrix' || $data->type == 'Neo'){
       $matrixData = [];
       foreach($pagevalue[$handle] as $block => $value){
          $matrixFields = $value->getFieldLayout()->getFields();
          foreach ($matrixFields as $field) {
           $fieldValue = $field->getField();
-          $matrixData[$block][$fieldValue->handle] =  $this->handleFieldType($value, $fieldValue);
+          $field_loc_handle = preg_replace($pattern, "Loc", $fieldValue->handle);
+          if ($fieldValue->type !== 'Entries' && $fieldValue->type !== 'Assets') {
+            $matrixData[$block][$field_loc_handle] =  $this->handleFieldType($value, $fieldValue);
+          }
          }
       }
       return $matrixData;
@@ -44,14 +102,6 @@ class SimpleApiController extends BaseController
       } else {
         return null;
       }
-    } elseif ($data->type == 'Assets') {
-      $assetData = [];
-      if($pagevalue[$handle][0]){
-        foreach($pagevalue[$handle] as $projImage) {
-          return $projImage->getUrl();
-        }
-      }
-      return $assetData;
     } elseif ($data->type == 'Tags') {
       $tags = [];
       if($pagevalue[$handle][0]){
@@ -64,12 +114,6 @@ class SimpleApiController extends BaseController
         }
       }
       return $tags;
-    } elseif ($data->type == 'Entries'){
-      $entries = [];
-      foreach ($pagevalue[$handle] as $entry) {
-        $entries[] = $this->getEntryDetails($entry);
-      }
-      return $entries;
     } elseif ($data->type == 'Categories') {
       $cats = [];
       if($pagevalue[$handle][0]){
@@ -83,14 +127,12 @@ class SimpleApiController extends BaseController
       }
       return $cats;
     } elseif ($data->type == 'PlainText') {
-      return [
-        'text' => $pagevalue[$handle]
-      ];
+      return $pagevalue[$handle];
     } else {
-      // $stuff = [
-      //   'type' => $data->type,
-      //   'value' => $pagevalue[$handle]
-      // ];
+      $stuff = [
+        'type' => $data->type,
+        'value' => $pagevalue[$handle]
+      ];
       return $pagevalue[$handle];
     }
   }
@@ -101,10 +143,16 @@ class SimpleApiController extends BaseController
     $page['title'] = $entry->title;
     $page['slug'] = $entry->slug;
     $page['type'] = $entry->type->handle;
+    $page['locale'] = $entry->locale;
     foreach($fields as $field){
       $data = $field->getField();
       $handle = $data->handle;
-      $page[$handle] = $this->handleFieldType($entry, $data);
+      $pattern = '/\_(loc)/';
+      $loc_handle = preg_replace($pattern, "Loc", $handle);
+      if ($data->type !== 'Entries' && $data->type !== 'Assets') {
+        $page[$loc_handle] = $this->handleFieldType($entry, $data);
+      }
+      
     }
     return $page;
   }
@@ -215,6 +263,63 @@ class SimpleApiController extends BaseController
     }
     return $post_fields;
   }
+  public function updateEntryFromFile($file) {
+    $post_fields = $file;
+    return $post_fields;
+    $entry = craft()->entries->getEntryById($file['entryId'], $file['locale']);
+    $entry->getContent()->title = $post_fields["title_loc"]['text'];
+    $fields = $entry->getFieldLayout()->getFields();
+    $matrices = array();
+    // Populates entry fields from post request
+    // Ignores data included in post request that entry does not support
+    foreach ($fields as $field) {
+      $data = $field->getField();
+      $handle = $data->handle;
+      if (isset($post_fields[$handle])) {
+        $value = $post_fields[$handle];
+        if (isset($value['text'])) {
+          $value = $value['text'];
+        }
+        if ($data->type == 'Matrix') {
+          //Save matrix field data to array to save after entry creation
+          $matrices[] = $data;          
+        } elseif ($data->type == 'Tags') {
+          // Accepts an array of tags by title
+          // Looks for tag group ID
+          $tagGroup = craft()->tags->getTagGroupByHandle($handle);
+          $tag_ids = array();
+          foreach ($post_fields[$handle] as $value) {
+            $tag = [
+              'title' => $value,
+              'groupId' => $tagGroup->id
+            ];
+            $tag_ids[] = $this->saveTag($tag);
+          }
+          $entry->getContent()->setAttribute($handle, $tag_ids);
+        } else {
+          $entry->getContent()->setAttribute($handle, $value);  
+        }
+      }
+    }
+    $saved = craft()->entries->saveEntry($entry);
+    if ($saved) {
+      // On success, populate MatrixBlockModel with matrix data and the returned entry ID
+      foreach ($matrices as $key => $field) {
+        foreach ($post_fields[$field->handle] as $value) {
+
+          $block = new MatrixBlockModel();
+          $blockType = craft()->matrix->getBlockTypesByFieldId($field->id);
+          $block->fieldId = $field->id;
+          $block->typeId = $blockType[0]->id;
+          $block->ownerId = $entry->id;
+
+          $this->saveMatrix($block, $value);
+        }
+      }
+      return $entry;
+    }
+    return ['unsuccessful' => true];
+  }
   public function addEntry(array $variables = array()) {
     $this->requirePostRequest();
     //Parse serialized data
@@ -248,8 +353,11 @@ class SimpleApiController extends BaseController
   }
   public function actionShowFields() {
     $fields = craft()->fields->getFieldsWithContent();
-    // $fields = ['hi' => 'hi'];
     $this->returnJson($fields);
+  }
+  public function actionUploadEntry() {
+    $updated = $this->updateEntryFromFile($_POST);
+    $this->returnJson($updated);
   }
   public function handlePostRequest($variables) {
     if (isset($variables['id'])) {
