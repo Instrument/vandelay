@@ -17,23 +17,7 @@ return array(
     'siteUrl' => 'http://snapchat.craft.dev',
     'environmentVariables' => array(
       'siteUrl' => 'http://snapchat.craft.dev',
-      'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
-    )
-  ),
-  'localhost' => array(
-    'devMode' => true,
-    'siteUrl' => 'http://localhost:8888',
-    'environmentVariables' => array(
-      'siteUrl'  => 'http://localhost:8888',
-      'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
-    )
-  ),
-  '35.203.149.185' => array(
-    'devMode' => true,
-    'siteUrl' => 'http://35.203.149.185',
-    'environmentVariables' => array(
-      'siteUrl'  => 'http://35.203.149.185',
-      'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
+      'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-localdev',
     )
   ),
   'snapchat-craft-dev.wrkbench.in' => array(
@@ -52,7 +36,7 @@ return array(
       'sv_se' => 'http://snapchat-craft-dev.wrkbench.in/sv-se',
     ),
     'environmentVariables' => array(
-      'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
+      'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-dev',
     )
   ),
   'snapchat-craft-staging.wrkbench.in' => array(
@@ -71,7 +55,7 @@ return array(
       'sv_se' => 'http://snapchat-craft-staging.wrkbench.in/sv-se',
     ),
     'environmentVariables' => array(
-      'gcsUrl' => 'http://storage.googleapis.com/snapcraft-assets',
+      'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-staging',
     )
   )
 );
