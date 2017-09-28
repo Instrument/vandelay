@@ -50,10 +50,27 @@ class SimpleApiPlugin extends BasePlugin
             /** @var EntryModel $entry **/
             $entry = $context['entry'];
             // Return the button HTML
-            $url = UrlHelper::getUrl('some/path/'.$entry->id);
+            $oldPath = craft()->path->getTemplatesPath();
+            $newPath = craft()->path->getPluginsPath().'simpleapi/templates';
+            craft()->path->setTemplatesPath($newPath);
+            $html = craft()->templates->render('upload');
+            craft()->path->setTemplatesPath($oldPath);
             $locale = $entry->locale;
-            return '<a href="/simpleapi/Entry/'.$entry->id.'/'.$locale.'?download=1" target="download" class="btn">Export entry</a>';
+            return '<a href="/simpleapi/Entry/'.$entry->id.'/'.$locale.'?download=1" target="download" class="btn">Export entry</a>' . $html;
         });
+    }
+    public function hasCpSection()
+    {
+        return true;
+    }
+    /**
+     * Register control panel routes
+     */
+    public function hookRegisterCpRoutes()
+    {
+        return array(
+            'simpleapi\/home\/' => 'simpleApi',
+        );
     }
     /**
      * Register Site Routes
@@ -67,6 +84,8 @@ class SimpleApiPlugin extends BasePlugin
             'simpleapi/Entry/(?P<id>[0-9]+)/(?P<locale>[a-z\_]+)' => array('action' => 'simpleApi/handleEntry'),
             'simpleapi/Entry' => array('action' => 'simpleApi/handleEntry'),
             'simpleapi/Singles' => array('action' => 'simpleApi/getSingles'),
+            'simpleapi/uploadEntry' => array('action' => 'simpleApi/uploadEntry'),
+            'simpleapi/getSection/(?P<section>[a-zA-Z\_]+)' => array('action' => 'simpleApi/getSectionEntries'),
         ];
     }
 }

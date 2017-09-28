@@ -1,0 +1,52 @@
+{% extends "_layouts/cp" %}
+{% set centered = true %}
+{% set title = 'SimpleApi' %}
+{% set sections = craft.sections.getAllSections() %}
+{% set handles = [] %}
+{% set js %}
+  $('.trigger').on('click', function() {
+    $('[id^=section-]').text('exporting');
+    {% for section in sections %}
+      $.get( "/simpleapi/getSection/{{ section.handle }}?download=1", function( data ) {
+        $('#section-{{section.handle}}').text('exported');
+      });
+    {% endfor %}
+    $.get( "/actions/simpleApi/getGlobals?download=1", function( data ) {
+      $('#globals').text('exported');
+    });
+  })
+{% endset %}
+{% set css %}
+  td {
+    padding: 10px 20px 10px 0px;
+  }
+{% endset %}
+{% includeCss css %}
+{% set content %}
+    <button class="trigger">Export sections</button>
+    <h2>All Sections</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>Section</th>
+      </tr>
+      </thead>
+      <tbody>
+        {% for section in sections %}
+        <tr>
+          <td>{{ section.name }}</td>
+          <td id="section-{{section.handle}}">
+            Not exported
+          </td>
+        </tr>
+      {% endfor %}
+      <tr>
+        <td>Globals</td>
+        <td id="globals">
+          Not exported
+        </td>
+      </tr>
+      </tbody>
+    </table>
+{% endset %}
+{% includeJs js %}
