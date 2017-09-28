@@ -16,7 +16,19 @@ return array(
     'devMode' => true,
     'siteUrl' => 'http://snapchat.craft.dev',
     'environmentVariables' => array(
-      'siteUrl' => 'http://snapchat.craft.dev',
+      'siteUrl'  => array(
+        'en_us' => 'http://snapchat.craft.dev',
+        'da_dk' => 'http://snapchat.craft.dev/da-dk',
+        'nl_nl' => 'http://snapchat.craft.dev/nl-nl',
+        'fi_fi' => 'http://snapchat.craft.dev/fi-fi',
+        'fr_fr' => 'http://snapchat.craft.dev/fr-fr',
+        'de_de' => 'http://snapchat.craft.dev/de-de',
+        'it_it' => 'http://snapchat.craft.dev/it-it',
+        'nb_no' => 'http://snapchat.craft.dev/nb-no',
+        'pt_br' => 'http://snapchat.craft.dev/pt-br',
+        'es_es' => 'http://snapchat.craft.dev/es-es',
+        'sv_se' => 'http://snapchat.craft.dev/sv-se',
+      ),
       'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-localdev',
     )
   ),
