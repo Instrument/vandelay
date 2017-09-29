@@ -101,6 +101,19 @@ class SimpleApiController extends BaseController
       return $cats;
     } elseif ($data->type == 'PlainText') {
       return $pagevalue[$handle];
+    } elseif ($data->type == 'FruitLinkIt') {
+      $value = [];
+      if(!empty($pagevalue[$handle])) {
+        foreach($pagevalue[$handle] as $key => $obj) {
+          if ($key === 'customText') {
+            $value['customTextLoc'] = $obj;
+          } else {
+            $value[$key] = $obj;
+          }
+        }
+        return $value;
+      }
+      return $pagevalue[$handle];
     } else {
       $stuff = [
         'type' => $data->type,
