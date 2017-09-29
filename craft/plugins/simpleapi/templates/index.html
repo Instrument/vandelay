@@ -2,6 +2,7 @@
 {% set centered = true %}
 {% set title = 'SimpleApi' %}
 {% set sections = craft.sections.getAllSections() %}
+{% set locales = craft.i18n.getSiteLocaleIds()%}
 {% set handles = [] %}
 {% set js %}
   $('.trigger').on('click', function() {
@@ -20,13 +21,58 @@
         saveAs(blob, filename+".json");
         $('#globals').text('exported');
     });
+  });
+  var $form = $('form');
+  var droppedFiles = false;
+  var fileSelect = document.getElementById('file');
+  $form.on('submit', function (e) {
+    e.preventDefault();
+
+    var ajaxData = new FormData();
+    var files = fileSelect.files;
+    for (var i = 0, f; f = files[i]; i++) {
+      var file = files[i];
+      var reader = new FileReader();
+
+      reader.onload = (function(theFile) {
+        return function(e) {
+          var p = JSON.parse(e.target.result);
+          $.post({
+            url: $form.attr('action'),
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            processData: false,
+            data: JSON.stringify(p),
+            success: function(data) {
+              console.log(data);
+              console.log(JSON.stringify(p));
+            },
+          });
+        };
+      })(f);
+      reader.readAsText(f);
+    }
   })
+  
 {% endset %}
 {% set css %}
-  td {
+  td, th {
     padding: 10px 20px 10px 0px;
   }
+  .green {
+    color: green;
+  }
+  .red {
+    color: red;
+  }
+  .box__dragndrop,
+  .box__uploading,
+  .box__success,
+  .box__error {
+    display: none;
+  }
 {% endset %}
+{% includeCssFile 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' %}
 {% includeCss css %}
 {% set content %}
     <button class="trigger">Export sections</button>
@@ -35,6 +81,10 @@
       <thead>
       <tr>
         <th>Section</th>
+        <th>Status</th>
+        {% for locale in locales %}
+            <th>{{ locale }}</th>
+        {% endfor %}
       </tr>
       </thead>
       <tbody>
@@ -44,6 +94,12 @@
           <td id="section-{{section.handle}}">
             Not exported
           </td>
+          {% set sectionLocales = section.getLocales() %}
+           {% for locale in locales %}
+              <td class="{{ locale in sectionLocales|keys ? 'green' : 'red'}}">
+                <span class="fa {{ locale in sectionLocales|keys ? 'fa-check' : 'fa-close'}}"></span>
+              </td>
+           {% endfor %}
         </tr>
       {% endfor %}
       <tr>
@@ -51,9 +107,25 @@
         <td id="globals">
           Not exported
         </td>
+         {% for locale in locales %}
+            <td class="green">
+              <span class="fa fa-check"></span>
+            </td>
+         {% endfor %}
       </tr>
       </tbody>
     </table>
+    <h2>Import localized files</h2>
+    <form class="box" method="post" action="/actions/simpleApi/uploadEntry" enctype="multipart/form-data">
+      <div class="box__input">
+        <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
+        <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
+        <button class="box__button" type="submit">Upload</button>
+      </div>
+      <div class="box__uploading">Uploading&hellip;</div>
+      <div class="box__success">Done!</div>
+      <div class="box__error">Error! <span></span>.</div>
+    </form>
 {% endset %}
-{% includeJsResource 'simpleApi/js/fetch.js' %}
+{% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
 {% includeJs js %}
