@@ -24,8 +24,11 @@ class SimpleApiController extends BaseController
   }
   public function actionGetGlobals(array $variables = array()) {
     $globals = craft()->globals->getAllSets();
-    $page = [];
-    foreach ($globals as $key => $value) {
+    $page = [
+      'locale' => 'en_us',
+      'title' => 'globals',
+    ];
+    foreach ($globals as $value) {
       $fields = $value->getFieldLayout()->getFields();
       foreach($fields as $field){
         $data = $field->getField();
@@ -37,21 +40,6 @@ class SimpleApiController extends BaseController
         }
       }
     }
-    if (craft()->request->getParam('download')) {
-      $locale = craft()->i18n->getPrimarySiteLocale();
-      $fname = 'globals-'. $locale .'.json';
-      $handle = fopen($fname,'w');
-      fwrite($handle, json_encode($page));
-      fclose($handle);
-      header('Content-Type: application/octet-stream');
-      header('Content-Disposition: attachment; filename='.basename($fname));
-      header('Expires: 0');
-      header('Cache-Control: must-revalidate');
-      header('Pragma: public');
-      header('Content-Length: ' . filesize($fname));
-      readfile($fname);
-      exit;
-    }
     $this->returnJson($page);
   }
   public function actionGetSectionEntries(array $variables = array()) {
@@ -61,21 +49,6 @@ class SimpleApiController extends BaseController
     $entries = [];
     foreach ($result as $key => $value) {
       $entries[] = $this->getEntryDetails($value);
-    }
-    if (craft()->request->getParam('download')) {
-      $locale = craft()->i18n->getPrimarySiteLocale();
-      $fname = $variables['section'] . '-'. $locale .'.json';
-      $handle = fopen($fname,'w');
-      fwrite($handle, json_encode($entries));
-      fclose($handle);
-      header('Content-Type: application/octet-stream');
-      header('Content-Disposition: attachment; filename='.basename($fname));
-      header('Expires: 0');
-      header('Cache-Control: must-revalidate');
-      header('Pragma: public');
-      header('Content-Length: ' . filesize($fname));
-      readfile($fname);
-      exit;
     }
     $this->returnJson($entries);
   }
@@ -98,7 +71,7 @@ class SimpleApiController extends BaseController
       return $matrixData;
     } elseif ($data->type == 'RichText') {
       if ($pagevalue[$handle] != null){
-        return $pagevalue[$handle]->getRawContent();
+        return html_entity_decode($pagevalue[$handle]->getRawContent());
       } else {
         return null;
       }
@@ -127,6 +100,19 @@ class SimpleApiController extends BaseController
       }
       return $cats;
     } elseif ($data->type == 'PlainText') {
+      return $pagevalue[$handle];
+    } elseif ($data->type == 'FruitLinkIt') {
+      $value = [];
+      if(!empty($pagevalue[$handle])) {
+        foreach($pagevalue[$handle] as $key => $obj) {
+          if ($key === 'customText') {
+            $value['customTextLoc'] = $obj;
+          } else {
+            $value[$key] = $obj;
+          }
+        }
+        return $value;
+      }
       return $pagevalue[$handle];
     } else {
       $stuff = [

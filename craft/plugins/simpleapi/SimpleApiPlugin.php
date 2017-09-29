@@ -66,7 +66,7 @@ class SimpleApiPlugin extends BasePlugin
     /**
      * Register control panel routes
      */
-    public function hookRegisterCpRoutes()
+    public function registerCpRoutes()
     {
         return array(
             'simpleapi\/home\/' => 'simpleApi',

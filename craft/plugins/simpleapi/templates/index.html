@@ -8,11 +8,17 @@
     $('[id^=section-]').text('exporting');
     {% for section in sections %}
       $.get( "/simpleapi/getSection/{{ section.handle }}?download=1", function( data ) {
+        var filename = '{{section.handle}}-{{craft.locale}}';
+        var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+        saveAs(blob, filename+".json");
         $('#section-{{section.handle}}').text('exported');
       });
     {% endfor %}
-    $.get( "/actions/simpleApi/getGlobals?download=1", function( data ) {
-      $('#globals').text('exported');
+    $.get( "/actions/simpleApi/getGlobals", function( data ) {
+        var filename = data.title + '-' + data.locale;
+        var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+        saveAs(blob, filename+".json");
+        $('#globals').text('exported');
     });
   })
 {% endset %}
@@ -49,4 +55,5 @@
       </tbody>
     </table>
 {% endset %}
+{% includeJsResource 'simpleApi/js/fetch.js' %}
 {% includeJs js %}
