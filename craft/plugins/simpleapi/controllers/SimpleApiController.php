@@ -71,7 +71,7 @@ class SimpleApiController extends BaseController
       return $matrixData;
     } elseif ($data->type == 'RichText') {
       if ($pagevalue[$handle] != null){
-        return $pagevalue[$handle]->getRawContent();
+        return html_entity_decode($pagevalue[$handle]->getRawContent());
       } else {
         return null;
       }
