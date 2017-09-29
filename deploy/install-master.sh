@@ -27,7 +27,7 @@ a2enmod rewrite
 service apache2 restart
 
 ### DB STUFF ###
-# install mysql quietly
+unzip craft_db.zip
 sed -i "/SET NAMES utf8;/a-- \n\
 -- Create and use the DB; \n\
 -- \n\
