@@ -10,7 +10,7 @@ fi
 
 ### DB IMPORT ###
 sleep 1
-echo "updating the 'craftcms' database"
+echo "Updating the 'craftcms' database"
 unzip craft_db.zip
 sed -i "/SET NAMES utf8;/a-- \n\
 -- Create and use the DB; \n\
@@ -25,8 +25,8 @@ mysql -h $GCLOUD_DB_IP -P 3306 -sfu $GCLOUD_DB_USER -p$GCLOUD_DB_PASSWORD < "/tm
 
 ### INSTALL CRAFT FILES  ###
 sleep 1
-echo "updating website files"
-unzip craftfiles.zip
+echo "Updating website files"
+unzip craftfiles.zip 1>/dev/null
 cp -r craftfiles/craft /var/www/
 rm -r /var/www/html
 cp -r craftfiles/public /var/www/html
@@ -43,3 +43,8 @@ mkdir -p /var/www/craft/storage
 chown -R  www-data:www-data /var/www/craft/app
 chown -R  www-data:www-data /var/www/craft/config
 chown -R  www-data:www-data /var/www/craft/storage
+
+# CLEANUP
+echo "Cleaning up."
+rm craftfiles.zip
+rm craft_db.zip

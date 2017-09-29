@@ -46,10 +46,6 @@ if [ -z "$gce_username" ] || [ -z "$gce_name" ] || [ -z "$sql_instance_name" ] |
 else
 
     # collect your files
-
-    rm -r xfr
-    rm -r craftfiles
-
     mkdir xfr
     mkdir craftfiles
 
@@ -62,7 +58,7 @@ else
     cp -r ../public craftfiles/
     cp -r ../craft craftfiles/
     rm -r craftfiles/craft/storage
-    zip -r xfr/craftfiles.zip craftfiles/
+    zip -qr xfr/craftfiles.zip craftfiles/
     cp conf_files/* xfr/
     cp README.md xfr/
 
@@ -104,9 +100,8 @@ else
 
 
     # spin up a new gcloud sql instance, if it doesn't already exist. keep 'authorized-networks' at the end of this command!
-    gsql_exists=$(gcloud sql instances list --filter="NAME:sql_instance_name") | sed 's/ //g'
-
-    if [ "$gsql_exists" == "" ] || [ "$gsql_exists" == "Listed 0 items.\n" ]; then
+    gsql_exists=$(gcloud sql instances list --filter="NAME:$sql_instance_name")
+    if [[ $gsql_exists != NAME* ]]; then
         echo "Creating a new MySQL 5.7 server instance called '$sql_instance_name' - grab a cup of coffee, this will probably take a while." 1>&2
         gcloud sql instances create $sql_instance_name \
             --database-flags=sql_mode=TRADITIONAL \
@@ -115,13 +110,25 @@ else
             --gce-zone="us-west1-b" \
             --authorized-networks=$gce_ip
 
-        # set up the craft user
-        echo "Creating new db user $sql_username on $sql_instance_name" 1>&2
-        gcloud sql users create $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
+
+    else
+        echo "Using existing database server $sql_instance_name"
+
     fi
 
     # regardless get its IP address
     sql_ip=$(gcloud sql instances list --filter="NAME:$sql_instance_name" --format='value(ipAddresses[0].ipAddress)')
+
+
+    # set up the craft user
+    gsqluser_exists=$(gcloud sql users list --instance=$sql_instance_name --filter="$sql_username")
+    if [[ $gsqluser_exists != NAME* ]]; then
+        echo "Updating password for $sql_username on $sql_instance_name"
+        gcloud sql users set-password $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
+    else
+        echo "Creating new db user $sql_username on $sql_instance_name" 1>&2
+        gcloud sql users create $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
+    fi
 
 
     # update the bashrc file with the new env vars
@@ -130,10 +137,17 @@ else
     sed -i '' "s/GCLOUDDBPASSWORD/$sql_password/g" bashrc
 
 
-    
+
     # copy the deploy files up to your new GCE
     gcloud compute scp xfr $gce_username@$gce_name:~/ --recurse
     gcloud compute scp bashrc $gce_username@$gce_name:~/.bashrc
+
+
+    # clean up
+    rm -r craftfiles
+    rm craft_db.sql
+    rm -r xfr
+    rm bashrc
 
     # give further instructions
 

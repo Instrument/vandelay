@@ -45,7 +45,7 @@ cp php.ini /etc/php/7.1/apache2/php.ini
 service apache2 restart
 
 ### DB IMPORT ###
-echo "deploying the 'craftcms' database"
+echo "Deploying the 'craftcms' database"
 unzip craft_db.zip
 sed -i "/SET NAMES utf8;/a-- \n\
 -- Create and use the DB; \n\
@@ -58,10 +58,9 @@ mkdir -p /tmp/crafttmp
 mv craft_db.sql /tmp/crafttmp/
 mysql -h $GCLOUD_DB_IP -P 3306 -sfu $GCLOUD_DB_USER -p$GCLOUD_DB_PASSWORD < "/tmp/crafttmp/craft_db.sql"
 
-
 ### INSTALL CRAFT FILES  ###
-echo "installing website files"
-unzip craftfiles.zip
+echo "Installing website files"
+unzip craftfiles.zip 1>/dev/null
 cp -r craftfiles/craft /var/www/
 sed -i "s/DB_IP/$GCLOUD_DB_IP/g" db.php
 sed -i "s/DB_USER/$GCLOUD_DB_USER/g" db.php
@@ -76,3 +75,8 @@ mkdir -p /var/www/craft/storage
 chown -R  www-data:www-data /var/www/craft/app
 chown -R  www-data:www-data /var/www/craft/config
 chown -R  www-data:www-data /var/www/craft/storage
+
+# CLEANUP
+echo "Cleaning up."
+rm craftfiles.zip
+rm craft_db.zip
