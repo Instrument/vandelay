@@ -49,14 +49,8 @@ class SimpleApiPlugin extends BasePlugin
         craft()->templates->hook('cp.entries.edit.right-pane', function(&$context) {
             /** @var EntryModel $entry **/
             $entry = $context['entry'];
-            // Return the button HTML
-            $oldPath = craft()->path->getTemplatesPath();
-            $newPath = craft()->path->getPluginsPath().'simpleapi/templates';
-            craft()->path->setTemplatesPath($newPath);
-            $html = craft()->templates->render('upload');
-            craft()->path->setTemplatesPath($oldPath);
             $locale = $entry->locale;
-            return '<a href="/simpleapi/Entry/'.$entry->id.'/'.$locale.'?download=1" target="download" class="btn">Export entry</a>' . $html;
+            return '<a href="/simpleapi/Entry/'.$entry->id.'/'.$locale.'?download=1" target="download" class="btn">Export entry</a>';
         });
     }
     public function hasCpSection()
