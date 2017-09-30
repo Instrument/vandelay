@@ -42,6 +42,18 @@ class SimpleApiController extends BaseController
     }
     $this->returnJson($page);
   }
+  public function actionGetCategories() {
+    $criteria = craft()->elements->getCriteria(ElementType::Category);
+    $result = $criteria->find();
+    $cats = [];
+    foreach ($result as $key => $value) {
+      $cats[] = [
+        'id' => $value->id,
+        'titleLoc' => $value->title,
+      ];
+    }
+    $this->returnJson($cats);
+  }
   public function actionGetSectionEntries(array $variables = array()) {
     $criteria = craft()->elements->getCriteria(ElementType::Entry);
     $criteria->section = $variables['section'];
@@ -249,62 +261,65 @@ class SimpleApiController extends BaseController
     }
     return $post_fields;
   }
-  public function updateEntryFromFile($file) {
-    $post_fields = $file;
-    return $post_fields;
-    $entry = craft()->entries->getEntryById($file['entryId'], $file['locale']);
-    $entry->getContent()->title = $post_fields["title_loc"]['text'];
-    $fields = $entry->getFieldLayout()->getFields();
-    $matrices = array();
-    // Populates entry fields from post request
-    // Ignores data included in post request that entry does not support
-    foreach ($fields as $field) {
-      $data = $field->getField();
-      $handle = $data->handle;
-      if (isset($post_fields[$handle])) {
-        $value = $post_fields[$handle];
-        if (isset($value['text'])) {
-          $value = $value['text'];
-        }
-        if ($data->type == 'Matrix') {
-          //Save matrix field data to array to save after entry creation
-          $matrices[] = $data;          
-        } elseif ($data->type == 'Tags') {
-          // Accepts an array of tags by title
-          // Looks for tag group ID
-          $tagGroup = craft()->tags->getTagGroupByHandle($handle);
-          $tag_ids = array();
-          foreach ($post_fields[$handle] as $value) {
-            $tag = [
-              'title' => $value,
-              'groupId' => $tagGroup->id
-            ];
-            $tag_ids[] = $this->saveTag($tag);
-          }
-          $entry->getContent()->setAttribute($handle, $tag_ids);
-        } else {
-          $entry->getContent()->setAttribute($handle, $value);  
-        }
-      }
-    }
-    $saved = craft()->entries->saveEntry($entry);
-    if ($saved) {
-      // On success, populate MatrixBlockModel with matrix data and the returned entry ID
-      foreach ($matrices as $key => $field) {
-        foreach ($post_fields[$field->handle] as $value) {
+  public function updateEntryFromFile($array_data) {
+    $entries = [];
+    foreach ($array_data as $file) {
 
-          $block = new MatrixBlockModel();
-          $blockType = craft()->matrix->getBlockTypesByFieldId($field->id);
-          $block->fieldId = $field->id;
-          $block->typeId = $blockType[0]->id;
-          $block->ownerId = $entry->id;
+      // $entry = craft()->entries->getEntryById($data['id'], $data['locale']);
+      $entries[] = $file;
+      // $entry->getContent()->title = $data["title_loc"];
+      // $fields = $entry->getFieldLayout()->getFields();
+      // $matrices = array();
+      // // Populates entry fields from post request
+      // // Ignores data included in post request that entry does not support
+      // foreach ($fields as $field) {
+      //   $data = $field->getField();
+      //   $handle = $data->handle;
+      //   if (isset($post_fields[$handle])) {
+      //     $value = $post_fields[$handle];
+      //     if (isset($value['text'])) {
+      //       $value = $value['text'];
+      //     }
+      //     if ($data->type == 'Matrix') {
+      //       //Save matrix field data to array to save after entry creation
+      //       $matrices[] = $data;          
+      //     } elseif ($data->type == 'Tags') {
+      //       // Accepts an array of tags by title
+      //       // Looks for tag group ID
+      //       $tagGroup = craft()->tags->getTagGroupByHandle($handle);
+      //       $tag_ids = array();
+      //       foreach ($post_fields[$handle] as $value) {
+      //         $tag = [
+      //           'title' => $value,
+      //           'groupId' => $tagGroup->id
+      //         ];
+      //         $tag_ids[] = $this->saveTag($tag);
+      //       }
+      //       $entry->getContent()->setAttribute($handle, $tag_ids);
+      //     } else {
+      //       $entry->getContent()->setAttribute($handle, $value);  
+      //     }
+      //   }
+      // }
+      // $saved = craft()->entries->saveEntry($entry);
+      // if ($saved) {
+      //   // On success, populate MatrixBlockModel with matrix data and the returned entry ID
+      //   foreach ($matrices as $key => $field) {
+      //     foreach ($post_fields[$field->handle] as $value) {
 
-          $this->saveMatrix($block, $value);
-        }
-      }
-      return $entry;
+      //       $block = new MatrixBlockModel();
+      //       $blockType = craft()->matrix->getBlockTypesByFieldId($field->id);
+      //       $block->fieldId = $field->id;
+      //       $block->typeId = $blockType[0]->id;
+      //       $block->ownerId = $entry->id;
+
+      //       $this->saveMatrix($block, $value);
+      //     }
+      //   }
+      //   $entries[] = $saved;
+      // }
     }
-    return ['unsuccessful' => true];
+    return $entries;
   }
   public function addEntry(array $variables = array()) {
     $this->requirePostRequest();
@@ -342,8 +357,13 @@ class SimpleApiController extends BaseController
     $this->returnJson($fields);
   }
   public function actionUploadEntry() {
-    $updated = $this->updateEntryFromFile($_POST);
-    $this->returnJson($updated);
+    $data = craft()->request->rawBody;
+    $updated = $this->updateEntryFromFile(json_decode($data));
+    $this->returnJson(array(
+      'status' => 200,
+      'message' => 'Success!',
+      'data' => $updated,
+    ));
   }
   public function handlePostRequest($variables) {
     if (isset($variables['id'])) {
