@@ -182,12 +182,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                         // $render[$handle][$GLOBALS['currSection']]['normalized-neo-2'] = normalizeEntry($entry);
                     }
                 }
-            } else if ($type == 'RichText') {
-                if ($itemsRaw[$handle] != null){
-                    $render[$handle] = html_entity_decode($itemsRaw[$handle]);
-                } else {
-                    return null;
-                }
             } else if ($type == 'Assets') {
               if (count($entry[$handle]) === 1 && $entry[$handle][0]) {
                 $render[$handle]['kind'] = $entry[$handle][0]->kind;
