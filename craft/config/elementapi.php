@@ -304,7 +304,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                 } else {
                     $render[$handle] = $itemsRaw[$handle];
                 }
-           }
+            }
        }
     }
 
