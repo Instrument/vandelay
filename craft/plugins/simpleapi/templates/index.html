@@ -2,11 +2,14 @@
 {% set centered = true %}
 {% set title = 'SimpleApi' %}
 {% set sections = craft.sections.getAllSections() %}
+{% set categories = craft.categories.getAllCategories() %}
 {% set locales = craft.i18n.getSiteLocaleIds()%}
 {% set handles = [] %}
 {% set js %}
   $('.trigger').on('click', function() {
     $('[id^=section-]').text('exporting');
+    $('[id^=cat-]').text('exporting');
+    $('#globals').text('exporting');
     {% for section in sections %}
       $.get( "/simpleapi/getSection/{{ section.handle }}?download=1", function( data ) {
         var filename = '{{section.handle}}-{{craft.locale}}';
@@ -20,6 +23,14 @@
         var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
         saveAs(blob, filename+".json");
         $('#globals').text('exported');
+    });
+    $.get( "/actions/simpleApi/getCategories", function( data ) {
+      var filename = 'categories-{{craft.locale}}';
+      var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+      saveAs(blob, filename+".json");
+      {% for cat in categories %}
+        $('#cat-{{ cat.title|split(' ')|join }}').text('exported');
+      {% endfor %}
     });
   });
   var $form = $('form');
@@ -113,6 +124,35 @@
             </td>
          {% endfor %}
       </tr>
+      </tbody>
+    </table>
+    <h2>Categories</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>Category</th>
+        <th>Status</th>
+        {% for locale in locales %}
+            <th>{{ locale }}</th>
+        {% endfor %}
+      </tr>
+      </thead>
+      <tbody>
+        {% for category in categories %}
+        <tr>
+          <td>{{ category.title }}</td>
+          <td id="cat-{{ category.title|split(' ')|join }}">
+            Not exported
+          </td>
+          {% set catLocales = category.getLocales() %}
+           {% for locale in locales %}
+              <td class="{{ locale in catLocales|keys ? 'green' : 'red'}}">
+                <span class="fa {{ locale in catLocales|keys ? 'fa-check' : 'fa-close'}}"></span>
+              </td>
+           {% endfor %}
+        </tr>
+      {% endfor %}
+      
       </tbody>
     </table>
     <h2>Import localized files</h2>
