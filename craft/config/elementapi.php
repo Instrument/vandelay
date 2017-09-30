@@ -298,13 +298,13 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                     }
                     $render[$handle] = $itemsRaw[$handle];
                  }
-            } else {
+           } else {
                 if (gettype($itemsRaw[$handle]) === 'string') {
                     $render[$handle] = html_entity_decode($itemsRaw[$handle]);
                 } else {
                     $render[$handle] = $itemsRaw[$handle];
                 }
-            }
+           }
        }
     }
 
