@@ -261,6 +261,17 @@ class SimpleApiController extends BaseController
     }
     return $post_fields;
   }
+  public function actionGetLocales() {
+    $locale_array = craft()->i18n->getSiteLocales();
+    $locales = [];
+    foreach ($locale_array as $locale) {
+      $locales[] = [
+        'title' => $locale->getNativeName(),
+        'lang' => $locale->getId()
+      ];
+    }
+    $this->returnJson($locales);
+  }
   public function updateEntryFromFile($array_data) {
     $entries = [];
     foreach ($array_data as $file) {
