@@ -50,6 +50,8 @@ class SimpleApiController extends BaseController
       $cats[] = [
         'id' => $value->id,
         'titleLoc' => $value->title,
+        'type' => 'category',
+        'locale' => $value->locale
       ];
     }
     $this->returnJson($cats);
@@ -177,6 +179,16 @@ class SimpleApiController extends BaseController
       }
     }
   }
+  public function saveCategories($data) {
+    $cats = [];
+    foreach ($data as $item) {
+      $cat = $cat = craft()->categories->getCategoryById($item['id'], $item['locale']);
+      $cat->getContent()->setAttribute('title', $item['titleLoc']);
+      $response = craft()->categories->saveCategory($cat);
+      $cats[] = $response;
+    }
+    return $this->returnJson($data);
+  }
   public function saveImage($image_url) {
     $imageInfo = pathinfo($image_url);
     // Download image to temp folder
@@ -206,6 +218,9 @@ class SimpleApiController extends BaseController
     }
     $success = craft()->matrix->saveBlock($block);
     return $block;
+  }
+  public function setField($field, $entry) {
+    $entry->getContent()->setAttribute($handle, $value);
   }
   public function updateEntry($entry) {
 
@@ -261,11 +276,21 @@ class SimpleApiController extends BaseController
     }
     return $post_fields;
   }
+  public function actionGetLocales() {
+    $locale_array = craft()->i18n->getSiteLocales();
+    $locales = [];
+    foreach ($locale_array as $locale) {
+      $locales[] = [
+        'title' => $locale->getNativeName(),
+        'lang' => $locale->getId()
+      ];
+    }
+    $this->returnJson($locales);
+  }
   public function updateEntryFromFile($array_data) {
     $entries = [];
     foreach ($array_data as $file) {
-
-      // $entry = craft()->entries->getEntryById($data['id'], $data['locale']);
+      $entry = craft()->entries->getEntryById($file['id'], $file['locale']);
       $entries[] = $file;
       // $entry->getContent()->title = $data["title_loc"];
       // $fields = $entry->getFieldLayout()->getFields();
@@ -358,10 +383,13 @@ class SimpleApiController extends BaseController
   }
   public function actionUploadEntry() {
     $data = craft()->request->rawBody;
-    $updated = $this->updateEntryFromFile(json_decode($data));
+    if ($data[0]->type === 'category') {
+      $updated = $this->updateCategories($data);
+    } else {
+      $updated = $this->updateEntryFromFile(json_decode($data));
+    }
     $this->returnJson(array(
       'status' => 200,
-      'message' => 'Success!',
       'data' => $updated,
     ));
   }
