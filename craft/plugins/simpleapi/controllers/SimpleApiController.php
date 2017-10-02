@@ -179,11 +179,11 @@ class SimpleApiController extends BaseController
       }
     }
   }
-  public function saveCategories($data) {
+  public function localizeCategories($data) {
     $cats = [];
     foreach ($data as $item) {
-      $cat = $cat = craft()->categories->getCategoryById($item['id'], $item['locale']);
-      $cat->getContent()->setAttribute('title', $item['titleLoc']);
+      $cat = $cat = craft()->categories->getCategoryById($item->id, $item->locale);
+      $cat->getContent()->setAttribute('title', $item->titleLoc);
       $response = craft()->categories->saveCategory($cat);
       $cats[] = $response;
     }
@@ -381,12 +381,17 @@ class SimpleApiController extends BaseController
     $fields = craft()->fields->getFieldsWithContent();
     $this->returnJson($fields);
   }
+  public function isCategory($item) {
+    return isset($item->type) && $item->type == 'category';
+  }
   public function actionUploadEntry() {
-    $data = craft()->request->rawBody;
-    if ($data[0]->type === 'category') {
-      $updated = $this->updateCategories($data);
+    $raw_data = craft()->request->rawBody;
+    $data = json_decode($raw_data);
+    $items = array_values($data);
+    if (isset($items[0]) && $this->isCategory($items[0])) {
+      $updated = $this->localizeCategories($data);
     } else {
-      $updated = $this->updateEntryFromFile(json_decode($data));
+      $updated = $this->updateEntryFromFile($data);
     }
     $this->returnJson(array(
       'status' => 200,

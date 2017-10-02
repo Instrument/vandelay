@@ -21,22 +21,27 @@
   .box__error {
     display: none;
   }
-  .fa-spinner {
+  .fa-spinner{
     animation: animationFrames linear 1s;
-    animation-iteration-count: 1;
+    animation-iteration-count: infinite;
     transform-origin: 50% 50%;
+    animation-fill-mode:forwards; /*when the spec is finished*/
     -webkit-animation: animationFrames linear 1s;
-    -webkit-animation-iteration-count: 1;
+    -webkit-animation-iteration-count: infinite;
     -webkit-transform-origin: 50% 50%;
+    -webkit-animation-fill-mode:forwards; /*Chrome 16+, Safari 4+*/ 
     -moz-animation: animationFrames linear 1s;
-    -moz-animation-iteration-count: 1;
+    -moz-animation-iteration-count: infinite;
     -moz-transform-origin: 50% 50%;
+    -moz-animation-fill-mode:forwards; /*FF 5+*/
     -o-animation: animationFrames linear 1s;
-    -o-animation-iteration-count: 1;
+    -o-animation-iteration-count: infinite;
     -o-transform-origin: 50% 50%;
+    -o-animation-fill-mode:forwards; /*Not implemented yet*/
     -ms-animation: animationFrames linear 1s;
-    -ms-animation-iteration-count: 1;
+    -ms-animation-iteration-count: infinite;
     -ms-transform-origin: 50% 50%;
+    -ms-animation-fill-mode:forwards; /*IE 10+*/
   }
 
   @keyframes animationFrames{
