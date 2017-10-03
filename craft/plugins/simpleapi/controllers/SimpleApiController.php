@@ -189,6 +189,35 @@ class SimpleApiController extends BaseController
     }
     return $this->returnJson($data);
   }
+  public function localizeGlobals($data) {
+    $locale = $data->locale;
+    $globals = craft()->globals->getAllSets();
+    $page = [
+      'matrices' => []
+    ];
+    foreach ($globals as $value) {
+      $localized = craft()->globals->getSetByHandle($value->handle, $locale);
+      $values = $localized->getContent();
+      $fields = $value->getFieldLayout()->getFields();
+      foreach($fields as $field){
+        $field_val = $field->getField();
+        $type = $field_val->type;
+        $handle = $field_val->handle;
+        $pattern = '/(_loc)/';
+        $loc_handle = preg_replace($pattern, "Loc", $handle);
+        if(isset($data->$loc_handle)) {
+          if ($field_val->type == 'Matrix' || $field_val->type == 'Neo') {
+            //Save matrix field data to array to save after entry creation
+            $page['matrices'][] = $field_val;        
+          } else {
+            $localized->getContent()->setAttribute($handle, $data->$loc_handle);
+          }
+        }
+        $page[] = craft()->globals->saveContent($localized);
+      }
+    }
+    $this->returnJson($page);
+  }
   public function saveImage($image_url) {
     $imageInfo = pathinfo($image_url);
     // Download image to temp folder
@@ -387,9 +416,15 @@ class SimpleApiController extends BaseController
   public function actionUploadEntry() {
     $raw_data = craft()->request->rawBody;
     $data = json_decode($raw_data);
-    $items = array_values($data);
-    if (isset($items[0]) && $this->isCategory($items[0])) {
-      $updated = $this->localizeCategories($data);
+    if (gettype($data) == 'array') {
+      $items = array_values($data);
+      if (isset($items[0]) && $this->isCategory($items[0])) {
+        $updated = $this->localizeCategories($data);
+      } 
+    }
+    
+    if (isset($data->title) && $data->title == 'globals') {
+      $updated = $this->localizeGlobals($data);
     } else {
       $updated = $this->updateEntryFromFile($data);
     }
