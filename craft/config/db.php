@@ -4,13 +4,13 @@ return array(
 	'*' => array(
 		'tablePrefix' => 'craft',
 		'database' => 'snapchat',
-		'server' => 'localhost',
+		'server' => '127.0.0.1',
 	),
 	'craft.dev' => array(
 		'user' => 'homestead',
 		'password' => 'secret',
 	),
-	'localhost' => array(
+	'snapchat.craft.dev' => array(
 		'user' => 'root',
 		'password' => 'root',
 	),

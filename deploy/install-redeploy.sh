@@ -2,7 +2,7 @@
 if
 	[ -z ${GCLOUD_DB_IP+1} ] || [ -z ${GCLOUD_DB_USER+1} ] || [ -z ${GCLOUD_DB_PASSWORD+1} ]
 then
-	echo ERROR: required environment variables: GCLOUD_DB_IP, GCLOUD_DB_USER, GCLOUD_DB_PASSWORD  1>&2
+	echo ERROR: required environment variables: GCLOUD_DB_IP, GCLOUD_DB_USER, GCLOUD_DB_PASSWORD, GCLOUD_DB_USER  1>&2
     echo update these variables in your .bashrc file and run "'"source ~/.bashrc"'" before proceeding. 1>&2
     echo More details in the README file. 1>&2
 	exit 1
@@ -10,7 +10,7 @@ fi
 
 ### DB IMPORT ###
 sleep 1
-echo "Updating the 'craftcms' database"
+#echo "Updating the 'craftcms' database"
 unzip craft_db.zip
 sed -i "/SET NAMES utf8;/a-- \n\
 -- Create and use the DB; \n\
@@ -21,11 +21,14 @@ USE craftcms; \n\
 
 mkdir -p /tmp/crafttmp
 mv craft_db.sql /tmp/crafttmp/
+# dump craftcms db
+# import fresh stuff
 mysql -h $GCLOUD_DB_IP -P 3306 -sfu $GCLOUD_DB_USER -p$GCLOUD_DB_PASSWORD < "/tmp/crafttmp/craft_db.sql"
 
 ### INSTALL CRAFT FILES  ###
 sleep 1
 echo "Updating website files"
+# rm -r craftfiles
 unzip craftfiles.zip 1>/dev/null
 cp -r craftfiles/craft /var/www/
 rm -r /var/www/html

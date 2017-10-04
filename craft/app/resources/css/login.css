@@ -5,7 +5,9 @@ html, body { height: 100%; }
 
 #login-form { display: block; position: absolute; top: 50%; left: 50%; margin: -208px 0 0 -150px; width: 300px; background: no-repeat center top; }
 
-#login-form.has-logo { padding-top: 116px; }
+#login-form.has-logo {
+  padding-top: 116px;
+}
 
 #login-form h1 { text-align: center; font-size: 3em; color: #29323d; word-wrap: break-word; }
 
@@ -68,5 +70,82 @@ body.ltr .modal.email-sent .body:before { left: 24px; }
 body.rtl .modal.email-sent .body:before { right: 24px; }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3 / 2), only screen and (min-device-pixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) { #login-form { background-size: 202px; } }
+
+#loginBlock {
+  width: 50%;
+  height: 50%;
+  position: absolute;
+  top:0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: block;
+
+  margin: auto;
+}
+
+#logo {
+  display: block;
+  margin: auto;
+  padding: 48px;
+}
+
+.okta {
+  display: block;
+  margin: auto;
+  /* Rectangle: */
+  background: #0079B7;
+  border: 1px solid #00699F;
+  border-radius: 4px;
+  /* Log in with Okta: */
+  font-family: AvenirNext-DemiBold;
+  font-size: 14px;
+  font-weight: initial;
+  text-align: center;
+  letter-spacing: 0;
+  color: #FFFFFF;
+  line-height: 16px;
+  width: 240px;
+  height: 50px;
+  cursor: pointer;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  animation: reset .2s ease-in-out;
+  animation-fill-mode: forwards;
+}
+.okta:hover {
+  /* transition: all 0.3s ease 0s; */
+  animation: nudge .2s ease-in-out;
+  animation-fill-mode: forwards;
+  background: #00699F;
+  border: 1px solid #00699F;
+}
+.okta:active {
+  transform: translate(0, 5px);
+  box-shadow: 0 -5px -10px rgba(0,0,0,0.1);
+}
+
+@keyframes nudge {
+
+  0% {
+    transform: translate(0, 0px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  }
+  100% {
+    transform: translate(0, -3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+}
+@keyframes reset {
+
+  0% {
+    transform: translate(0, -3px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  }
+  100% {
+    transform: translate(0, 0px);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+  }
+}
+
 
 /*# sourceMappingURL=login.css.map */

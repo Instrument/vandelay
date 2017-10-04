@@ -1,0 +1,14 @@
+{
+	"name": "/okta",
+	"description": "A saml connector for craft cms",
+	"type": "craft-plugin",
+	"authors": [
+		{
+			"name": "Inger Kitkatz",
+			"homepage": "instrument.com"
+		}
+	],
+	"require": {
+		"composer/installers": "~1.0"
+	}
+}

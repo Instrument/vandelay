@@ -113,6 +113,8 @@ else
 
     else
         echo "Using existing database server $sql_instance_name"
+        echo "Backing up database. You can find backups in the GCP Console."
+        gcloud sql backups create --instance=$sql_instance_name --description="Backing up for Craft redeploy"
 
     fi
 
@@ -121,12 +123,12 @@ else
 
 
     # set up the craft user
-    gsqluser_exists=$(gcloud sql users list --instance=$sql_instance_name --filter="$sql_username")
+     gsqluser_exists=$(gcloud sql users list --instance=$sql_instance_name --filter="NAME:$sql_username AND HOST:$gce_ip")
     if [[ $gsqluser_exists != NAME* ]]; then
-        echo "Updating password for $sql_username on $sql_instance_name"
+        echo "Updating password for $sql_username at $gce_ip on $sql_instance_name" 1>&2
         gcloud sql users set-password $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
     else
-        echo "Creating new db user $sql_username on $sql_instance_name" 1>&2
+        echo "Creating new db user $sql_username at $gce_ip on $sql_instance_name" 1>&2
         gcloud sql users create $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
     fi
 
@@ -135,6 +137,7 @@ else
     sed -i '' "s/GCLOUDDBIP/$sql_ip/g" bashrc
     sed -i '' "s/GCLOUDDBUSERNAME/$sql_username/g" bashrc
     sed -i '' "s/GCLOUDDBPASSWORD/$sql_password/g" bashrc
+    sed -i '' "s/GCLOUDDBNAME/$sql_instance_name/g" bashrc
 
 
 
