@@ -6,7 +6,7 @@ usage() {
     echo "redeploys code and data to existing servers. All options are required." 1>&2
     echo "Usage details: $0 -a <GCE admin username> -e <GCE instance name> -s <Cloud SQL instance name> -u <db admin username> -p <admin password>" 1>&2
     echo ""
-    echo "For example, $0 -a gceuser -e myubuntu -s mydbserver -u craftuser -p supersecurepassword" 1>&2
+    echo "For example, $0 -a gceuser -e myvm -s mydbserver -u craftuser -p supersecurepassword" 1>&2
     echo ""; exit 0
 }
 
@@ -126,11 +126,11 @@ else
      gsqluser_exists=$(gcloud sql users list --instance=$sql_instance_name --filter="NAME:$sql_username AND HOST:$gce_ip")
     if [[ $gsqluser_exists != NAME* ]]; then
         echo "Updating password for $sql_username at $gce_ip on $sql_instance_name" 1>&2
-        gcloud sql users set-password $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
+#        gcloud sql users set-password $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
     else
         echo "Creating new db user $sql_username at $gce_ip on $sql_instance_name" 1>&2
-        gcloud sql users create $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
     fi
+        gcloud sql users create $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
 
 
     # update the bashrc file with the new env vars
