@@ -285,7 +285,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                         $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                       }
                     }
-                    if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton') {
+                    if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton' || $handle === 'relatedContentButton') {
                       if (isset($entry[$handle]->attributes)) {
                         if ($entry[$handle]->attributes['type'] === 'entry') {
                           if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
