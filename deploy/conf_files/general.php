@@ -5,6 +5,7 @@ return array(
     'limitAutoSlugsToAscii' => true,
 		'defaultWeekStartDay' => 0,
 		'enableCsrfProtection' => false,
+    'phpMaxMemoryLimit' => '512M',
     'cpTrigger' => 'admin',
     'maxUploadFileSize' => 16000000,
     'defaultSearchTermOptions' => array(

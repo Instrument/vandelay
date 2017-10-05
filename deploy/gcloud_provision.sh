@@ -62,7 +62,6 @@ else
     cp conf_files/* xfr/
     cp README.md xfr/
 
-
     echo "Copying most recently modded SQL dump into the xfr folder" 1>&2
     newSQL=$(ls -t ../data/snapchat-craft*.sql | head -n1)
     cp $newSQL ./craft_db.sql
@@ -70,30 +69,44 @@ else
     sed -i '' "s/MyISAM/InnoDB/g" ./craft_db.sql
     zip xfr/craft_db.zip ./craft_db.sql
 
-
-
     # create a new Ubunutu server, if it doesn't already exist
     gce_exists=$(gcloud compute instances list --filter="NAME:$gce_name")
 
     if [ "$gce_exists" == "" ]; then
         echo "Creating a new Ubuntu server instance called '$gce_name'" 1>&2
-        gcloud compute instances create $gce_name --image-family=ubuntu-1604-lts \
+        gcloud compute instances create $gce_name \
+            --machine-type=n1-standard-4 \
+            --image-family=ubuntu-1604-lts \
             --image-project=ubuntu-os-cloud \
-            --tags=http-server,https-server \
             --zone us-west1-b
+
+        # explicitly allow HTTP and HTTPS access
+        gcloud compute instances add-tags $gce_name --tags http-server,https-server
+
+        gce_ip=$(gcloud compute instances list --filter="NAME:$gce_name"  --format='value(networkInterfaces[0].accessConfigs[0].natIP)')
+        echo "Reserving a static IP for $gce_name" 1>&2
+        gcloud compute addresses create $gce_name-staticip --addresses $gce_ip --region us-west1
 
         #this a new install, so you'll need the long form of install.sh
         echo "using the long form of the install script"
         cp install-newdeploy.sh xfr/install.sh
+
     else
         #this a redeploy, so you'll need the short form of install.sh
         echo "using the short form of the install script"
         cp install-redeploy.sh xfr/install.sh
+
+        # get its ip address
+        gce_ip=$(gcloud compute instances list --filter="NAME:$gce_name"  --format='value(networkInterfaces[0].accessConfigs[0].natIP)')
+
+        # is it a static ip yet? if not, promote it
+        isStaticIp=$(gcloud compute addresses list --filter="ADDRESS:$gce_ip")
+        if [ "$isStaticIp" == "" ]; then
+            echo "promoting IP address from ephemeral to static"
+            gcloud compute addresses create $gce_name-staticip --addresses $gce_ip --region us-west1
+        fi
+
     fi
-
-
-    # ...regardless, get its IP address
-    gce_ip=$(gcloud compute instances list --filter="NAME:$gce_name"  --format='value(networkInterfaces[0].accessConfigs[0].natIP)')
 
     # give your new install script the proper perms
     chmod 700 xfr/install.sh

@@ -1,8 +1,8 @@
 #!/bin/bash
 if 
-	[ -z ${GCLOUD_DB_IP+1} ] || [ -z ${GCLOUD_DB_USER+1} ] || [ -z ${GCLOUD_DB_PASSWORD+1} ] || [ -z ${GCLOUD_DB_NAME+1} ]
+	[ -z ${GCLOUD_DB_IP+1} ] || [ -z ${GCLOUD_DB_USER+1} ] || [ -z ${GCLOUD_DB_PASSWORD+1} ]
 then 
-	echo ERROR: required environment variables: GCLOUD_DB_IP, GCLOUD_DB_USER, GCLOUD_DB_PASSWORD, GCLOUD_DB_NAME  1>&2
+	echo ERROR: required environment variables: GCLOUD_DB_IP, GCLOUD_DB_USER, GCLOUD_DB_PASSWORD  1>&2
     echo update these variables in your .bashrc file and run "'"source ~/.bashrc"'" before proceeding. 1>&2
     echo More details in the README file. 1>&2
 	exit 1
@@ -63,7 +63,6 @@ cp -r craftfiles/craft /var/www/
 sed -i "s/DB_IP/$GCLOUD_DB_IP/g" db.php
 sed -i "s/DB_USER/$GCLOUD_DB_USER/g" db.php
 sed -i "s/DB_ROOT_PASSWORD/$GCLOUD_DB_PASSWORD/g" db.php
-sed -i "s/DB_NAME/$GCLOUD_DB_NAME/g" db.php
 cp db.php /var/www/craft/config/db.php
 cp general.php /var/www/craft/config/general.php
 rm -r /var/www/html
