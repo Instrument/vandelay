@@ -388,7 +388,7 @@ class SimpleApiController extends BaseController
     if (isset($variables['id'])) {
       $result = $this->returnEntry($variables['id'], $variables['locale']);
       if (craft()->request->getParam('download')) {
-        $fname = $result['type'] . '-'. $result['slug'] . '-'. $variables['locale'] .'.json';
+        $fname = CRAFT_STORAGE_PATH . "/" . $result['type'] . '-'. $result['slug'] . '-'. $variables['locale'] .'.json';
         $handle = fopen($fname,'w');
         fwrite($handle, json_encode($result));
         fclose($handle);
@@ -399,6 +399,8 @@ class SimpleApiController extends BaseController
         header('Pragma: public');
         header('Content-Length: ' . filesize($fname));
         readfile($fname);
+        sleep(5);
+        unlink($fname);
         exit;
       }
       $this->returnJson(array(
