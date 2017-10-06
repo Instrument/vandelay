@@ -78,7 +78,9 @@ class SimpleApiController extends BaseController
           $fieldValue = $field->getField();
           $field_loc_handle = preg_replace($pattern, "Loc", $fieldValue->handle);
           if ($fieldValue->type !== 'Entries' && $fieldValue->type !== 'Assets') {
-            $matrixData[$block][$field_loc_handle] =  $this->handleFieldType($value, $fieldValue);
+            $data = $this->handleFieldType($value, $fieldValue);
+            $matrixData[$block][$field_loc_handle] = $data;
+            $matrixData[$block]['blockType'] = $value->type['handle'];
           }
          }
       }
@@ -192,28 +194,38 @@ class SimpleApiController extends BaseController
   public function localizeGlobals($data) {
     $locale = $data->locale;
     $globals = craft()->globals->getAllSets();
-    $page = [
-      'matrices' => []
-    ];
+    $matrices = [];
     foreach ($globals as $value) {
+      $en = craft()->globals->getSetByHandle($value->handle);
       $localized = craft()->globals->getSetByHandle($value->handle, $locale);
-      $values = $localized->getContent();
+      $values = $en->getContent();
+      $values_en = $en->getContent();
       $fields = $value->getFieldLayout()->getFields();
-      foreach($fields as $field){
+      foreach($fields as $field_key => $field){
         $field_val = $field->getField();
         $type = $field_val->type;
         $handle = $field_val->handle;
         $pattern = '/(_loc)/';
+        $matrices = [];
+        $translatable = $field_val->translatable == 1;
         $loc_handle = preg_replace($pattern, "Loc", $handle);
-        if(isset($data->$loc_handle)) {
-          if ($field_val->type == 'Matrix' || $field_val->type == 'Neo') {
-            //Save matrix field data to array to save after entry creation
-            $page['matrices'][] = $field_val;        
+        if(isset($data->$loc_handle) && $translatable) {
+          if ($field_val->type == 'Neo') {
+            $matrices[] = $field_val;
+          } elseif ($field_val->type == 'Matrix') {
+            // $blockTypes = craft()->matrix->getBlockTypesByFieldId($field_val->id);
+            // $type = $blockTypes[0];
+            // $block = new MatrixBlockModel();
+            // $block->fieldId = $field_val->id;
+            // $block->typeId = $blockType[0]->id;
+            // $block->ownerId = $localized->id;
+            // // $this->saveMatrix($block, $data->$loc_handle);
+            // $page[$loc_handle] = $block;
           } else {
             $localized->getContent()->setAttribute($handle, $data->$loc_handle);
           }
         }
-        $page[] = craft()->globals->saveContent($localized);
+        $saved = craft()->globals->saveContent($localized);
       }
     }
     $this->returnJson($page);
@@ -236,17 +248,24 @@ class SimpleApiController extends BaseController
     }
   }
   public function saveMatrix($block, $data) {
+    $values = [];
     foreach ($data as $key => $value) {
-      // Upload an image from a URL if the field handle is image
-      if ($key == 'image') {
-        $saved_image = $this->saveImage($value);
-        $block->getContent()->setAttribute($key, array($saved_image));
-      } else {
-        $block->getContent()->setAttribute($key, $value);
-      }
+      // $pattern = '/(Loc)/';
+      // $loc_handle = preg_replace($pattern, "_loc", $key);
+      // if (isset($block->getContent()[$key])) {
+      //   $values[$loc_handle] = [
+      //     'val' => $value,
+      //     'original' => $block->getContent()[$loc_handle]
+      //   ];
+      //   $block->getContent()->setAttribute($loc_handle, $value);
+      // }
     }
-    $success = craft()->matrix->saveBlock($block);
-    return $block;
+    $saved = craft()->matrix->saveBlock($block);
+    if ($saved) {
+      $this->returnJson($saved);
+    } else {
+      $this->returnJson($block);
+    }
   }
   public function setField($field, $entry) {
     $entry->getContent()->setAttribute($handle, $value);
