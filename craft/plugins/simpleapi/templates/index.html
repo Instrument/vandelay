@@ -5,67 +5,6 @@
 {% set categories = craft.categories.getAllCategories() %}
 {% set locales = craft.i18n.getSiteLocaleIds()%}
 {% set handles = [] %}
-{% set js %}
-  $('.trigger').on('click', function() {
-    $('[id^=section-]').text('exporting');
-    $('[id^=cat-]').text('exporting');
-    $('#globals').text('exporting');
-    {% for section in sections %}
-      $.get( "/simpleapi/getSection/{{ section.handle }}?download=1", function( data ) {
-        var filename = '{{section.handle}}-{{craft.locale}}';
-        var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
-        saveAs(blob, filename+".json");
-        $('#section-{{section.handle}}').text('exported');
-      });
-    {% endfor %}
-    $.get( "/actions/simpleApi/getGlobals", function( data ) {
-        var filename = data.title + '-' + data.locale;
-        var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
-        saveAs(blob, filename+".json");
-        $('#globals').text('exported');
-    });
-    $.get( "/actions/simpleApi/getCategories", function( data ) {
-      var filename = 'categories-{{craft.locale}}';
-      var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
-      saveAs(blob, filename+".json");
-      {% for cat in categories %}
-        $('#cat-{{ cat.title|split(' ')|join }}').text('exported');
-      {% endfor %}
-    });
-  });
-  var $form = $('form');
-  var droppedFiles = false;
-  var fileSelect = document.getElementById('file');
-  $form.on('submit', function (e) {
-    e.preventDefault();
-
-    var ajaxData = new FormData();
-    var files = fileSelect.files;
-    for (var i = 0, f; f = files[i]; i++) {
-      var file = files[i];
-      var reader = new FileReader();
-
-      reader.onload = (function(theFile) {
-        return function(e) {
-          var p = JSON.parse(e.target.result);
-          $.post({
-            url: $form.attr('action'),
-            dataType: 'json',
-            contentType: 'application/json; charset=UTF-8',
-            processData: false,
-            data: JSON.stringify(p),
-            success: function(data) {
-              console.log(data);
-              console.log(JSON.stringify(p));
-            },
-          });
-        };
-      })(f);
-      reader.readAsText(f);
-    }
-  })
-  
-{% endset %}
 {% set css %}
   td, th {
     padding: 10px 20px 10px 0px;
@@ -81,6 +20,73 @@
   .box__success,
   .box__error {
     display: none;
+  }
+  .fa-spinner{
+    animation: animationFrames linear 1s;
+    animation-iteration-count: infinite;
+    transform-origin: 50% 50%;
+    animation-fill-mode:forwards; /*when the spec is finished*/
+    -webkit-animation: animationFrames linear 1s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-transform-origin: 50% 50%;
+    -webkit-animation-fill-mode:forwards; /*Chrome 16+, Safari 4+*/ 
+    -moz-animation: animationFrames linear 1s;
+    -moz-animation-iteration-count: infinite;
+    -moz-transform-origin: 50% 50%;
+    -moz-animation-fill-mode:forwards; /*FF 5+*/
+    -o-animation: animationFrames linear 1s;
+    -o-animation-iteration-count: infinite;
+    -o-transform-origin: 50% 50%;
+    -o-animation-fill-mode:forwards; /*Not implemented yet*/
+    -ms-animation: animationFrames linear 1s;
+    -ms-animation-iteration-count: infinite;
+    -ms-transform-origin: 50% 50%;
+    -ms-animation-fill-mode:forwards; /*IE 10+*/
+  }
+
+  @keyframes animationFrames{
+    0% {
+      transform:  rotate(0deg) ;
+    }
+    100% {
+      transform:  rotate(360deg) ;
+    }
+  }
+
+  @-moz-keyframes animationFrames{
+    0% {
+      -moz-transform:  rotate(0deg) ;
+    }
+    100% {
+      -moz-transform:  rotate(360deg) ;
+    }
+  }
+
+  @-webkit-keyframes animationFrames {
+    0% {
+      -webkit-transform:  rotate(0deg) ;
+    }
+    100% {
+      -webkit-transform:  rotate(360deg) ;
+    }
+  }
+
+  @-o-keyframes animationFrames {
+    0% {
+      -o-transform:  rotate(0deg) ;
+    }
+    100% {
+      -o-transform:  rotate(360deg) ;
+    }
+  }
+
+  @-ms-keyframes animationFrames {
+    0% {
+      -ms-transform:  rotate(0deg) ;
+    }
+    100% {
+      -ms-transform:  rotate(360deg) ;
+    }
   }
 {% endset %}
 {% includeCssFile 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' %}
@@ -141,7 +147,7 @@
         {% for category in categories %}
         <tr>
           <td>{{ category.title }}</td>
-          <td id="cat-{{ category.title|split(' ')|join }}">
+          <td id="cat-{{ category.id }}">
             Not exported
           </td>
           {% set catLocales = category.getLocales() %}
@@ -168,4 +174,63 @@
     </form>
 {% endset %}
 {% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
+{% set js %}
+$('.trigger').on('click', function() {
+    $('[id^=section-]').html('<span class="fa fa-spinner"></span>');
+    $('[id^=cat-]').html('<span class="fa fa-spinner"></span>');
+    $('#globals').html('<span class="fa fa-spinner"></span>');
+    {% for section in sections %}
+      $.get( "/simpleapi/getSection/{{ section.handle }}?download=1", function( data ) {
+        var filename = '{{section.handle}}-{{craft.locale}}';
+        var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+        saveAs(blob, filename+".json");
+        $('#section-{{section.handle}}').text('exported');
+      });
+    {% endfor %}
+    $.get( "/actions/simpleApi/getGlobals", function( data ) {
+        var filename = data.title + '-' + data.locale;
+        var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+        saveAs(blob, filename+".json");
+        $('#globals').text('exported');
+    });
+    $.get( "/actions/simpleApi/getCategories", function( data ) {
+      var filename = 'categories-{{craft.locale}}';
+      var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+      saveAs(blob, filename+".json");
+      {% for cat in categories %}
+        $('#cat-{{ cat.id }}').text('exported');
+      {% endfor %}
+    });
+  });
+  var $form = $('form');
+  var droppedFiles = false;
+  var fileSelect = document.getElementById('file');
+  $form.on('submit', function (e) {
+    e.preventDefault();
+
+    var ajaxData = new FormData();
+    var files = fileSelect.files;
+    for (var i = 0, f; f = files[i]; i++) {
+      var file = files[i];
+      var reader = new FileReader();
+
+      reader.onload = (function(theFile) {
+        return function(e) {
+          var p = JSON.parse(e.target.result);
+          $.post({
+            url: $form.attr('action'),
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            processData: false,
+            data: JSON.stringify(p),
+            success: function(data) {
+              console.log(data);
+            },
+          });
+        };
+      })(f);
+      reader.readAsText(f);
+    }
+  })
+{% endset %}
 {% includeJs js %}
