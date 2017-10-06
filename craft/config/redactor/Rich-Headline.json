@@ -1,0 +1,14 @@
+{
+	"buttons": [],
+	// "formattingAdd": {
+	// 	"headline-add": {
+	// 		"title": "Headline",
+	// 		"args": ["h2", "class", "block-headline"]
+	// 	},
+	// 	"quote-author-add": {
+	// 		"title": "Quote Author",
+	// 		"args": ["cite", "class", "block-quote-author"]
+	// 	}
+	// },
+	"plugins": ["scriptbuttons"]
+}
