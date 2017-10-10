@@ -1,0 +1,29 @@
+<svg width="85" height="80" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <defs>
+  <path id="path-2" d="m12,0l217.93615,0c6.62741,0 12,5.37258 12,12l0,117.14239c0,6.62742 -5.37259,12 -12,12l-217.93615,0l0,0c-6.62742,0 -12,-5.37258 -12,-12l0,-117.14239l0,0c0,-6.62742 5.37258,-12 12,-12l0,0zm100.00082,294c5.07407,0 9.18741,4.11333 9.18741,9.18741l0,52.23347c0,3.86309 -2.41673,7.31318 -6.04532,8.63354c-1.02724,0.37362 -2.08948,0.55474 -3.14034,0.55474c-2.66522,0 -5.26045,-1.16111 -7.04105,-3.28384l-43.81344,-52.23347c-2.29422,-2.73522 -2.79559,-6.55281 -1.28711,-9.78765c1.50936,-3.23572 4.75645,-5.3042 8.32642,-5.3042l43.81343,0z"/>
+  <filter id="filter-3" filterUnits="objectBoundingBox" height="119.7%" width="129.8%" y="-8.0%" x="-14.9%">
+   <feGaussianBlur stdDeviation="10.5"/>
+  </filter>
+  <linearGradient id="linearGradient-1" y2="0%" x2="100%" y1="100%" x1="0%">
+   <stop offset="0%" stop-color="#F53953"/>
+   <stop offset="100%" stop-color="#FD6F5F"/>
+  </linearGradient>
+ </defs>
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="77" width="77" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <g fill-rule="evenodd" fill="none" id="Page-1">
+   <g id="Popups">
+    <g id="Group-52">
+     <g id="Combined-Shape">
+      <use id="svg-shadow" x="-59" y="-310" xlink:href="#path-2" filter="url(#filter-3)" fill="#F0F0F0"/>
+      <use id="svg_2" x="-59" y="-310" xlink:href="#path-2" fill-rule="evenodd" fill="#FFFFFF" stroke-width="2" stroke="url(#linearGradient-1)"/>
+     </g>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>
