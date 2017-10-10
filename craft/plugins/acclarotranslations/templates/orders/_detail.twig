@@ -1,0 +1,406 @@
+{% extends '_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+
+{% set tabs = adminTabs %}
+{% set selectedTab = 'orders' %}
+
+{% set title = 'Translations'|t %}
+{% set extraPageHeaderHtml = '<small class="acclarotranslations-version-header">' ~ 'Version'|t ~ ' ' ~ pluginVersion ~ '</small>' %}
+
+{% includeJsResource "acclarotranslations/js/OrderDetail.js" %}
+{% includeCssResource "acclarotranslations/css/AcclaroTranslations.css" %}
+
+{% set crumbs = [
+    { label: 'Translations'|t, url: url('acclarotranslations') },
+    { label: 'Orders'|t, url: url('acclarotranslations/orders') },
+] %}
+
+{% if isSubmitted %}
+    {% set crumbs = crumbs|merge([
+        { label: order.title, url: 'javascript:void(0)' },
+    ]) %}
+{% elseif orderId %}
+    {% set crumbs = crumbs|merge([
+        { label: 'Edit Order'|t, url: 'javascript:void(0)' },
+    ]) %}
+{% else %}
+    {% set crumbs = crumbs|merge([
+        { label: 'Create New Order'|t, url: 'javascript:void(0)' },
+    ]) %}
+{% endif %}
+
+
+{% block content %}
+{% if isSubmitted %}
+
+    {% includecssresource 'css/settings.css' %}
+    {% includejsresource 'js/settings.js' %}
+
+    <div class="acclarotranslations-order-detail-summary">
+
+        {% if order.status != 'complete' and order.status != 'published' %}
+
+        {% includeJsResource 'acclarotranslations/js/SyncOrderTool.js' %}
+
+        <a class="btn submit right" id="tool-{{ tool.getClassHandle() }}">{{ 'Sync'|t }}</a>
+        {% includejs 'new Craft.AcclaroTranslations.SyncOrderTool("'~tool.getClassHandle()~'", '~tool.getOptionsHtml()|json_encode~', "'~tool.getButtonLabel()~'");' %}
+
+        {% endif %}
+
+        <h2>{{ 'Order'|t }} #{{ order.serviceOrderId }} - {{ order.title }}</h2>
+
+        <table class="data">
+            <tbody>
+                <tr>
+                    <th>{{ 'ID'|t }}</th>
+                    <td><a href="https://apisandbox.acclaro.com/portal/vieworder.php?id={{ order.serviceOrderId }}" target="_blank">#{{ order.serviceOrderId }}</a></td>
+                </tr>
+                <tr>
+                    <th>{{ 'Name'|t }}</th>
+                    <td>{{ order.title }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'Translator'|t }}</th>
+                    <td>{{ order.translatorId ? order.translator.name : '' }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'Languages'|t }}</th>
+                    <td>
+                        {% for targetLanguage in order.targetLanguagesArray %}
+                            {{ craft.i18n.localeData.language(order.sourceLanguage) }} -&gt; {{ craft.i18n.localeData.language(targetLanguage) }}{% if not loop.last %}<br>{% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ 'Status'|t }}</th>
+                    <td>
+                        <input type="radio" name="__status" disabled="disabled"{% if order.status == 'new' %} checked="checked"{% endif %}>&nbsp;&nbsp;{{ 'Pending submission'|t }}<br>
+                        <input type="radio" name="__status" disabled="disabled"{% if order.status == 'in progress' or order.status == 'getting quote' or order.status == 'needs approval' or order.status == 'in preparation' %} checked="checked"{% endif %}>&nbsp;&nbsp;{{ 'Submitted to translator'|t }}<br>
+                        <input type="radio" name="__status" disabled="disabled"{% if order.status == 'complete' %} checked="checked"{% endif %}>&nbsp;&nbsp;{{ 'Ready to publish'|t }}<br>
+                        <input type="radio" name="__status" disabled="disabled"{% if order.status == 'published' %} checked="checked"{% endif %}>&nbsp;&nbsp;{{ 'Published'|t }}
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ 'Requested Due Date'|t }}</th>
+                    <td>{{ order.requestedDueDate ? order.requestedDueDate.format('n/j/Y') : '' }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="acclarotranslations-order-detail-activity-log">
+            <h2>{{ 'Order Activity Log'|t }}</h2>
+            <ul class="bullets">
+                {% for log in order.activityLogArray %}
+                <li>{{ log.date }} &ndash; {{ log.message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="acclarotranslations-order-detail-entries right">
+        <h2>{{ 'Order Entries Summary'|t }}</h2>
+
+        <table class="data">
+            <tbody>
+                {% for sectionName, entriesCount in entriesCountBySection %}
+                <tr>
+                    <th>{{ sectionName }}</th>
+                    <td>{{ entriesCount }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url('acclarotranslations/orders/entries/'~order.id) }}" class="btn submit">{{ 'View Entries in this Order'|t }}</a>
+    </div>
+
+{% else %}
+    <form method="post" class="acclarotranslations-order-form" data-confirm-unload accept-charset="UTF-8">
+        {{ getCsrfInput() }}
+
+        {{ forms.hidden({
+            name: 'action',
+            value: 'acclaroTranslations/saveOrder',
+        }) }}
+
+        {{ forms.hidden({
+            name: 'id',
+            value: orderId,
+        }) }}
+
+        {{ forms.hidden({
+            name: 'sourceLanguage',
+            value: order.sourceLanguage,
+        }) }}
+
+        {% if orderId %}
+        <h1>{{ 'Edit Order'|t }}</h1>
+        {% else %}
+        <h1>{{ 'Create New Order'|t }}</h1>
+        {% endif %}
+
+        <div class="acclarotranslations-order-step-btngroup">
+            <ul>
+                <li>
+                    <a class="btn big{% if orderId %} prev{% endif %}" href="#step1">1 - {{ 'Choose Entries'|t }}</a>
+                </li>
+                <li>
+                    <a class="btn big {% if orderId %}prev{% else %}disabled{% endif %}" href="#step2">2 - {{ 'Select Languages'|t }}</a>
+                </li>
+                <li>
+                    <a class="btn big {% if orderId %}prev{% else %}disabled{% endif %}" href="#step3">3 - {{ 'Add Details'|t }}</a>
+                </li>
+                <li>
+                    <a class="btn big{% if orderId is empty %} disabled{% endif %}" href="#step4">4 - {{ 'Submit'|t }}</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="acclarotranslations-order-steps">
+            <div class="acclarotranslations-order-step{% if orderId is empty %} active{% endif %}" id="step1">
+                <div class="acclarotranslations-order-step-intro">
+                    <h2>{{ 'Choose Entries'|t }}</h2>
+
+                    <p>{{ 'Entries that are added to this order will appear below. You can add entries from either of the following:'|t }}</p>
+
+                    <ul class="bullets">
+                        <li>{{ 'Entry edit screen'|t }}</li>
+                        <li>{{ 'Entry listing screens'|t }}</li>
+                    </ul>
+                </div>
+
+                {% if orderEntriesCount == 0 %}
+                <h2>{{ 'No entries selected'|t }}</h2>
+                <p><a href="{{ url('entries') }}">{{ 'Add entries from the Craft Entry listing screen.'|t }} &raquo;</a></p>
+                {% else %}
+                <table class="data">
+                    <caption><span data-order-attribute="entriesCount">{{ orderEntriesCount }}</span> {{ orderEntriesCount == 1 ? 'entry selected'|t : 'entries selected'|t }}, <span data-order-attribute="wordCount">{{ orderWordCount }}</span> {{ 'words'|t }}</caption>
+                    <thead>
+                        <tr>
+                            <th>{{ 'Title'|t }}</th>
+                            <th>{{ 'Section'|t }}</th>
+                            <th>{{ 'Date Updated'|t }}</th>
+                            <th>{{ 'Source Language'|t }}</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for element in elements %}
+                        <tr data-word-count="{{ elementWordCounts[element.id] }}">
+                            <td>{% include "_elements/element" with {'element': element} only %}</td>
+                            <td>{{ element.elementType == 'GlobalSet' ? 'Globals'|t : element.section.name }}</td>
+                            <td>{{ element.dateUpdated.format('n/j/Y') }}</td>
+                            <td>{{ craft.i18n.localeData.language(order.sourceLanguage) }}</td>
+                            <td><a class="icon delete acclarotranslations-order-delete-entry" title="{{ 'Delete entry'|t }}"><input type="hidden" name="elements[]" value="{{ element.id }}"></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% endif %}
+                </table>
+
+                <div class="item" data-position="left" data-colspan="1">
+                    <div class="buttons">
+                        <div class="btngroup submit first">
+                            <a class="btn submit acclarotranslations-order-step-next" href="#step2">{{ 'Next'|t }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acclarotranslations-order-step" id="step2">
+                <div class="acclarotranslations-order-step-intro">
+                    <h2>{{ 'Select Languages'|t }}</h2>
+
+                    <p>
+                        <i>{{ 'Select your source and target languages. Only one source language may be selected per order.'|t }}</i><br>
+                        <a href="{{ url('settings/locales') }}" target="_blank">{{ 'Add more languages from the Craft Locales settings page.'|t }} &raquo;</a>
+                    </p>
+                </div>
+
+                <div class="field">
+                    <div class="heading">
+                        <label>{{ 'Source Language'|t }}</label>
+                    </div>
+                    <div class="input {{ orientation }}">
+                        {{ craft.i18n.localeData.language(order.sourceLanguage) }}
+                    </div>
+                </div>
+
+                {{ forms.checkboxSelectField({
+                    label: 'Target Language(s)'|t,
+                    options: languages,
+                    values: order.targetLanguagesArray,
+                    name: 'targetLanguages',
+                    id: 'targetLanguages'
+                }) }}
+
+                <div class="item" data-position="left" data-colspan="1">
+                    <div class="buttons">
+                        <div class="btngroup submit first">
+                            <a class="btn submit acclarotranslations-order-step-next" href="#step3">{{ 'Next'|t }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acclarotranslations-order-step" id="step3">
+                <div class="acclarotranslations-order-step-intro">
+                    <h2>{{ 'Add Details'|t }}</h2>
+
+                    <p>
+                        <i>{{ 'Define additional details about this order.'|t }}</i>
+                    </p>
+                </div>
+
+                {{ forms.textField({
+                    label: 'Order Name'|t,
+                    value: order.title,
+                    name: 'title',
+                    id: 'title',
+                    size: 20,
+                    placeholder: 'Optional'
+                }) }}
+
+                {{ forms.selectField({
+                    fieldClass: 'hidden',
+                    label: 'Order Owner'|t,
+                    value: null,
+                    options: owners,
+                    name: 'ownerId',
+                    id: 'ownerId',
+                    size: 20
+                }) }}
+
+                {{ forms.dateField({
+                    label: 'Requested Due Date'|t,
+                    value: order.requestedDueDate,
+                    name: 'requestedDueDate',
+                    id: 'requestedDueDate',
+                    size: 20,
+                    placeholder: 'Optional'
+                }) }}
+
+                {{ forms.textareaField({
+                    label: 'Additional comments and instructions'|t,
+                    value: order.comments,
+                    name: 'comments',
+                    id: 'comments',
+                    size: 20
+                }) }}
+
+                <div class="item" data-position="left" data-colspan="1">
+                    <div class="buttons">
+                        <div class="btngroup submit first">
+                            <a class="btn submit acclarotranslations-order-step-next" href="#step4">{{ 'Next'|t }}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="acclarotranslations-order-step{% if orderId %} active{% endif %}" id="step4">
+                <div class="acclarotranslations-order-step-intro">
+                    <h2>{{ 'Review & Submit'|t }}</h2>
+
+                    <p>
+                        <i>{{ 'Review the summary of this order and submit for Translation.'|t }}</i>
+                    </p>
+
+                    <table class="data">
+                        <tbody>
+                            {% if order.serviceOrderId is not empty %}
+                            <tr>
+                                <th>{{ 'ID'|t }}</th>
+                                <td>{{ order.serviceOrderId }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th>{{ 'Name'|t }}</th>
+                                <td data-order-attribute="title">{{ order.title }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ 'Languages'|t }}</th>
+                                <td>
+                                    {{ craft.i18n.localeData.language(order.sourceLanguage) }}
+                                    -&gt;
+                                    {% if orderId %}
+                                    <span data-order-attribute="targetLanguages">
+                                    {% for language in order.targetLanguagesArray %}
+                                        {{ craft.i18n.localeData.language(language) }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                    </span>
+                                    {% else %}
+                                    <span data-order-attribute="targetLanguages">{{ languages|join(', ') }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{{ 'Requested due date'|t }}</th>
+                                <td data-order-attribute="requestedDueDate[date]">{{ order.requestedDueDate ? order.requestedDueDate.format('n/j/Y') : '' }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ 'Entries'|t }}</th>
+                                <td data-order-attribute="entriesCount">{{ orderEntriesCount }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ 'Words'|t }}</th>
+                                <td data-order-attribute="wordCount">{{ orderWordCount }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                {{ forms.selectField({
+                    label: 'Translation Service'|t,
+                    value: order.translatorId,
+                    options: translatorOptions,
+                    name: 'translatorId',
+                    id: 'translatorId',
+                    size: 20
+                }) }}
+
+                <div class="field">
+                    <div class="heading">
+                        <label>{{ 'Requested Due Date'|t }}</label>
+                        &nbsp;&nbsp;&nbsp;
+                        <a class="acclarotranslations-order-step-prev" href="#step3">Edit &raquo;</a>
+                    </div>
+                    <div class="input {{ orientation }}">
+                        <div data-order-attribute="requestedDueDate[date]">
+                        {% if order.requestedDueDate %}
+                            {{ order.requestedDueDate.format('n/j/Y') }}
+                        {% else %}
+                            <i>None</i>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <div class="heading">
+                        <label>{{ 'Additional comments and instructions'|t }}</label>
+                        &nbsp;&nbsp;&nbsp;
+                        <a class="acclarotranslations-order-step-prev" href="#step3">Edit &raquo;</a>
+                    </div>
+                    <div class="input {{ orientation }}">
+                        <div data-order-attribute="comments" style="white-space: pre-wrap">{% if order.comments %}{{ order.comments }}{% else %}<i>None</i>{% endif %}</div>
+                    </div>
+                </div>
+
+                <div class="item" data-position="left" data-colspan="1">
+                    <div class="buttons">
+                        <div class="btngroup submit">
+                            <button type="submit" name="submit" value="submit" class="acclarotranslations-order-submit-btn btn big submit{% if orderEntriesCount == 0 %} disabled{% endif %}"{% if orderEntriesCount == 0 %} disabled="disabled"{% endif %} onclick="setTimeout(function(){window.location.href=Craft.getCpUrl('acclarotranslations/orders')},1000)">{{ 'Submit'|t }}</button>
+                        </div>
+                        <div class="btngroup submit">
+                            <button type="submit" class="acclarotranslations-order-save-btn btn big">{{ 'Save'|t }}</button>
+                        </div>
+                        <div class="acclarotranslations-loader hidden">
+                            <div class="spinner"></div>
+                            <p class="acclarotranslations-loader-msg hidden">{{ 'Please wait and do not close this window until the page finishes loading.'|t }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,9 @@
+vendor/pimple/pimple/ext
+vendor/pimple/pimple/src/Pimple/Tests
+vendor/**/*.yml
+vendor/**/*.md
+vendor/**/*.rst
+vendor/**/.gitignore
+vendor/**/*.xml.dist
+vendor/**/CHANGELOG
+vendor/**/LICENSE

@@ -8,6 +8,7 @@
 	"Reset Password",
 	"Check your email for instructions to reset your password."
 %}
+{% includejsresource "okta/sso.js" %}
 
 {% set username = (craft.config.rememberUsernameDuration ? craft.session.rememberedUsername : '') %}
 
@@ -21,6 +22,7 @@
 			document.cookie = cookieTest + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
 			document.write(
+
 				'{%- set hasLogo = (CraftEdition >= CraftClient and craft.rebrand.isLogoUploaded ? true : false) -%}'+
 				'<form id="login-form" method="post" accept-charset="UTF-8" {% if hasLogo -%}
 						{%- set logo = craft.rebrand.logo -%}
@@ -28,6 +30,7 @@
 						class="has-logo" style="background-image: url(\'{{ logo.url }}\'); background-size: {{ logo.width }}px {{ logo.height }}px; padding-top: {{ padding }}px; margin-top: -{{ round((353+padding)/2) }}px"
 					{%- endif %}>' +
 					'{% if not hasLogo -%}<h1>{{ siteName }}</h1>{%- endif %}'+
+					'<br>' +
 					'{% set placeHolderText = (craft.config.useEmailAsUsername ? "Email"|t : "Username or Email"|t) %}' +
 					'{{ forms.textField({ id: "loginName", name: "username", placeholder: placeHolderText, value: username })|e("js") }}' +
 
@@ -40,12 +43,17 @@
 					'</div>' +
 
 					'<div class="buttons">' +
-						'{# <div id="ssl-icon" class="disabled"><div class="{{ craft.request.isSecure ? "secure" : "insecure" }} icon"></div></div>#}' +
+						'{# <div id="ssl-icon" class=""><div class="{{ craft.request.isSecure ? "secure" : "insecure" }} icon"></div></div>#}' +
 						'<input id="submit" class="btn submit disabled" type="submit" value="{{ "Login"|t }}">' +
 						'<div id="spinner" class="spinner hidden"></div>' +
+						'<br>' +
+						'<form>'+
+							'<input id="submit" class="okta" type="button" value="{{ "Log in with Okta"|t }}" onclick="oktaLogin();">' +
+						'</form>'+
 					'</div>' +
-					'<a id="poweredby" href="http://craftcms.com/" title="{{ "Powered by Craft CMS"|t }}"><img src="{{ resourceUrl("images/craftcms.svg") }}" /></a>'+
+//					'<a id="poweredby" href="http://craftcms.com/" title="{{ "Powered by Craft CMS"|t }}"><img src="{{ resourceUrl("images/craftcms.svg") }}" /></a>'+
 				'</form>'
+
 			);
 
 			{% if not craft.request.isMobileBrowser(true) %}
@@ -70,4 +78,11 @@
 			);
 		}
 	</script>
+
+	{#<div id="loginBlock">
+		{% set image = craft.rebrand.logo %}
+		<img id="logo" src='{{image.getUrl()}}' />
+
+		<button type=button class="okta" onclick="oktaLogin();"> Log in with Okta </button>
+	</div> #}
 {% endblock %}

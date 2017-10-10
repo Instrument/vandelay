@@ -1,5 +1,5 @@
 <?php
-
+ini_set('max_execution_time', 300);
 // Path to your craft/ folder
 $craftPath = '../craft';
 

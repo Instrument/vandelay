@@ -1,17 +1,21 @@
 # Craft runtime and backups folders
 # ----------------------------------------------------------------------
-/craft/storage/*
-!/craft/storage/logo/*
-!/craft/storage/userphotos/
+/craft/storage/runtime/*
+/craft/storage/backups/*
+deploy/xfr/*
+bashrc
 
 # Uploaded files
 # ----------------------------------------------------------------------
 node_modules/
+public/imager
 
 # Misc files
 # ----------------------------------------------------------------------
 .DS_Store
 Thumbs.db
+.idea
+.vscode
 .cache
 .project
 .settings
