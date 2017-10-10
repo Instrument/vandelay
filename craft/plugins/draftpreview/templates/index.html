@@ -1,0 +1,76 @@
+{% block header %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+<link rel="apple-touch-icon" sizes="100x100" href="{{ resourceUrl('draftpreview/icon_100.png') }}">
+<link rel="shortcut icon" href="{{ resourceUrl('draftpreview/favicon.ico') }}">
+<style>
+@font-face {
+    font-family: AvenirNext;
+    font-style: normal;
+    font-weight: 400;
+    src: url({{ resourceUrl('draftpreview/fonts/avenir-next-regular.woff') }} format("woff")
+}
+
+@font-face {
+    font-family: AvenirNext-Bold;
+    font-style: normal;
+    font-weight: 700;
+    src: url({{ resourceUrl('draftpreview/fonts/avenir-next-bold.woff') }} format("woff")
+}
+
+@font-face {
+    font-family: AvenirNext-Medium;
+    font-style: normal;
+    font-weight: 500;
+    src: url({{ resourceUrl('draftpreview/fonts/avenir-next-medium.woff') }} format("woff")
+}
+
+@font-face {
+    font-family: AvenirNext-DemiBold;
+    font-style: normal;
+    font-weight: 700;
+    src: url({{ resourceUrl('draftpreview/fonts/avenir-next-demi.woff') }}) format("woff")
+}
+
+body,
+html {
+    height: 100%;
+    min-height: 100%
+}
+
+body {
+    margin: 0;
+    width: 100%;
+    display: block;
+    overflow-x: hidden;
+    background-color: #fff;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    margin: 0;
+    font-weight: 400
+}
+</style>
+<title>Snapchat</title>
+<script>
+  window.pageData = {{ collections|raw }};
+</script>
+<script src="{{ resourceUrl('draftpreview/js/fc2b65e6-7977-4cbb-89cf-db3809269ed6.js') }}"></script>
+<noscript>Your browser does not support JavaScript!</noscript>
+<link href="{{ resourceUrl('draftpreview/static/css/main.040ec719.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<div id="app"></div>
+    <script type="text/javascript" src="{{ resourceUrl('draftpreview/static/js/manifest.bundle.js') }}"></script>
+    <script type="text/javascript" src="{{ resourceUrl('draftpreview/static/js/vendor-static.bundle.js') }}"></script>
+    <script type="text/javascript" src="{{ resourceUrl('draftpreview/static/js/main.bundle.js') }}"></script>
+{% endblock %}
