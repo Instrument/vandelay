@@ -145,6 +145,14 @@ else
     fi
         gcloud sql users create $sql_username $gce_ip --instance=$sql_instance_name --password=$sql_password
 
+    gsql_globaluser=$(gcloud sql users list --instance=$sql_instance_name --filter="NAME:$sql_username AND HOST:%")
+    if [[ $gsql_globaluser != NAME* ]]; then
+        echo "WARNING!" 1>&2
+        echo "It appears that this user also has permissions from % (any host). " 1>&2
+        echo "This may cause errors when you try to connect from the web server." 1>&2
+        echo "You can resolve this in the Cloud SQL area of the Console website." 1>&2
+    fi
+
 
     # update the bashrc file with the new env vars
     sed -i '' "s/GCLOUDDBIP/$sql_ip/g" bashrc
