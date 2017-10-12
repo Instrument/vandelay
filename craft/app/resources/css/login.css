@@ -1,9 +1,12 @@
 /* Flexbox stuff */
 /* Other */
 /* RTL stuff */
-html, body { height: 100%; }
+html, body { height: 100%;}
 
-#login-form { display: block; position: absolute; top: 50%; left: 50%; margin: -208px 0 0 -150px; width: 300px; background: no-repeat center top; }
+body {overflow-x: hidden;}
+
+#login-form { display: block; position: relative;}
+/*#login-form { display: block; position: absolute; top: 50%; left: 50%; margin: -208px 0 0 -150px; width: 300px; background: no-repeat center top; }*/
 
 #login-form.has-logo {
   padding-top: 116px;
@@ -19,7 +22,7 @@ html, body { height: 100%; }
 
 .passwordwrapper .password-toggle { z-index: 1; }
 
-#loginName { padding: 14px 16px; border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+#loginName { padding: 14px 16px; border-top-left-radius: 4px; border-top-right-radius: 4px; border-bottom-left-radius: 0; border-bottom-right-radius: 0;}
 
 #login-form.reset-password #loginName { border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; }
 
@@ -29,8 +32,9 @@ html, body { height: 100%; }
 body.ltr #password-field .passwordwrapper .password-toggle { right: 14px; }
 body.rtl #password-field .passwordwrapper .password-toggle { left: 14px; }
 
-#rememberMe-field { padding-top: 24px; }
+#rememberMe-field { padding-top: 24px; float: left; width: 50%; text-align: left; display: inline-block;}
 
+#forgot-wrapper {float: left; text-align: right; width: 50%; display: inline-block;}
 #forgot-password { position: relative; z-index: 1; display: block; font-style: normal; font-size: 11px; color: #8f98a3; margin-top: 24px; }
 body.ltr #forgot-password { float: right; }
 body.rtl #forgot-password { float: left; }
@@ -48,7 +52,7 @@ body.rtl #login-form #ssl-icon { right: 0; }
 body.ltr #login-form #ssl-icon + #submit { padding-left: 2em; }
 body.rtl #login-form #ssl-icon + #submit { padding-right: 2em; }
 
-#login-form .submit { display: block; width: auto; float: none; padding: 14px 16px; height: auto; width: 100%; border-radius: 4px; }
+#login-form .submit { display: block; width: auto; float: none; padding: 14px 16px; height: auto; width: 100%; border-radius: 4px; margin-top: 16px;}
 
 #spinner { position: absolute; top: 58px; left: 50%; margin-left: -12px; }
 
@@ -69,25 +73,84 @@ body.rtl .modal.email-sent .body { padding-right: 68px; }
 body.ltr .modal.email-sent .body:before { left: 24px; }
 body.rtl .modal.email-sent .body:before { right: 24px; }
 
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-moz-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3 / 2), only screen and (min-device-pixel-ratio: 1.5), only screen and (min-resolution: 1.5dppx) { #login-form { background-size: 202px; } }
 
-#loginBlock {
+
+#loginBlock, #adminLoginBlock {
   width: 50%;
-  height: 50%;
-  position: absolute;
+  position: relative;
   top:0;
   bottom: 0;
   left: 0;
   right: 0;
   display: block;
-
   margin: auto;
 }
 
+#loginBlock {
+  height: 30%;
+}
+
+#adminLoginBlock {
+  background-color: #e2e3e4;
+  text-align: center;
+  padding: 1em;
+  width: 25%;
+  max-width: 500px;
+  min-width: 300px;
+  box-sizing: border-box;
+  height: 350px
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) and (max-width: 767px),
+only screen and (min--moz-device-pixel-ratio: 1.5) and (max-width: 767px),
+only screen and (-o-min-device-pixel-ratio: 3 / 2) and (max-width: 767px),
+only screen and (min-device-pixel-ratio: 1.5) and (max-width: 767px),
+only screen and (min-resolution: 1.5dppx) and (max-width: 767px){
+  #loginBlock {height: 30%; width: 80%; margin-bottom: 3em;}
+  #adminLoginBlock { padding: 1em; width: 80%;}
+  #login-form { background-size: 202px;}
+}
+
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) and (min-width: 500px) and (max-width: 1024px),
+only screen and (min--moz-device-pixel-ratio: 1.5) and (min-width: 500px) and (max-width: 1024px),
+only screen and (-o-min-device-pixel-ratio: 3 / 2) and (min-width: 500px) and (max-width: 1024px),
+only screen and (min-device-pixel-ratio: 1.5) and (min-width: 500px) and (max-width: 1024px),
+only screen and (min-resolution: 1.5dppx) and (min-width: 500px) and (max-width: 1024px) {
+  #loginBlock {height: 25%; width: 80%; margin-bottom: 3em;}
+  #adminLoginBlock { padding: 1em;  width: 478px;;}
+  /*#login-form { background-size: 202px;}*/
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) and (min-width: 800px) {
+  #loginBlock {height: 25%; width: 478px; margin-bottom: 3em;}
+  #adminLoginBlock { padding: 1em;  width: 478px;;}
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5) and (max-width: 767px) {
+  #login-form #rememberMe-field, #login-form #forgot-wrapper {
+    width: 100%;
+    clear: both;
+    /*border: dashed #444444 1px;*/
+    padding-top: 10px;
+  }
+  #login-form #forgot-wrapper {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    text-align: left;
+  }
+
+  body.ltr #forgot-password {
+    float: left;
+    margin-top: 0;
+  }
+
+
+}
 #logo {
   display: block;
   margin: auto;
-  padding: 48px;
+  padding: 48px 48px 12px 48px;
 }
 
 .okta {
@@ -105,7 +168,7 @@ body.rtl .modal.email-sent .body:before { right: 24px; }
   letter-spacing: 0;
   color: #FFFFFF;
   line-height: 16px;
-  width: 240px;
+  width: auto;
   height: 50px;
   cursor: pointer;
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
@@ -121,7 +184,7 @@ body.rtl .modal.email-sent .body:before { right: 24px; }
 }
 .okta:active {
   transform: translate(0, 5px);
-  box-shadow: 0 -5px -10px rgba(0,0,0,0.1);
+  box-shadow: 0 -5px 10px rgba(0,0,0,0.1);
 }
 
 @keyframes nudge {

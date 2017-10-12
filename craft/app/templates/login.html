@@ -13,6 +13,16 @@
 {% set username = (craft.config.rememberUsernameDuration ? craft.session.rememberedUsername : '') %}
 
 {% block body %}
+<div id="loginBlock">
+	{% set image = craft.rebrand.logo %}
+	<img id="logo" src='{{craft.rebrand.logo.url}}' />
+
+	<button type=button class="okta" onclick="oktaLogin();">Staff log in with Okta </button>
+</div>
+
+<!--<div id="adminLoginBlock" style="position: relative!important; margin: 2em 0!important; display: inline-block; padding: 2em; background-color: #DDDDDD; width: 50%">Administrator Login:</div>-->
+<div id="adminLoginBlock">
+
     <script type="text/javascript">
 		var cookieTest = 'CraftCookieTest='+Math.floor(Math.random() * 1000000);
 		document.cookie = cookieTest;
@@ -21,25 +31,20 @@
 		{
 			document.cookie = cookieTest + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 
-			document.write(
+
+			document.getElementById('adminLoginBlock').innerHTML = '{%- set hasLogo = (CraftEdition >= CraftClient and craft.rebrand.isLogoUploaded ? true : false) -%}'+
 
 				'{%- set hasLogo = (CraftEdition >= CraftClient and craft.rebrand.isLogoUploaded ? true : false) -%}'+
-				'<form id="login-form" method="post" accept-charset="UTF-8" {% if hasLogo -%}
-						{%- set logo = craft.rebrand.logo -%}
-						{%- set padding = logo.height + 30 -%}
-						class="has-logo" style="background-image: url(\'{{ logo.url }}\'); background-size: {{ logo.width }}px {{ logo.height }}px; padding-top: {{ padding }}px; margin-top: -{{ round((353+padding)/2) }}px"
-					{%- endif %}>' +
-					'{% if not hasLogo -%}<h1>{{ siteName }}</h1>{%- endif %}'+
-					'<br>' +
+				'<h3>Administrator Login:</h3> <form id="login-form" method="post" accept-charset="UTF-8" >' +
 					'{% set placeHolderText = (craft.config.useEmailAsUsername ? "Email"|t : "Username or Email"|t) %}' +
-					'{{ forms.textField({ id: "loginName", name: "username", placeholder: placeHolderText, value: username })|e("js") }}' +
+					'{{ forms.textField({ id: "loginName", name: "username", placeholder: "Username", value: "" })|e("js") }}' +
 
 					'<div id="login-fields" class="nested-fields">' +
 						'{{ forms.passwordField({ id: "password", name: "password", placeholder: "Password"|t })|e("js") }}' +
-						'<a id="forgot-password">{{ "Forget your password?"|t }}</a>' +
 						{% if craft.config.rememberedUserSessionDuration %}
 							'{{ forms.checkboxField({ id: "rememberMe", label: "Keep me logged in"|t })|e("js") }}' +
 						{% endif %}
+			            '<div id="forgot-wrapper"><a id="forgot-password">{{ "Forget your password?"|t }}</a></div>' +
 					'</div>' +
 
 					'<div class="buttons">' +
@@ -47,18 +52,14 @@
 						'<input id="submit" class="btn submit disabled" type="submit" value="{{ "Login"|t }}">' +
 						'<div id="spinner" class="spinner hidden"></div>' +
 						'<br>' +
-						'<form>'+
-							'<input id="submit" class="okta" type="button" value="{{ "Log in with Okta"|t }}" onclick="oktaLogin();">' +
-						'</form>'+
 					'</div>' +
-//					'<a id="poweredby" href="http://craftcms.com/" title="{{ "Powered by Craft CMS"|t }}"><img src="{{ resourceUrl("images/craftcms.svg") }}" /></a>'+
-				'</form>'
+				'</form>';
 
-			);
-
-			{% if not craft.request.isMobileBrowser(true) %}
+			{#
+				// removing focus function since most users will be going through Okta
+				{% if not craft.request.isMobileBrowser(true) %}
 				document.getElementById("{{ (username ? 'password' : 'loginName') }}").focus();
-			{% endif %}
+			{% endif %} #}
 		}
 		else
 		{
@@ -78,11 +79,5 @@
 			);
 		}
 	</script>
-
-	{#<div id="loginBlock">
-		{% set image = craft.rebrand.logo %}
-		<img id="logo" src='{{image.getUrl()}}' />
-
-		<button type=button class="okta" onclick="oktaLogin();"> Log in with Okta </button>
-	</div> #}
+</div>
 {% endblock %}
