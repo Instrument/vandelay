@@ -11,34 +11,22 @@ function transformForAutocomplete($entry) {
     ];
 }
 
-$cdnUrl = craft()->config->get('environmentVariables')['siteUrl'];
-
-function transform2x($asset, $siteUrl) {
-    $imageUrl = "";
+function transform2x($asset) {
+    $imageUrl = null;
     if ($asset) {
         craft()->config->set('generateTransformsBeforePageLoad', true);
-        if (craft()->plugins->getPlugin('Imager')) {
-            $image = craft()->imager->transformImage($asset, [
-                'width' => $asset->width,
-            ], null, null);
-            $imageUrl = $image->url;
-        }
+        $imageUrl = $asset->getUrl(['width' => $asset->width]);
     }
-    return "$siteUrl$imageUrl";
+    return "$imageUrl";
 }
 
-function transform1x($asset, $siteUrl) {
-    $imageUrl = "";
+function transform1x($asset) {
+    $imageUrl = null;
     if ($asset) {
         craft()->config->set('generateTransformsBeforePageLoad', true);
-        if (craft()->plugins->getPlugin('Imager')) {
-            $image = craft()->imager->transformImage($asset, [
-                'width' => $asset->width / 2,
-            ], null, null);
-            $imageUrl = $image->url;
-        }
+        $imageUrl = $asset->getUrl(['width' => $asset->width / 2]);
     }
-    return "$siteUrl$imageUrl";
+    return "$imageUrl";
 }
 
 function normalizeEntry($entry) {
@@ -190,10 +178,10 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                 $render[$handle]['height'] = $entry[$handle][0]->height;
                 $render[$handle]['title'] = $entry[$handle][0]->title;
                 if (in_array(strtolower($entry[$handle][0]->extension), $imageExtensions)) {
-                    // $render[$handle]['url2x'] = transform2x($entry[$handle][0], $cdnUrl);
-                    // $render[$handle]['url1x'] = transform1x($entry[$handle][0], $cdnUrl);
-                    $render[$handle]['url2x'] = $entry[$handle][0]->url;
-                    $render[$handle]['url1x'] = $entry[$handle][0]->url;
+                    $render[$handle]['url2x'] = transform2x($entry[$handle][0]);
+                    $render[$handle]['url1x'] = transform1x($entry[$handle][0]);
+                    // $render[$handle]['url2x'] = $entry[$handle][0]->url;
+                    // $render[$handle]['url1x'] = $entry[$handle][0]->url;
                 }
                 // $rsender['normalized-aset-1'] = normalizeEntry($entry);
               } else if (count($entry[$handle]) > 1) {
@@ -206,10 +194,10 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                     $assets[$key1]['height'] = $value1->height;
                     $assets[$key1]['title'] = $value1->title;
                     if (in_array(strtolower($value1->extension), $imageExtensions)) {
-                        // $assets[$key1]['url2x'] = transform2x($value1, $cdnUrl);
-                        // $assets[$key1]['url1x'] = transform1x($value1, $cdnUrl);
-                        $assets[$key1]['url2x'] = $value1->url;
-                        $assets[$key1]['url1x'] = $value1->url;
+                        $assets[$key1]['url2x'] = transform2x($value1);
+                        $assets[$key1]['url1x'] = transform1x($value1);
+                        // $assets[$key1]['url2x'] = $value1->url;
+                        // $assets[$key1]['url1x'] = $value1->url;
                     }
                   // $assets[$key1]['normalized-asset-2'] = normalizeEntry($value1);
                 }
