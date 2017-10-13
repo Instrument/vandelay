@@ -1,0 +1,37 @@
+# Prewind plugin for Craft CMS
+
+Execute craft image transforms on save.
+
+![Screenshot](resources/screenshots/plugin_logo.png)
+
+## Installation
+
+To install Prewind, follow these steps:
+
+1. Download & unzip the file and place the `prewind` directory into your `craft/plugins` directory
+2.  -OR- do a `git clone https://github.com/mortscode/prewind.git` directly into your `craft/plugins` folder.  You can then update it with `git pull`
+3.  -OR- install with Composer via `composer require mortscode/prewind`
+4. Install plugin in the Craft Control Panel under Settings > Plugins
+5. The plugin folder should be named `prewind` for Craft to see it.  GitHub recently started appending `-master` (the branch name) to the name of the folder for zip file downloads.
+
+Prewind works on Craft 2.4.x and Craft 2.5.x.
+
+## Prewind Overview
+
+-Insert text here-
+
+## Configuring Prewind
+
+-Insert text here-
+
+## Using Prewind
+
+-Insert text here-
+
+## Prewind Roadmap
+
+Some things to do, and ideas for potential features:
+
+* Release it
+
+Brought to you by [Mort](github.com/mortscode)
