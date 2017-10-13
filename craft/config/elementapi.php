@@ -76,7 +76,7 @@ function normalizeEntry($entry) {
               $block = craft()->neo->getBlockById($id);
               $entriesData->_data->$id = normalizeEntry($block);
           }
-          $normalized[$handle] = $entriesData;  
+          $normalized[$handle] = $entriesData;
         }  elseif ($classHandle == 'Assets') {
             $entryIds = $entry[$handle]->ids();
             $normalized[$handle] = array(
@@ -116,13 +116,13 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
              $itemsRaw[$key] = $value;
         }
     }
-    
+
     if (isset($entry['type']['handle'])) {
         $render['type'] = $entry['type']['handle'];
     }
     // $render['shouldNormalize'] = $normalized;
     if ($normalized) {
-      $render['normalized'] = normalizeEntry($entry);  
+      $render['normalized'] = normalizeEntry($entry);
     }
     foreach ($entry->fieldLayout->fields as $key => $value) {
         $handle = $value->field->handle;
@@ -151,7 +151,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                             $newFields = $fields[$handle];
                         }
                     }
-                    
+
                     $vals = getValues($entry[$handle][$key1], $newFields, $key1); // , true, $normalized);
                     $vals['handle'] = $handle;
                     if (isset($vals['sectionTitle_loc'])) {
@@ -217,7 +217,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                         $filteredFields[$fvalue->field->handle] = [];
                       }
                     }
-                    
+
                     // $filteredFields['title_loc'] = [];
                     // $filteredFields['brandLogo'] = [];
                     // $filteredFields['cardHeadline_loc'] = [];
@@ -230,9 +230,9 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                     // $filteredFields['spotlightSummary_loc'] = [];
                     // $filteredFields['cardImage'] = [];
                     // $filteredFields['cardColor'] = [];
-                    $render[$handle]['data'][$key4]['data'] = getValues($value1, $filteredFields, $handle); // , false, $normalized);                     
+                    $render[$handle]['data'][$key4]['data'] = getValues($value1, $filteredFields, $handle); // , false, $normalized);
                    } else {
-                    $render[$handle]['data'][$key4]['data'] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : [], $handle); // , false, $normalized); 
+                    $render[$handle]['data'][$key4]['data'] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : [], $handle); // , false, $normalized);
                    }
 
                }
@@ -255,9 +255,9 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                     //   if ($entry[$handle]) {
                         if ($entry[$handle]->type === 'entry') {
                             if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
-                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
+                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
                             } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) { // TODO update to remove the _loc
-                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];  
+                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                             } else {
                             if (isset($entry[$handle]->entry->attributes['slug'])) {
                                 $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->attributes['slug'];
@@ -273,11 +273,11 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                         $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                       }
                     }
-                    if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton' || $handle === 'relatedContentButton') {
+                    if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton' || $handle === 'relatedContentButton' || $handle === 'cardCta') {
                       if (isset($entry[$handle]->attributes)) {
                         if ($entry[$handle]->attributes['type'] === 'entry') {
                           if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
-                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];    
+                            $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
                           } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) {
                             $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                           }
@@ -312,7 +312,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
       $entryType = $entry->type;
       $render['entryType'] = $entryType->handle;
       if (isset($entry->attributes['postDate'])) {
-        $render['postDate'] = $entry->attributes['postDate']->getTimestamp();  
+        $render['postDate'] = $entry->attributes['postDate']->getTimestamp();
       }
     }
 
@@ -362,7 +362,7 @@ return [
         },
         'api/<section:[a-zA-Z0-9]*>.json' => function($section) {
             $params = craft()->request->getQuery();
-            
+
             return [
             'elementType' => 'Entry',
             'criteria' => [
