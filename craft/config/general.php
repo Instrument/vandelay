@@ -7,6 +7,7 @@ return array(
 		'enableCsrfProtection' => false,
     'cpTrigger' => 'admin',
     'maxUploadFileSize' => 16000000,
+    'phpMaxMemoryLimit' => '1024M',
     'defaultSearchTermOptions' => array(
       'subLeft' => true,
       'subRight' => true,
