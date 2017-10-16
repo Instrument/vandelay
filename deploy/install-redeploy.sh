@@ -32,6 +32,7 @@ sleep 1
 echo "Updating website files"
 rm -r craftfiles
 unzip craftfiles.zip 1>/dev/null
+rm -r /var/www/craft
 cp -r craftfiles/craft /var/www/
 rm -r /var/www/html
 cp -r craftfiles/public /var/www/html
