@@ -3,7 +3,8 @@ return array(
   '*' => array(
     'omitScriptNameInUrls' => true,
     'limitAutoSlugsToAscii' => true,
-		'defaultWeekStartDay' => 0,
+    'defaultWeekStartDay' => 0,
+    'defaultImageQuality' => 90,
 		'enableCsrfProtection' => false,
     'cpTrigger' => 'admin',
     'maxUploadFileSize' => 16000000,
