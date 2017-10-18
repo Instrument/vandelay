@@ -148,10 +148,10 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                               $newFields = $fields[$handle];
                          }
                      }
-                     $vals = getValues($entry[$handle][$key1], $newFields, $handle, false, false); 
-                     $vals['handle'] = $handle;
                      if($entry[$handle][$key1]->parent) {
                       if ($entry[$handle][$key1]->parent->status !== 'disabled') {
+                        $vals = getValues($entry[$handle][$key1], $newFields, $handle, false, false); 
+                        $vals['handle'] = $handle;
                         $render[$handle][] = $vals; 
                       }
                      }
@@ -166,9 +166,10 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                           }
                       }
                       
-                      $vals = getValues($entry[$handle][$key1], $newFields, $key1); 
-                      $vals['handle'] = $handle;
                       if($entry[$handle][$key1]->status === 'enabled') {
+                        $vals = getValues($entry[$handle][$key1], $newFields, $key1); 
+                        $vals['handle'] = $handle;
+                      
                         if (isset($vals['sectionTitle_loc'])) {
                             $GLOBALS['currSection']++;
 
