@@ -109,14 +109,8 @@ function normalizeEntry($entry) {
 
 $GLOBALS['currSection'] = -1;
 $GLOBALS['count'] = 0;
-// $GLOBALS['limit'] = 600;
-// $GLOBALS['ignores'] = [];
-// $GLOBALS['ignores'][0] = 'relatedEntries';
 
 function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normalized = false) {
-  // if ($GLOBALS['count'] >= $GLOBALS['limit']) {
-  //   return [];//['maxedOut'] = true;
-  // } else {
     $GLOBALS['count']++;
     $items=[];
     $render = [];
@@ -138,7 +132,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
       if (isset($entry['type']['handle'])) {
           $render['type'] = $entry['type']['handle'];
       }
-      // $render['shouldNormalize'] = $normalized;
       if ($normalized) {
         $render['normalized'] = normalizeEntry($entry);  
       }
@@ -155,14 +148,13 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                               $newFields = $fields[$handle];
                          }
                      }
-                     $vals = getValues($entry[$handle][$key1], $newFields, $handle, false, false); // , false, $normalized);
+                     $vals = getValues($entry[$handle][$key1], $newFields, $handle, false, false); 
                      $vals['handle'] = $handle;
                      if($entry[$handle][$key1]->parent) {
                       if ($entry[$handle][$key1]->parent->status !== 'disabled') {
                         $render[$handle][] = $vals; 
                       }
                      }
-                     // $render['normalized'] = normalizeEntry($entry);
                   }
               } else if ($type == 'Neo') {
                   $GLOBALS['currSection'] = -1;
@@ -174,7 +166,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                           }
                       }
                       
-                      $vals = getValues($entry[$handle][$key1], $newFields, $key1); // , true, $normalized);
+                      $vals = getValues($entry[$handle][$key1], $newFields, $key1); 
                       $vals['handle'] = $handle;
                       if($entry[$handle][$key1]->status === 'enabled') {
                         if (isset($vals['sectionTitle_loc'])) {
@@ -182,17 +174,15 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
 
                             $render[$handle][$GLOBALS['currSection']] = getValues($entry[$handle][$key1], $newFields, $handle, true); // , $normalized);
                             $render[$handle][$GLOBALS['currSection']]['elements'] = [];
-                            // $render[$handle][$GLOBALS['currSection']]['normalized-neo-1'] = normalizeEntry($entry);
                         } else {
                             if($entry[$handle][$key1]->parent) {
                               if ($entry[$handle][$key1]->parent->status !== 'disabled') {
                                 if ($vals['handle'] === 'footerLinks' || $vals['handle'] === 'entryBuilder' || $vals['handle'] === 'primaryNavigation' || $vals['handle'] === 'storyBuilder') {
                                   $GLOBALS['currSection']++;
                                 }
-                                $vals2 = getValues($entry[$handle][$key1], $newFields, $handle, true); // , $normalized);
+                                $vals2 = getValues($entry[$handle][$key1], $newFields, $handle, true); 
                                 $vals2['type'] = $entry[$handle][$key1]->type->handle;
                                 $render[$handle][$GLOBALS['currSection']]['elements'][] = $vals2;
-                                // $render[$handle][$GLOBALS['currSection']]['normalized-neo-2'] = normalizeEntry($entry);
                               }
                             }
                         }
@@ -211,7 +201,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                       $render[$handle]['url2x'] = $entry[$handle][0]->url;
                       $render[$handle]['url1x'] = $entry[$handle][0]->url;
                   }
-                  // $rsender['normalized-aset-1'] = normalizeEntry($entry);
                 } else if (count($entry[$handle]) > 1) {
                   $assets = [];
                   foreach ($entry[$handle] as $key1 => $value1) {
@@ -227,7 +216,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                           $assets[$key1]['url2x'] = $value1->url;
                           $assets[$key1]['url1x'] = $value1->url;
                       }
-                    // $assets[$key1]['normalized-asset-2'] = normalizeEntry($value1);
                   }
                   $render[$handle] = $assets;
                  }
@@ -235,7 +223,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                  $render[$handle]['type'] = $type;
                  foreach ($entry[$handle] as $key4 => $value1) {
                      $render[$handle]['data'][$key4]['slug'] = $value1['slug'];
-                     // $render[$handle]['data'][$key4]['parentKey'] = $parentKey;
                      if ($parentKey === 'relatedEntries') {
                       // This filteredFields is to prevent relatedEntries from getting stuck into another relatedEntries entry.
                       // May need to add more fields to this.
@@ -245,19 +232,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                           $filteredFields[$fvalue->field->handle] = [];
                         }
                       }
-                      
-                      // $filteredFields['title_loc'] = [];
-                      // $filteredFields['brandLogo'] = [];
-                      // $filteredFields['cardHeadline_loc'] = [];
-                      // $filteredFields['cardDeviceImage'] = [];
-                      // $filteredFields['brandColor'] = [];
-                      // $filteredFields['lightText'] = [];
-                      // $filteredFields['slug'] = [];
-                      // $filteredFields['title'] = [];
-                      // $filteredFields['spotlightDeviceAsset'] = [];
-                      // $filteredFields['spotlightSummary_loc'] = [];
-                      // $filteredFields['cardImage'] = [];
-                      // $filteredFields['cardColor'] = [];
                       $render[$handle]['data'][$key4]['data'] = getValues($value1, $filteredFields, $handle); // , false, $normalized);                     
                      } else {
                       $render[$handle]['data'][$key4]['data'] = getValues($value1, isset($fields[$handle]) ? $fields[$handle] : [], $handle); // , false, $normalized); 
@@ -280,7 +254,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                       }
                       if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem' || $handle === 'successStoriesButton' || $handle === 'creativeSpotlightButton') {
                         $render['buttonStyle'] = $entry->type->handle;
-                      //   if ($entry[$handle]) {
                           if ($entry[$handle]->type === 'entry') {
                               if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
                               $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];  
@@ -292,7 +265,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                               }
                               }
                           }
-                      // }
                       }
                       if(($handle === 'mainNavigationCta' || $handle === 'mainNavigationCta_loc') && $entry[$handle]->attributes['type'] === 'entry') { // TODO update to remove the _loc from mainNavigationCta_loc from craft
                         if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
@@ -346,7 +318,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
     }
 
     return $render;
-  // }
 }
 
 return [
