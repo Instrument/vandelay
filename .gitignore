@@ -23,5 +23,3 @@ Thumbs.db
 *.esproj
 
 libs
-craft/config/general.php
-craft/config/db.php
