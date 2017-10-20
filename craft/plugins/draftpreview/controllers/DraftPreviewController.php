@@ -611,6 +611,62 @@ class DraftPreviewController extends BaseController
           $page->pageBuilder = [$elements];
           break;
         default:
+            $page->pageTitle_loc = $page->title_loc;
+            $page->page_themeColor = 'Yellow';
+            $page->color = 'Yellow';
+          if($page->entryType !== 'successStory' && $page->entryType !== 'creativeSpotlightVideo' && $page->entryType !== 'creativeSpotlightDevice') {  
+            foreach ($categories['blog'] as $cat) {
+              if (strpos($page->entryType, $cat->slug) >= 0) {
+                $page->entryTypeLabel = $cat->title_loc;
+              }
+            }  
+          } elseif ($page->entryType === 'creativeSpotlightVideo' || $page->entryType === 'creativeSpotlightDevice') {
+            $spotlightResponse = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/'.'api/creativeSpotlight'.'.json'));
+
+            $creativeSpotRef = $spotlightResponse->data[0];
+            $selectOptions = [
+              [
+                "placeholder" => $general->productFilterTitle_loc,  //TODO come back and replace this with data from craft
+                "options" => $categories['product']
+              ],
+              [
+                "placeholder" => $general->objectiveFilterTitle_loc, //TODO come back and replace this with data from craft
+                "options" => $categories['objective']
+              ],
+              [
+                "placeholder" => $general->industryFilterTitle_loc, //TODO come back and replace this with data from craft
+                "options" => $categories['industry']
+              ],
+              [
+                "placeholder" => $general->regionFilterTitle_loc, //TODO come back and replace this with data from craft
+                "options" => $categories['region']
+              ]
+            ];
+            // $response = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/api/creativeSpotlightEntries.json?perpage=2&page=1'));
+
+            $creativeSpotlightEntries = [$page]; // $response->data;
+            // array_unshift($creativeSpotlightEntries, $page);
+            $intro = [
+              "sectionTitle_loc" => $creativeSpotRef->title_loc,
+              "sectionBackgroundColor" => 'white',
+              "elements" => [
+                [
+                  "imageWithAlt" => [],
+                  "headline_loc" => $creativeSpotRef->headline_loc,
+                  "subhead_loc" => '',
+                  "ctaButtons" => [],
+                  "type" => 'centeredTextLockup'
+                ],
+                [
+                  "type" => 'successStoriesGrid',
+                  "selectOptions" => $selectOptions,
+                  "stories" => $creativeSpotlightEntries
+                ]
+              ]
+            ]; 
+            $spotlightResponse->data[0]->pageBuilder = [$intro];
+            $page = $spotlightResponse->data[0];
+          }
           break;
     }
     return $page;
@@ -674,17 +730,26 @@ class DraftPreviewController extends BaseController
       [
         "id" => 'blog',
         "url" => 'category/blogType'
+      ],
+      [
+        "id" => 'months',
+        "url" => 'category/months'
       ]
     ];
     
     $singles = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/simpleapi/Singles'));
+    $cats = $this->loadCategories($categories);
 
     $returnData = [];
     $returnData['pages'] = [];
+    $cntr = 0;
     foreach ($collections as $value) {
       // TODO add language and draft info to urls
       $response = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/'.$value['url'].'.json'));
       if (!isset($value['isPage'])) {
+        if($cntr === 0) {
+          $response->data[0]->months = $cats['months'];
+        }
         $returnData[$value['id']] = $response->data[0];  
       } else {
         if (!isset($value['special'])) {
@@ -693,9 +758,9 @@ class DraftPreviewController extends BaseController
               array_push($returnData['pages'], $this->formatPage($page, $returnData['general'], $cats));
             }
           } else {
-            if (($response->data[0]->slug === 'creative-spotlight' || $response->data[0]->slug === 'blog' || $response->data[0]->slug === 'inspiration' || $response->data[0]->slug === 'success-stories') && count($cats) === 0) {
-              $cats = $this->loadCategories($categories);
-            }
+            // if (($response->data[0]->slug === 'creative-spotlight' || $response->data[0]->slug === 'blog' || $response->data[0]->slug === 'inspiration' || $response->data[0]->slug === 'success-stories') && count($cats) === 0) {
+            //   $cats = $this->loadCategories($categories);
+            // }
             array_push($returnData['pages'], $this->formatPage($response->data[0], $returnData['general'], $cats));
           }
         }
@@ -703,7 +768,8 @@ class DraftPreviewController extends BaseController
           array_push($returnData['pages'], $this->format404($response->data[0]));
         }
         
-      }  
+      }
+      $cntr++; 
     }
 
     $pageRef = craft()->entryRevisions->getDraftById($variables['draft']);
