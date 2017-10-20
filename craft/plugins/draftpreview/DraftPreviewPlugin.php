@@ -49,10 +49,11 @@ class DraftPreviewPlugin extends BasePlugin
         craft()->templates->hook('cp.entries.edit.preview-hook', function(&$context) {
             $entry = $context['entry'];
             $locale = $entry->locale;
-            $isBlog = strpos($entry->uri, 'blog/') !== false;
+            // var_dump($_SERVER['REQUEST_URI']);
+            $isBlog = strpos($_SERVER['REQUEST_URI'], 'insightsAndNewsEntries') !== false;//strpos($entry->uri, 'blog/') !== false;
             $isDraft = $entry->getClassHandle() === 'EntryDraft';
             if ($isDraft) {
-                $previewButton = '<div style="display: block; width: 100%; position: relative; text-align: right;"><a href="/draftpreview/'.($isBlog ? 'Blog' : '').'Entry/'.$entry->id.'/'.$locale.'/'.$entry->draftId.'" target="_blank" class="btn submit">Preview Draft</a></div>';
+                $previewButton = '<div style="display: block; width: 100%; position: relative; text-align: right;"><a href="/draftpreview'.($isBlog ? 'blog' : '').'/Entry/'.$entry->id.'/'.$locale.'/'.$entry->draftId.'" target="_blank" class="btn submit">Preview Draft</a></div>';
             }
 
             return $isDraft ? $previewButton : null; 
@@ -82,8 +83,8 @@ class DraftPreviewPlugin extends BasePlugin
         return [
             'draftpreview/Entry/(?P<id>[0-9]+)/(?P<locale>[a-z\_]+)/(?P<draft>[0-9]+)' => array('action' => 'draftPreview/handleEntry'),
             'draftpreview/Entry' => array('action' => 'draftPreview/handleEntry'),
-            'draftpreview/BlogEntry/(?P<id>[0-9]+)/(?P<locale>[a-z\_]+)/(?P<draft>[0-9]+)' => array('action' => 'draftPreview/handleEntry'),
-            'draftpreview/BlogEntry' => array('action' => 'draftPreview/handleEntry'),
+            'draftpreviewblog/Entry/(?P<id>[0-9]+)/(?P<locale>[a-z\_]+)/(?P<draft>[0-9]+)' => array('action' => 'draftPreview/handleEntry'),
+            'draftpreviewblog/Entry' => array('action' => 'draftPreview/handleEntry'),
         ];
     }
 }
