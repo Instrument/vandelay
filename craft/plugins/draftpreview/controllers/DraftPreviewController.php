@@ -642,10 +642,7 @@ class DraftPreviewController extends BaseController
                 "options" => $categories['region']
               ]
             ];
-            // $response = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/api/creativeSpotlightEntries.json?perpage=2&page=1'));
-
-            $creativeSpotlightEntries = [$page]; // $response->data;
-            // array_unshift($creativeSpotlightEntries, $page);
+            $creativeSpotlightEntries = [$page];
             $intro = [
               "sectionTitle_loc" => $creativeSpotRef->title_loc,
               "sectionBackgroundColor" => 'white',
@@ -758,9 +755,6 @@ class DraftPreviewController extends BaseController
               array_push($returnData['pages'], $this->formatPage($page, $returnData['general'], $cats));
             }
           } else {
-            // if (($response->data[0]->slug === 'creative-spotlight' || $response->data[0]->slug === 'blog' || $response->data[0]->slug === 'inspiration' || $response->data[0]->slug === 'success-stories') && count($cats) === 0) {
-            //   $cats = $this->loadCategories($categories);
-            // }
             array_push($returnData['pages'], $this->formatPage($response->data[0], $returnData['general'], $cats));
           }
         }
