@@ -13,12 +13,6 @@
 {% set username = (craft.config.rememberUsernameDuration ? craft.session.rememberedUsername : '') %}
 
 {% block body %}
-<div id="loginBlock">
-	{% set image = craft.rebrand.logo %}
-	<img id="logo" src='{{craft.rebrand.logo.url}}' />
-
-	<button type=button class="okta" onclick="oktaLogin();">Staff log in with Okta </button>
-</div>
 
 <!--<div id="adminLoginBlock" style="position: relative!important; margin: 2em 0!important; display: inline-block; padding: 2em; background-color: #DDDDDD; width: 50%">Administrator Login:</div>-->
 <div id="adminLoginBlock">
@@ -35,6 +29,7 @@
 			document.getElementById('adminLoginBlock').innerHTML = '{%- set hasLogo = (CraftEdition >= CraftClient and craft.rebrand.isLogoUploaded ? true : false) -%}'+
 
 				'{%- set hasLogo = (CraftEdition >= CraftClient and craft.rebrand.isLogoUploaded ? true : false) -%}'+
+				'<div id="loginBlock">{% set image = craft.rebrand.logo %}<img id="logo" src="{{craft.rebrand.logo.url}}" /><h3>Staff Login:</h3><button type=button class="okta" onclick="oktaLogin();">Staff log in with Okta </button></div>' +
 				'<h3>Administrator Login:</h3> <form id="login-form" method="post" accept-charset="UTF-8" >' +
 					'{% set placeHolderText = (craft.config.useEmailAsUsername ? "Email"|t : "Username or Email"|t) %}' +
 					'{{ forms.textField({ id: "loginName", name: "username", placeholder: "Username", value: "" })|e("js") }}' +
