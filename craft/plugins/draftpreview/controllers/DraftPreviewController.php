@@ -794,7 +794,24 @@ class DraftPreviewController extends BaseController
   }
   public function actionHandleEntry(array $variables = array()) {
     if (craft()->request->isGetRequest()) {
-      $this->handleGetRequest($variables);
+
+      if(!craft()->userSession->isLoggedIn()) {
+        // clear redirect vars beforehand
+        $redirect = null;
+        if (in_array('originalUri', $variables)) {
+          if ($variables['originalUri'] != null) {
+            $redirect = $variables['originalUri'];
+          }
+        }
+        // re-authenticate the user
+        $url = UrlHelper::getUrl() . $redirect;
+
+        // Send to SsoLogin override for redirect
+        craft()->okta_authcheck->checkOktaAuth($url);
+
+      } else {
+        $this->handleGetRequest($variables);
+      }
     }
   }
 }
