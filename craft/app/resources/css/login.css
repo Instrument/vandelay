@@ -32,14 +32,14 @@ body {overflow-x: hidden;}
 body.ltr #password-field .passwordwrapper .password-toggle { right: 14px; }
 body.rtl #password-field .passwordwrapper .password-toggle { left: 14px; }
 
-#rememberMe-field { padding-top: 24px; float: left; width: 50%; text-align: left; display: inline-block;}
+#rememberMe-field { padding-top: 24px; float: left; width: auto; text-align: left; display: inline-block;}
 
-#forgot-wrapper {float: left; text-align: right; width: 50%; display: inline-block;}
+#forgot-wrapper {float: left; text-align: right; width: 60%; display: inline-block;}
 #forgot-password { position: relative; z-index: 1; display: block; font-style: normal; font-size: 11px; color: #8f98a3; margin-top: 24px; }
 body.ltr #forgot-password { float: right; }
 body.rtl #forgot-password { float: left; }
 
-#forgot-password:hover { color: #0d78f2; text-decoration: none; }
+#forgot-password:hover { color: #03ACFF; text-decoration: none; }
 
 #login-form .buttons { position: relative; text-align: center; }
 
@@ -52,7 +52,7 @@ body.rtl #login-form #ssl-icon { right: 0; }
 body.ltr #login-form #ssl-icon + #submit { padding-left: 2em; }
 body.rtl #login-form #ssl-icon + #submit { padding-right: 2em; }
 
-#login-form .submit { display: block; width: auto; float: none; padding: 14px 16px; height: auto; width: 100%; border-radius: 4px; margin-top: 16px;}
+#login-form .submit { display: block; width: auto; float: none; padding: 14px 16px; height: auto; width: 100%; border-radius: 4px; margin-top: 16px; font-family: AvenirNext-DemiBold, sans-serif;}
 
 #spinner { position: absolute; top: 58px; left: 50%; margin-left: -12px; }
 
@@ -75,30 +75,38 @@ body.rtl .modal.email-sent .body:before { right: 24px; }
 
 
 
-#loginBlock, #adminLoginBlock {
+/*#loginBlock, #adminLoginBlock {
   width: 50%;
   position: relative;
-  top:0;
-  bottom: 0;
-  left: 0;
-  right: 0;
   display: block;
   margin: auto;
-}
+}*/
 
 #loginBlock {
-  height: 30%;
+  height: auto;
+  width: 100%;
+  margin-bottom: 30px;
 }
 
 #adminLoginBlock {
+  display: block;
   background-color: #e2e3e4;
   text-align: center;
-  padding: 1em;
-  width: 25%;
+  padding: 25px 80px;
+  width: 100%;
   max-width: 500px;
   min-width: 300px;
   box-sizing: border-box;
-  height: 350px
+  height: auto;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+}
+
+h3 {
+  text-align: left;
+  margin-bottom: 8px;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5) and (max-width: 767px),
@@ -106,9 +114,9 @@ only screen and (min--moz-device-pixel-ratio: 1.5) and (max-width: 767px),
 only screen and (-o-min-device-pixel-ratio: 3 / 2) and (max-width: 767px),
 only screen and (min-device-pixel-ratio: 1.5) and (max-width: 767px),
 only screen and (min-resolution: 1.5dppx) and (max-width: 767px){
-  #loginBlock {height: 30%; width: 80%; margin-bottom: 3em;}
+  /*#loginBlock {height: 30%; width: 80%; margin-bottom: 3em;}
   #adminLoginBlock { padding: 1em; width: 80%;}
-  #login-form { background-size: 202px;}
+  #login-form { background-size: 202px;}*/
 }
 
 
@@ -117,17 +125,18 @@ only screen and (min--moz-device-pixel-ratio: 1.5) and (min-width: 500px) and (m
 only screen and (-o-min-device-pixel-ratio: 3 / 2) and (min-width: 500px) and (max-width: 1024px),
 only screen and (min-device-pixel-ratio: 1.5) and (min-width: 500px) and (max-width: 1024px),
 only screen and (min-resolution: 1.5dppx) and (min-width: 500px) and (max-width: 1024px) {
-  #loginBlock {height: 25%; width: 80%; margin-bottom: 3em;}
-  #adminLoginBlock { padding: 1em;  width: 478px;;}
+  /*#loginBlock {height: 25%; width: 80%; margin-bottom: 3em;}*/
+  /*#adminLoginBlock { padding: 1em;  width: 478px;;}*/
   /*#login-form { background-size: 202px;}*/
 }
 
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5) and (min-width: 800px) {
-  #loginBlock {height: 25%; width: 478px; margin-bottom: 3em;}
-  #adminLoginBlock { padding: 1em;  width: 478px;;}
+@media (max-width: 800px) {
+  /*#loginBlock {height: 25%; width: 478px; margin-bottom: 3em;}*/
+  #adminLoginBlock { padding: 25px 50px;}
+  #forgot-wrapper { width: 100%; }
 }
 
-@media only screen and (-webkit-min-device-pixel-ratio: 1.5) and (max-width: 767px) {
+@media (max-width: 800px) {
   #login-form #rememberMe-field, #login-form #forgot-wrapper {
     width: 100%;
     clear: both;
@@ -144,41 +153,40 @@ only screen and (min-resolution: 1.5dppx) and (min-width: 500px) and (max-width:
     float: left;
     margin-top: 0;
   }
-
-
 }
 #logo {
   display: block;
   margin: auto;
-  padding: 48px 48px 12px 48px;
+  padding: 12px 48px 12px 48px;
 }
 
 .okta {
   display: block;
   margin: auto;
+  padding: 2px 25px;
   /* Rectangle: */
   background: #0079B7;
   border: 1px solid #00699F;
   border-radius: 4px;
   /* Log in with Okta: */
-  font-family: AvenirNext-DemiBold;
+  font-family: AvenirNext-DemiBold, sans-serif;
   font-size: 14px;
   font-weight: initial;
   text-align: center;
   letter-spacing: 0;
   color: #FFFFFF;
   line-height: 16px;
-  width: auto;
+  width: 100%;
   height: 50px;
   cursor: pointer;
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-  animation: reset .2s ease-in-out;
-  animation-fill-mode: forwards;
+  /*animation: reset .2s ease-in-out;
+  animation-fill-mode: forwards;*/
 }
 .okta:hover {
   /* transition: all 0.3s ease 0s; */
-  animation: nudge .2s ease-in-out;
-  animation-fill-mode: forwards;
+  /*animation: nudge .2s ease-in-out;
+  animation-fill-mode: forwards;*/
   background: #00699F;
   border: 1px solid #00699F;
 }
@@ -187,7 +195,7 @@ only screen and (min-resolution: 1.5dppx) and (min-width: 500px) and (max-width:
   box-shadow: 0 -5px 10px rgba(0,0,0,0.1);
 }
 
-@keyframes nudge {
+/*@keyframes nudge {
 
   0% {
     transform: translate(0, 0px);
@@ -208,7 +216,7 @@ only screen and (min-resolution: 1.5dppx) and (min-width: 500px) and (max-width:
     transform: translate(0, 0px);
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
   }
-}
+}*/
 
 
 /*# sourceMappingURL=login.css.map */
