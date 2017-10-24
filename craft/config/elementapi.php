@@ -103,7 +103,6 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
     $items=[];
     $render = [];
     $itemsRaw = [];
-    $cdnUrl = craft()->config->get('environmentVariables')['gcsUrl'];
     $imageExtensions = array("jpg", "jpeg", "png");
     if (isset($entry->content)) {
         foreach ($entry->content->attributes as $key => $value) {
