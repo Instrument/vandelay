@@ -367,6 +367,13 @@ class DraftPreviewController extends BaseController
 
   public function formatPage($pageData, $general, $categories) {
     $page = $pageData;
+    $color = 'Yellow';
+    if (isset($page->page_themeColor)) {
+      $color = $page->page_themeColor;
+    }
+    $page->page_themeColor = $color;
+    $page->color = $color;
+    
     switch ($page->slug) {
         case 'home':
             $homeHeroHeadline = $page->homeHero[0]->headline_loc;
@@ -623,12 +630,12 @@ class DraftPreviewController extends BaseController
               $spotlights,
             ]
           ];
+
           $page->pageBuilder = [$elements];
           break;
         default:
             $page->pageTitle_loc = $page->title_loc;
-            $page->page_themeColor = 'Yellow';
-            $page->color = 'Yellow';
+            
           if($page->entryType !== 'successStory' && $page->entryType !== 'creativeSpotlightVideo' && $page->entryType !== 'creativeSpotlightDevice') {  
             foreach ($categories['blog'] as $cat) {
               if (strpos($page->entryType, $cat->slug) >= 0) {
@@ -762,6 +769,7 @@ class DraftPreviewController extends BaseController
         if($cntr === 0) {
           $response->data[0]->months = $cats['months'];
         }
+
         $returnData[$value['id']] = $response->data[0];  
       } else {
         if (!isset($value['special'])) {
@@ -788,7 +796,11 @@ class DraftPreviewController extends BaseController
     $rawPage = (object) $rawPage;
     $objectPage = json_decode(json_encode($rawPage));
     $currentPage = $this->formatPage($objectPage, $returnData['general'], $cats);
-    
+    if (isset($pageRef->attributes['postDate'])) {
+      $currentPage->postDate = $pageRef->attributes['postDate']->getTimestamp();  
+    }
+    $currentPage->entryType = $entryRef->type->handle;
+        
     array_push($returnData['pages'], $currentPage);
     
     $returnData['successStories'] = [];
