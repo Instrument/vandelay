@@ -60,7 +60,7 @@ class DraftPreviewPlugin extends BasePlugin
     }
     public function hasCpSection()
     {
-        return true;
+        return false;
     }
     /**
      * Register control panel routes
