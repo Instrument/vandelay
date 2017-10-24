@@ -21,6 +21,7 @@ Thumbs.db
 .settings
 .tmproj
 *.esproj
+data/#archive/*
 
 libs
 craft/config/general.php
