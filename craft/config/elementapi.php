@@ -235,7 +235,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                         $itemsRaw[$handle]['customText_loc'] = $entry[$handle]->attributes['customText'];
                         unset($itemsRaw[$handle]['customText']);
                       }
-                      if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem' || $handle === 'successStoriesButton' || $handle === 'creativeSpotlightButton') {
+                      if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem' || $handle === 'successStoriesButton' || $handle === 'creativeSpotlightButton' || $handle === 'relatedContentButton') {
                         $render['buttonStyle'] = $entry->type->handle;
                         if ($entry[$handle]->type === 'entry') {
                           if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
@@ -270,7 +270,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                         }
                       }
-                      if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton' || $handle === 'relatedContentButton' || $handle === 'cardCta') {
+                      if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton' || $handle === 'cardCta') {
                         if (isset($entry[$handle]->attributes)) {
                           if ($entry[$handle]->attributes['type'] === 'entry') {
                             if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
