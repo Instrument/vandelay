@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_confetti_square</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <polygon id="path-1" points="9.6876 0 19.375 0 19.375 19.4690534 9.6876 19.4690534 0.0002 19.4690534 0.0002 0"></polygon>
+    </defs>
+    <g id="Home-Page" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ic_confetti_square" transform="translate(10.000000, 10.497368) rotate(90.000000) translate(-10.000000, -10.497368) translate(0.000000, 0.497368)">
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <g id="Clip-2"></g>
+            <path d="M16.6772,19.4690534 L2.6982,19.4690534 C1.2082,19.4690534 0.0002,18.2551893 0.0002,16.7579563 L0.0002,2.71109709 C0.0002,1.21386408 1.2082,0 2.6982,0 L16.6772,0 C18.1672,0 19.3752,1.21386408 19.3752,2.71109709 L19.3752,16.7579563 C19.3752,18.2551893 18.1672,19.4690534 16.6772,19.4690534" id="Fill-1" fill="#C293E0" mask="url(#mask-2)"></path>
+        </g>
+    </g>
+</svg>
