@@ -29,7 +29,6 @@ return array(
           'sv_se' => 'http://35.197.61.130/sv-se',
       ),
       'environmentVariables' => array(
-          'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-dev',
           'oktaSpBaseUrl' => 'http://35.197.61.130',
           'oktaEntityId' => 'https://dev-737069.oktapreview.com/app/exkc9a5ndj7c1z7zF0h7/sso/saml/metadata',
           'oktaUrl' => 'https://dev-737069.oktapreview.com/app/instrumentdev737069_snapchatsamltestingapp_1/exkc9a5ndj7c1z7zF0h7/sso/saml',
@@ -52,7 +51,6 @@ return array(
       'sv_se' => 'http://snapchat.craft.dev/sv-se',
     ),
     'environmentVariables' => array(
-      'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-localdev',
       'oktaSpBaseUrl' => 'http://snapchat.craft.dev',
       'oktaEntityId' => 'https://dev-737069.oktapreview.com/app/exkc0mv53l5rEjY4M0h7/sso/saml/metadata',
       'oktaUrl' => 'https://dev-737069.oktapreview.com/app/instrumentdev737069_snapchatsamlapp_1/exkc0mv53l5rEjY4M0h7/sso/saml',
@@ -75,7 +73,6 @@ return array(
       'sv_se' => 'http://snapchat-craft-dev.wrkbench.in/sv-se',
     ),
     'environmentVariables' => array(
-      'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-dev',
       'oktaSpBaseUrl' => 'https://snapchat-craft-dev.wrkbench.in/',
       'oktaEntityId' => 'https://dev-737069.oktapreview.com/app/exkc9pkzhcCL9o0S00h7/sso/saml/metadata',
       'oktaUrl' => 'https://dev-737069.oktapreview.com/app/instrumentdev737069_snapchatsamldev_1/exkc9pkzhcCL9o0S00h7/sso/saml',
@@ -98,7 +95,6 @@ return array(
       'sv_se' => 'http://snapchat-craft-staging.wrkbench.in/sv-se',
     ),
     'environmentVariables' => array(
-      'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-staging',
       'oktaSpBaseUrl' => 'https://snapchat-craft-staging.wrkbench.in/',
       'oktaEntityId' => 'https://dev-737069.oktapreview.com/app/exkc9oxa7epcVbjT20h7/sso/saml/metadata',
       'oktaUrl' => 'https://dev-737069.oktapreview.com/app/instrumentdev737069_snapchatsamlstaging_1/exkc9oxa7epcVbjT20h7/sso/saml',
@@ -121,7 +117,6 @@ return array(
         'sv_se' => 'http://snapchat-craft-master.wrkbench.in/sv-se',
     ),
     'environmentVariables' => array(
-        'gcsUrl' => 'http://storage.googleapis.com/snapchat-assets-master',
         'oktaSpBaseUrl' => 'https://snapchat-craft-master.wrkbench.in/',
         'oktaEntityId' => 'https://dev-737069.oktapreview.com/app/exkc9pfuvzPS6JfFi0h7/sso/saml/metadata',
         'oktaUrl' => 'https://dev-737069.oktapreview.com/app/instrumentdev737069_snapchatsamlmaster_1/exkc9pfuvzPS6JfFi0h7/sso/saml',
