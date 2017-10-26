@@ -271,6 +271,24 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
                         } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) { 
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
+                        } else {
+                          if (isset($entry[$handle]->entry->attributes['slug'])) {
+                            $entryType = $entry[$handle]->entry->type->handle;
+                            $prefix = '';
+                            if ($entryType === 'newsEntry' || $entryType === 'insightsEntry') {
+                              $prefix = 'blog/';
+                            }
+                            if ($entryType === 'successStory') {
+                              $prefix = 'success-stories/';
+                            }
+                            if ($entryType === 'creativeSpotlightDevice' || $entryType === 'creativeSpotlightVideo') {
+                              $prefix = 'creative-spotlight/';
+                            }
+                            if ($entryType === 'partnerEntries') {
+                              $prefix = 'partners/';
+                            }
+                            $itemsRaw[$handle]['uri'] = $prefix.$entry[$handle]->entry->attributes['slug'];
+                          }
                         }
                       }
                       if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton' || $handle === 'cardCta') {
