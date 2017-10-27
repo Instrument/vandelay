@@ -235,7 +235,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                         $itemsRaw[$handle]['customText_loc'] = $entry[$handle]->attributes['customText'];
                         unset($itemsRaw[$handle]['customText']);
                       }
-                      if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem' || $handle === 'successStoriesButton' || $handle === 'creativeSpotlightButton' || $handle === 'relatedContentButton') {
+                      if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem' || $handle === 'successStoriesButton' || $handle === 'creativeSpotlightButton' || $handle === 'relatedContentButton' || $handle === 'cardCta') {
                         if (isset($entry[$handle]) && isset($entry[$handle]->type)) {
                           $render['buttonStyle'] = $entry->type->handle;
                           if ($entry[$handle]->type === 'entry') {
@@ -271,6 +271,24 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
                         } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) { 
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
+                        } else {
+                          if (isset($entry[$handle]->entry->attributes['slug'])) {
+                            $entryType = $entry[$handle]->entry->type->handle;
+                            $prefix = '';
+                            if ($entryType === 'newsEntry' || $entryType === 'insightsEntry') {
+                              $prefix = 'blog/';
+                            }
+                            if ($entryType === 'successStory') {
+                              $prefix = 'success-stories/';
+                            }
+                            if ($entryType === 'creativeSpotlightDevice' || $entryType === 'creativeSpotlightVideo') {
+                              $prefix = 'creative-spotlight/';
+                            }
+                            if ($entryType === 'partnerEntries') {
+                              $prefix = 'partners/';
+                            }
+                            $itemsRaw[$handle]['uri'] = $prefix.$entry[$handle]->entry->attributes['slug'];
+                          }
                         }
                       }
                       if($handle === 'primaryCta' || $handle === 'secondaryLink' || $handle === 'ctaButton' || $handle === 'cardCta') {
