@@ -235,7 +235,7 @@ function getValues($entry, $fields = [], $parentKey, $nestedNeo = false, $normal
                         $itemsRaw[$handle]['customText_loc'] = $entry[$handle]->attributes['customText'];
                         unset($itemsRaw[$handle]['customText']);
                       }
-                      if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem' || $handle === 'successStoriesButton' || $handle === 'creativeSpotlightButton' || $handle === 'relatedContentButton') {
+                      if($handle === 'linkInfo' || $handle === 'button' || $handle == 'loginLink_loc' || $handle === 'ctaButton' || $handle === 'footerLink' || $handle === 'linkInfo' || $handle === 'button' || $handle === 'navItem' || $handle === 'successStoriesButton' || $handle === 'creativeSpotlightButton' || $handle === 'relatedContentButton' || $handle === 'cardCta') {
                         if (isset($entry[$handle]) && isset($entry[$handle]->type)) {
                           $render['buttonStyle'] = $entry->type->handle;
                           if ($entry[$handle]->type === 'entry') {
