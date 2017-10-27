@@ -481,7 +481,7 @@ class DraftPreviewController extends BaseController
           $selectOptions = [
             [
               "placeholder" => $general->allFilter_loc,  //TODO come back and replace this with data from craft
-              "options" => $categories['blog']
+              "options" => $categories['blog'],
               "id" => 'all'
             ],
             [
@@ -491,7 +491,7 @@ class DraftPreviewController extends BaseController
             ],
             [
               "placeholder" => $general->regionFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['region']
+              "options" => $categories['region'],
               "id" => 'regions'
             ]
           ];
@@ -539,7 +539,7 @@ class DraftPreviewController extends BaseController
             ],
             [
               "placeholder" => $general->objectiveFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['objective']
+              "options" => $categories['objective'],
               "id" => 'objectives'
             ],
             [
