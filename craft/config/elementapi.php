@@ -462,6 +462,7 @@ return [
             'elementType' => 'GlobalSet',
             'criteria' => [
               'handle' => $slug,
+              'locale' => isset($params['locale']) ? $params['locale'] : 'en_us'
             ],
             'paginate' => true,
             'elementsPerPage' => 100,
