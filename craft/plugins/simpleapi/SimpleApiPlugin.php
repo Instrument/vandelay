@@ -12,7 +12,7 @@ class SimpleApiPlugin extends BasePlugin
      */
     public function getName()
     {
-         return Craft::t('Simple Api');
+         return Craft::t('Vandelay');
     }
 
     /**
@@ -78,6 +78,7 @@ class SimpleApiPlugin extends BasePlugin
             'simpleapi/Entry/(?P<id>[0-9]+)/(?P<locale>[a-z\_]+)' => array('action' => 'simpleApi/handleEntry'),
             'simpleapi/Entry' => array('action' => 'simpleApi/handleEntry'),
             'simpleapi/Singles' => array('action' => 'simpleApi/getSingles'),
+            'simpleapi/Globals/(?P<locale>[a-z\_]+)' => array('action' => 'simpleApi/getGlobals'),
             'simpleapi/uploadEntry' => array('action' => 'simpleApi/uploadEntry'),
             'simpleapi/getSection/(?P<section>[a-zA-Z\_]+)' => array('action' => 'simpleApi/getSectionEntries'),
         ];
