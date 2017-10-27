@@ -50,7 +50,7 @@ class DraftPreviewController extends BaseController
                          $vals['handle'] = $handle;
                          $render[$handle][] = $vals;
                        }
-                     
+
                   }
               } else if ($type == 'Neo') {
                   $GLOBALS['currSection'] = -1;
@@ -154,7 +154,7 @@ class DraftPreviewController extends BaseController
                           if ($entry[$handle]->type === 'entry') {
                             if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
                               $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
-                            } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) { 
+                            } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) {
                               $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                             } else {
                               if (isset($entry[$handle]->entry->attributes['slug'])) {
@@ -175,14 +175,14 @@ class DraftPreviewController extends BaseController
                                 $itemsRaw[$handle]['uri'] = $prefix.$entry[$handle]->entry->attributes['slug'];
                               }
                             }
-                          }  
+                          }
                         }
-                        
+
                       }
-                      if(($handle === 'mainNavigationCta' || $handle === 'mainNavigationCta_loc') && $entry[$handle]->attributes['type'] === 'entry') { 
+                      if(($handle === 'mainNavigationCta' || $handle === 'mainNavigationCta_loc') && $entry[$handle]->attributes['type'] === 'entry') {
                         if (isset($entry[$handle]->entry->content->attributes['page_uri'])) {
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri'];
-                        } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) { 
+                        } elseif (isset($entry[$handle]->entry->content->attributes['page_uri_loc'])) {
                           $itemsRaw[$handle]['uri'] = $entry[$handle]->entry->content->attributes['page_uri_loc'];
                         } else {
                           if (isset($entry[$handle]->entry->attributes['slug'])) {
@@ -269,7 +269,7 @@ class DraftPreviewController extends BaseController
     return $render;
   // }
 }
-  
+
   public function handleFieldType($pagevalue, $data) {
     $handle = $data->handle;
     $pattern = '/\_(loc)/';
@@ -358,7 +358,7 @@ class DraftPreviewController extends BaseController
       if ($data->type !== 'Entries' && $data->type !== 'Assets') {
         $page[$loc_handle] = $this->handleFieldType($entry, $data);
       }
-      
+
     }
     return $page;
   }
@@ -402,7 +402,7 @@ class DraftPreviewController extends BaseController
     }
     $page->page_themeColor = $color;
     $page->color = $color;
-    
+
     switch ($page->slug) {
         case 'home':
             $homeHeroHeadline = $page->homeHero[0]->headline_loc;
@@ -436,19 +436,23 @@ class DraftPreviewController extends BaseController
           $selectOptions = [
             [
               "placeholder" => $general->productFilterTitle_loc,  //TODO come back and replace this with data from craft
-              "options" => $categories['product']
+              "options" => $categories['product'],
+              "id" => 'products'
             ],
             [
               "placeholder" => $general->objectiveFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['objective']
+              "options" => $categories['objective'],
+              "id" => 'objectives'
             ],
             [
               "placeholder" => $general->industryFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['industry']
+              "options" => $categories['industry'],
+              "id" => 'industries'
             ],
             [
               "placeholder" => $general->regionFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['region']
+              "options" => $categories['region'],
+              "id" => 'regions'
             ]
           ];
           $response = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/api/creativeSpotlightEntries.json?perpage=2&page=1'));
@@ -470,27 +474,30 @@ class DraftPreviewController extends BaseController
                 "stories" => $creativeSpotlightEntries
               ]
             ]
-          ]; 
+          ];
           $page->pageBuilder = [$intro];
           break;
         case 'blog':
           $selectOptions = [
             [
               "placeholder" => $general->allFilter_loc,  //TODO come back and replace this with data from craft
-              "options" => $categories['blog']
+              "options" => $categories['blog'],
+              "id" => 'all'
             ],
             [
               "placeholder" => $general->industryFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['industry']
+              "options" => $categories['industry'],
+              "id" => 'industries'
             ],
             [
               "placeholder" => $general->regionFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['region']
+              "options" => $categories['region'],
+              "id" => 'regions'
             ]
           ];
           $response = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/api/insightsAndNewsEntries.json?perpage=2&page=1'));
           $blogEntries = $response->data;
-          
+
           foreach( $blogEntries as $blogEntry) {
             foreach ($categories['blog'] as $cat) {
               if (strpos($blogEntry->entryType, $cat->slug) !== false) {
@@ -498,10 +505,10 @@ class DraftPreviewController extends BaseController
               }
             }
           }
-          
+
           $page->pageBuilder = [
             [
-              "sectionTitle_loc" => "OverView", // TODO get this from 
+              "sectionTitle_loc" => "OverView", // TODO get this from
               "sectionBackgroundColor" => "white",
               "elements" => [
                 [
@@ -527,19 +534,23 @@ class DraftPreviewController extends BaseController
           $selectOptions = [
             [
               "placeholder" => $general->productFilterTitle_loc,  //TODO come back and replace this with data from craft
-              "options" => $categories['product']
+              "options" => $categories['product'],
+              "id" => 'products'
             ],
             [
               "placeholder" => $general->objectiveFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['objective']
+              "options" => $categories['objective'],
+              "id" => 'objectives'
             ],
             [
               "placeholder" => $general->industryFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['industry']
+              "options" => $categories['industry'],
+              "id" => 'industries'
             ],
             [
               "placeholder" => $general->regionFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['region']
+              "options" => $categories['region'],
+              "id" => 'regions'
             ]
           ];
 
@@ -585,40 +596,47 @@ class DraftPreviewController extends BaseController
           $selectOptions = [
             [
               "placeholder" => $general->productFilterTitle_loc,  //TODO come back and replace this with data from craft
-              "options" => $categories['product']
+              "options" => $categories['product'],
+              "id" => 'products'
             ],
             [
               "placeholder" => $general->objectiveFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['objective']
+              "options" => $categories['objective'],
+              "id" => 'objectives'
             ],
             [
               "placeholder" => $general->industryFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['industry']
+              "options" => $categories['industry'],
+              "id" => 'industries'
             ]
           ];
           $selectOptionsSpotlight = [
             [
               "placeholder" => $general->productFilterTitle_loc,  //TODO come back and replace this with data from craft
-              "options" => $categories['product']
+              "options" => $categories['product'],
+              "id" => 'products'
             ],
             [
               "placeholder" => $general->objectiveFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['objective']
+              "options" => $categories['objective'],
+              "id" => 'objectives'
             ],
             [
               "placeholder" => $general->industryFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['industry']
+              "options" => $categories['industry'],
+              "id" => 'industries'
             ],
             [
               "placeholder" => $general->regionFilterTitle_loc, //TODO come back and replace this with data from craft
-              "options" => $categories['region']
+              "options" => $categories['region'],
+              "id" => 'regions'
             ]
           ];
           $response = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/api/successStoryEntries.json?perpage=2&page=1'));
           $successStoriesEntries = $response->data;
           $response = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/api/creativeSpotlightEntries.json?perpage=2&page=1'));
           $creativeSpotlightEntries = $response->data;
-          
+
 
           $stories = [
             "type" => 'successStoriesGrid',
@@ -664,13 +682,13 @@ class DraftPreviewController extends BaseController
           break;
         default:
             $page->pageTitle_loc = $page->title_loc;
-            
-          if($page->entryType !== 'successStory' && $page->entryType !== 'creativeSpotlightVideo' && $page->entryType !== 'creativeSpotlightDevice') {  
+
+          if($page->entryType !== 'successStory' && $page->entryType !== 'creativeSpotlightVideo' && $page->entryType !== 'creativeSpotlightDevice') {
             foreach ($categories['blog'] as $cat) {
               if (strpos($page->entryType, $cat->slug) >= 0) {
                 $page->entryTypeLabel = $cat->title_loc;
               }
-            }  
+            }
           } elseif ($page->entryType === 'creativeSpotlightVideo' || $page->entryType === 'creativeSpotlightDevice') {
             $spotlightResponse = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/'.'api/creativeSpotlight'.'.json'));
 
@@ -678,19 +696,23 @@ class DraftPreviewController extends BaseController
             $selectOptions = [
               [
                 "placeholder" => $general->productFilterTitle_loc,  //TODO come back and replace this with data from craft
-                "options" => $categories['product']
+                "options" => $categories['product'],
+                "id" => 'products'
               ],
               [
                 "placeholder" => $general->objectiveFilterTitle_loc, //TODO come back and replace this with data from craft
-                "options" => $categories['objective']
+                "options" => $categories['objective'],
+                "id" => 'objectives'
               ],
               [
                 "placeholder" => $general->industryFilterTitle_loc, //TODO come back and replace this with data from craft
-                "options" => $categories['industry']
+                "options" => $categories['industry'],
+                "id" => 'industries'
               ],
               [
                 "placeholder" => $general->regionFilterTitle_loc, //TODO come back and replace this with data from craft
-                "options" => $categories['region']
+                "options" => $categories['region'],
+                "id" => 'regions'
               ]
             ];
             $creativeSpotlightEntries = [$page];
@@ -711,7 +733,7 @@ class DraftPreviewController extends BaseController
                   "stories" => $creativeSpotlightEntries
                 ]
               ]
-            ]; 
+            ];
             $spotlightResponse->data[0]->pageBuilder = [$intro];
             $page = $spotlightResponse->data[0];
           }
@@ -784,7 +806,7 @@ class DraftPreviewController extends BaseController
         "url" => 'category/months'
       ]
     ];
-    
+
     $singles = json_decode(file_get_contents('http://'.$_SERVER['HTTP_HOST'].'/simpleapi/Singles'));
     $cats = $this->loadCategories($categories);
 
@@ -799,7 +821,7 @@ class DraftPreviewController extends BaseController
           $response->data[0]->months = $cats['months'];
         }
 
-        $returnData[$value['id']] = $response->data[0];  
+        $returnData[$value['id']] = $response->data[0];
       } else {
         if (!isset($value['special'])) {
           if (isset($value['isPages'])) {
@@ -813,9 +835,9 @@ class DraftPreviewController extends BaseController
         elseif ($value['special'] === '404') {
           array_push($returnData['pages'], $this->format404($response->data[0]));
         }
-        
+
       }
-      $cntr++; 
+      $cntr++;
     }
 
     $pageRef = craft()->entryRevisions->getDraftById($variables['draft']);
@@ -826,12 +848,12 @@ class DraftPreviewController extends BaseController
     $objectPage = json_decode(json_encode($rawPage));
     $currentPage = $this->formatPage($objectPage, $returnData['general'], $cats);
     if (isset($pageRef->attributes['postDate'])) {
-      $currentPage->postDate = $pageRef->attributes['postDate']->getTimestamp();  
+      $currentPage->postDate = $pageRef->attributes['postDate']->getTimestamp();
     }
     $currentPage->entryType = $entryRef->type->handle;
-        
+
     array_push($returnData['pages'], $currentPage);
-    
+
     $returnData['successStories'] = [];
     $returnData['blogs'] = [];
     $returnData['spotlights'] = [];
