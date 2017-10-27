@@ -305,7 +305,9 @@ class SimpleApiController extends BaseController
         }
       } elseif ($type === 'Assets') {
         $image = $english_entry->$handle->first();
-        if (!isset($entry->$handle[0])) {
+        if (!$image) {
+          SimpleApiPlugin::Log('No image exists: ' . $entry->title . $entry->id);
+        } elseif (!isset($entry->$handle[0])) {
           $entry->getContent()->setAttribute($handle, [$image->id]);
         }
       } elseif ($type === 'RichText') {
@@ -365,6 +367,7 @@ class SimpleApiController extends BaseController
     $blocks = $criteria->find();
     $newBlocks = [];
     return $blocks;
+<<<<<<< HEAD
   }
   public function saveNeo($field, $locale, $owner, $data) {
     // Delete blocks in locale and create copies of english versions
@@ -437,6 +440,80 @@ class SimpleApiController extends BaseController
     }
     return $neoblocks;
   }
+=======
+  }
+  public function saveNeo($field, $locale, $owner, $data) {
+    // Delete blocks in locale and create copies of english versions
+    $blocks = $this->cleanNeos($field, $owner, $locale);
+    $neoblocks = [];
+    
+    $pattern = '/(_loc)/';
+    foreach ($blocks as $key => $block) {
+      if (isset($data[$key])) {
+        $neo_matrix = [];
+        $fruitlinks = [];
+        $text = [];
+        $neo_fields = $block->getFieldLayout()->getFields();
+        foreach ($neo_fields as $neo_field) {
+          $neoblock_val = $neo_field->getField();
+          $neohandle = $neoblock_val->handle;
+          $neo_loc_handle = preg_replace($pattern, "Loc", $neohandle);
+          $fruitLink = $neoblock_val->type === 'FruitLinkIt';
+          if (isset($data[$key]->$neo_loc_handle)) {
+            if ($neoblock_val->type === 'PlainText') {
+              $block->getContent()->setAttribute($neohandle, $data[$key]->$neo_loc_handle);
+              $text[$neo_loc_handle] = [
+                'lang' => $data[$key]->$neo_loc_handle,
+                'og' => $block->$neohandle
+              ];
+            } elseif ($neoblock_val->type === 'RichText') {
+              $block->getContent()->setAttribute($neohandle, $data[$key]->$neo_loc_handle);
+            } elseif ($neoblock_val->type === 'Matrix') {
+              $criteria = craft()->elements->getCriteria(ElementType::MatrixBlock);
+              $criteria->ownerId = $block->id;
+              $criteria->fieldId = $neoblock_val->id;
+              if ($neoblock_val->translatable == 1) {
+                $criteria->locale = $locale;
+              }
+              $results = $criteria->find();
+              $blockIds = [];
+              $result_blocks = [];
+              $index = 0;
+              foreach ($results as $result) {
+                if (isset($data[$key]->$neo_loc_handle[$index])) {
+                  $result = craft()->matrix->getBlockById($result->id, $locale);
+                  $result_blocks[] = $this->saveMatrix($result, $data[$key]->$neo_loc_handle[$index]);
+                  $blockIds[] = $result;
+                  $index++;
+                }
+              }
+              $neo_matrix[] = [
+                'val' => $neoblock_val,
+                'matrix' => $results,
+                'result' => $result_blocks
+              ];
+              $block->getContent()->setAttribute($neohandle, $blockIds);
+            } elseif ($fruitLink) {
+              $og_link = $block->getContent()[$neohandle];
+              $link = $this->saveFruitLink($og_link, $data[$key]->$neo_loc_handle);
+              $block->getContent()->setAttribute($neohandle, $link);
+              $fruitlinks[$neo_loc_handle] = [$link, $og_link];
+            }
+          }
+        }
+        $saved_neo = craft()->neo->saveBlock($block);
+        $neoblocks[] = [
+            'data' => $data[$key],
+            'block' => $block,
+            'valid' => $block->getContent()->getErrors(),
+            'structure' => $neo_matrix,
+            'text' => $text
+          ];
+      }
+    }
+    return $neoblocks;
+  }
+>>>>>>> 8ff9436b06b59784e4f92981f3cc7973e2a13eb7
   public function cleanMatrixBlocks($entry, $field, $target_locale, $data) {
     $criteria = craft()->elements->getCriteria(ElementType::MatrixBlock);
     $criteria->ownerId = $entry->id;
@@ -485,11 +562,19 @@ class SimpleApiController extends BaseController
         } elseif ($field_data->type === 'Assets') {
           if (sizeof($original) < 1) {
             $original = craft()->matrix->getBlockById($block->id);
+<<<<<<< HEAD
           }
           $image = $original->$handle->first();
           if (!isset($block->$handle[0])) {
             $block->getContent()->setAttribute($handle, [$image->id]);
           }
+=======
+          }
+          $image = $original->$handle->first();
+          if (!isset($block->$handle[0])) {
+            $block->getContent()->setAttribute($handle, [$image->id]);
+          }
+>>>>>>> 8ff9436b06b59784e4f92981f3cc7973e2a13eb7
         } elseif ($field_data->type === 'Dropdown') {
           $block->getContent()->setAttribute($handle, $block->$handle);
         } elseif ($field_data->type === 'Categories') {
@@ -500,6 +585,17 @@ class SimpleApiController extends BaseController
           $block->getContent()->setAttribute($handle, $cats);
         } elseif (($required && sizeof($data->$loc_handle) > 0) || !$required){
           $block->getContent()->setAttribute($handle, $data->$loc_handle);
+<<<<<<< HEAD
+        }
+      } elseif ($field_data->type === 'Assets') {
+        $original = craft()->matrix->getBlockById($block->id);
+        $image = $original->$handle->first();
+        if (!$image) {
+          SimpleApiPlugin::Log('error: ' . $handle . $block->id);
+        } elseif (!isset($block->$handle[0])){
+          $block->getContent()->setAttribute($handle, [$image->id]);
+=======
+>>>>>>> 8ff9436b06b59784e4f92981f3cc7973e2a13eb7
         }
       } elseif ($field_data->type === 'Assets') {
         $original = craft()->matrix->getBlockById($block->id);

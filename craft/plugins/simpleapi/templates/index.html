@@ -92,6 +92,7 @@
 {% includeCssFile 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' %}
 {% includeCss css %}
 {% set content %}
+    <h1>An importer! An exporter!</h1>
     <button class="trigger">Export sections</button>
     <h2>All Sections</h2>
     <table>
@@ -166,7 +167,7 @@
       <div class="box__input">
         <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
         <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
-        <button class="box__button" type="submit">Upload</button>
+        <a class="box__button" type="submit">Upload</button>
       </div>
       <br/>
       <div class="box__uploading">Uploading&hellip;</div>
