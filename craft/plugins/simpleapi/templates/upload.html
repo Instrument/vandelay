@@ -129,7 +129,7 @@
             });
           }
           $.post({
-            url: '{{ actionUrl('simpleApi/uploadEntry') }}',
+            url: '{{ site.url }}/simpleApi/uploadEntry',
             dataType: 'json',
             contentType: 'application/json; charset=UTF-8',
             processData: false,
