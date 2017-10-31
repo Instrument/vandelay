@@ -250,8 +250,6 @@ class SimpleApiController extends BaseController
     $locale = $data->locale;
     $matrices = [];
     $neos = [];
-    $structures = [];
-    $fruits = [];
     $entry = craft()->entries->getEntryById($data->id, $locale);
     $english_entry = craft()->entries->getEntryById($data->id);
     //Exit if entry is not available in target locale
@@ -266,7 +264,7 @@ class SimpleApiController extends BaseController
       if (isset($data->$loc_handle)) {
         if ($type === 'Neo') {
           $neoblocks = $this->saveNeo($field_val, $locale, $entry, $data->$loc_handle);
-          $structures[$handle] = $neoblocks;
+          $neos[$handle] = $neoblocks;
         } elseif ($type === 'PlainText') {
             $entry->getContent()->setAttribute($handle, $data->$loc_handle);
         } elseif ($type === 'Categories') {
@@ -313,6 +311,9 @@ class SimpleApiController extends BaseController
               'custom' => $english_entry->$handle->custom,
               'target' => '_blank'
             ];
+            if ($data->$loc_handle->type == 'entry') {
+              $newLink['entry'] = $data->$loc_handle->value;
+            } 
             $entry->getContent()->setAttribute($handle, $newLink);
           }
         } elseif ($type === 'RichText') {
@@ -329,7 +330,7 @@ class SimpleApiController extends BaseController
     }
     $saved = craft()->entries->saveEntry($entry);
     if ($saved) {
-      return [$entry, $matrices, $fruits];
+      return [$entry, $matrices, $neos];
     } else {
       return [
         'not_saved' => $data
@@ -521,15 +522,14 @@ class SimpleApiController extends BaseController
       } elseif ($field_data->type === 'Assets') {
         $original = craft()->matrix->getBlockById($block->id);
         $image = $original->$handle->first();
+        $blockImage = $block->$handle->first();
         if (!$image) {
           SimpleApiPlugin::Log('error: ' . $handle . $block->id);
-        } elseif (!isset($block->$handle[0])){
+        } elseif(!$blockImage) {
           $block->getContent()->setAttribute($handle, [$image->id]);
+        } else {
+          $block->getContent()->setAttribute($handle, [$blockImage->id]);
         }
-      } elseif ($field_data->type === 'Assets') {
-        $original = craft()->matrix->getBlockById($block->id);
-        $image = $original->$handle->first();
-        $block->getContent()->setAttribute($handle, [$image->id]);
       }
     }
     $saved = craft()->matrix->saveBlock($block);
