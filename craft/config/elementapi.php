@@ -436,6 +436,7 @@ return [
             'criteria' => [
               'group' => $slug,
               'id' => isset($params['id']) ? $params['id'] : null,
+              'locale' => isset($params['locale']) ? $params['locale'] : 'en_us'
             ],
             'paginate' => true,
             'elementsPerPage' => 100,
