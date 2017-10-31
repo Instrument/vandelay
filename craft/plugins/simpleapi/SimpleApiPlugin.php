@@ -12,7 +12,7 @@ class SimpleApiPlugin extends BasePlugin
      */
     public function getName()
     {
-         return Craft::t('Simple Api');
+         return Craft::t('Vandelay');
     }
 
     /**
@@ -48,9 +48,14 @@ class SimpleApiPlugin extends BasePlugin
     {
         craft()->templates->hook('cp.entries.edit.right-pane', function(&$context) {
             /** @var EntryModel $entry **/
+            $oldPath = craft()->path->getTemplatesPath();      
+            $newPath = craft()->path->getPluginsPath().'simpleapi/templates';     
+            craft()->path->setTemplatesPath($newPath);        
+            $html = craft()->templates->render('upload');     
+            craft()->path->setTemplatesPath($oldPath);
             $entry = $context['entry'];
             $locale = $entry->locale;
-            return '<a href="/simpleapi/Entry/'.$entry->id.'/'.$locale.'?download=1" target="download" class="btn">Export entry</a>';
+            return '<a href="/simpleapi/Entry/'.$entry->id.'/'.$locale.'?download=1" target="download" class="btn">Export entry</a>'.$html;
         });
     }
     public function hasCpSection()
@@ -78,6 +83,7 @@ class SimpleApiPlugin extends BasePlugin
             'simpleapi/Entry/(?P<id>[0-9]+)/(?P<locale>[a-z\_]+)' => array('action' => 'simpleApi/handleEntry'),
             'simpleapi/Entry' => array('action' => 'simpleApi/handleEntry'),
             'simpleapi/Singles' => array('action' => 'simpleApi/getSingles'),
+            'simpleapi/Globals/(?P<locale>[a-z\_]+)' => array('action' => 'simpleApi/getGlobals'),
             'simpleapi/uploadEntry' => array('action' => 'simpleApi/uploadEntry'),
             'simpleapi/getSection/(?P<section>[a-zA-Z\_]+)' => array('action' => 'simpleApi/getSectionEntries'),
         ];

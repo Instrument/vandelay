@@ -92,6 +92,7 @@
 {% includeCssFile 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' %}
 {% includeCss css %}
 {% set content %}
+    <h1>An importer! An exporter!</h1>
     <button class="trigger">Export sections</button>
     <h2>All Sections</h2>
     <table>
@@ -168,9 +169,18 @@
         <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
         <button class="box__button" type="submit">Upload</button>
       </div>
-      <div class="box__uploading">Uploading&hellip;</div>
-      <div class="box__success">Done!</div>
-      <div class="box__error">Error! <span></span>.</div>
+      <br/>
+      <table>
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Locale</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
     </form>
 {% endset %}
 {% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
@@ -203,20 +213,42 @@ $('.trigger').on('click', function() {
     });
   });
   var $form = $('form');
+  var $table = $form.find('tbody');
   var droppedFiles = false;
   var fileSelect = document.getElementById('file');
   $form.on('submit', function (e) {
     e.preventDefault();
-
+    $table.html('');
+    $('.box__uploading').css('display', 'block');
+    $('.box__success').css('display', 'none');
     var ajaxData = new FormData();
     var files = fileSelect.files;
     for (var i = 0, f; f = files[i]; i++) {
       var file = files[i];
       var reader = new FileReader();
-
       reader.onload = (function(theFile) {
+        var file = theFile.name;
+        var $fileStatus;
+        var name;
+        var regex = /(..\_..)+/gi;
+        var m = file.match(regex);
+        file.replace(regex, function(match, g1, g2) { 
+          name = g1.toLowerCase();
+        });
+        $table.append("<tr class='file-"+i+"'><td>"+
+                      file + 
+                      "</td><td>" +
+                      name + 
+                      "</td><td class='file-status'>Uploading...</td></tr>");
+        $fileStatus = $('.file-'+i).find('.file-status');
         return function(e) {
           var p = JSON.parse(e.target.result);
+          p.locale = name;
+          if (p[0]) {
+            [].slice.call(p).forEach(function(item) {
+              item.locale = name;
+            });
+          }
           $.post({
             url: $form.attr('action'),
             dataType: 'json',
@@ -224,8 +256,17 @@ $('.trigger').on('click', function() {
             processData: false,
             data: JSON.stringify(p),
             success: function(data) {
-              console.log(data);
+              if (data.status == 200) {
+                $fileStatus.html('Done!');
+                console.log(data);
+              } else {
+                $fileStatus.html('Error!');
+                console.log('error', data);
+              }
             },
+            error: function(err) {
+              console.log('errrr', err);
+            }
           });
         };
       })(f);

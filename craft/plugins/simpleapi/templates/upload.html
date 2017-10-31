@@ -1,6 +1,153 @@
-<form method="POST" enctype="multipart/form-data">
-  <input type="hidden" name="action" value="simpleApi/uploadEntry">
-  {{ getCsrfInput() }}
-  <input type="file" name="fields[file][]">
-  <button type="submit">Upload file</button>
+{% set css %}
+  td, th {
+    padding: 10px 20px 10px 0px;
+  }
+  .green {
+    color: green;
+  }
+  .red {
+    color: red;
+  }
+  input#file {
+    display: block;
+    margin: 1em 0;
+  }
+  .box__dragndrop,
+  .box__uploading,
+  .box__success,
+  .box__error {
+    display: none;
+  }
+  .fa-spinner{
+    animation: animationFrames linear 1s;
+    animation-iteration-count: infinite;
+    transform-origin: 50% 50%;
+    animation-fill-mode:forwards; /*when the spec is finished*/
+    -webkit-animation: animationFrames linear 1s;
+    -webkit-animation-iteration-count: infinite;
+    -webkit-transform-origin: 50% 50%;
+    -webkit-animation-fill-mode:forwards; /*Chrome 16+, Safari 4+*/ 
+    -moz-animation: animationFrames linear 1s;
+    -moz-animation-iteration-count: infinite;
+    -moz-transform-origin: 50% 50%;
+    -moz-animation-fill-mode:forwards; /*FF 5+*/
+    -o-animation: animationFrames linear 1s;
+    -o-animation-iteration-count: infinite;
+    -o-transform-origin: 50% 50%;
+    -o-animation-fill-mode:forwards; /*Not implemented yet*/
+    -ms-animation: animationFrames linear 1s;
+    -ms-animation-iteration-count: infinite;
+    -ms-transform-origin: 50% 50%;
+    -ms-animation-fill-mode:forwards; /*IE 10+*/
+  }
+
+  @keyframes animationFrames{
+    0% {
+      transform:  rotate(0deg) ;
+    }
+    100% {
+      transform:  rotate(360deg) ;
+    }
+  }
+
+  @-moz-keyframes animationFrames{
+    0% {
+      -moz-transform:  rotate(0deg) ;
+    }
+    100% {
+      -moz-transform:  rotate(360deg) ;
+    }
+  }
+
+  @-webkit-keyframes animationFrames {
+    0% {
+      -webkit-transform:  rotate(0deg) ;
+    }
+    100% {
+      -webkit-transform:  rotate(360deg) ;
+    }
+  }
+
+  @-o-keyframes animationFrames {
+    0% {
+      -o-transform:  rotate(0deg) ;
+    }
+    100% {
+      -o-transform:  rotate(360deg) ;
+    }
+  }
+
+  @-ms-keyframes animationFrames {
+    0% {
+      -ms-transform:  rotate(0deg) ;
+    }
+    100% {
+      -ms-transform:  rotate(360deg) ;
+    }
+  }
+{% endset %}
+{% includeCss css%}
+<form class="box" method="post" action="/actions/simpleApi/uploadEntry" enctype="multipart/form-data">
+  <div class="box__input">
+    <input class="box__file btn" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
+    <a class="btn submit" id="upload-trigger">Upload</a>
+  </div>
+  <br/>
+  <div class="box__uploading">Uploading&hellip;</div>
+  <div class="box__success">Done!</div>
+  <div class="box__error">Error! <span></span>.</div>
 </form>
+{% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
+{% set js %}
+  var $form = $('#upload-trigger');
+  var droppedFiles = false;
+  var name;
+  var fileSelect = document.getElementById('file');
+  $form.on('click', function (e) {
+    e.preventDefault();
+    $('.box__uploading').css('display', 'block');
+    $('.box__success').css('display', 'none');
+    var ajaxData = new FormData();
+    var files = fileSelect.files;
+    for (var i = 0, f; f = files[i]; i++) {
+      var file = files[i];
+      var reader = new FileReader();
+      reader.onload = (function(theFile) {
+        var file = theFile.name;
+        var regex = /(..\_..)+/gi;
+        var m = file.match(regex);
+        
+        file.replace(regex, function(match, g1, g2) { 
+          name = g1.toLowerCase();
+        });
+        return function(e) {
+          var p = JSON.parse(e.target.result);
+          p.locale = name;
+          if (p[0]) {
+            [].slice.call(p).forEach(function(item) {
+              item.locale = name;
+            });
+          }
+          $.post({
+            url: '{{ siteUrl }}/simpleApi/uploadEntry',
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            processData: false,
+            data: JSON.stringify(p),
+            success: function(data) {
+              if (data.status == 200) {
+                $('.box__uploading').css('display', 'none');
+                $('.box__success').css('display', 'block');
+                console.log(data);
+              } else {
+                console.log('error', data);
+              }
+            },
+          });
+        };
+      })(f);
+      reader.readAsText(f);
+    }
+  })
+{% endset %}
+{% includeJs js %}
