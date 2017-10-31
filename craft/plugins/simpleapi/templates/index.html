@@ -170,9 +170,17 @@
         <button class="box__button" type="submit">Upload</button>
       </div>
       <br/>
-      <div class="box__uploading">Uploading&hellip;</div>
-      <div class="box__success">Done!</div>
-      <div class="box__error">Error! <span></span>.</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Locale</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
     </form>
 {% endset %}
 {% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
@@ -205,11 +213,12 @@ $('.trigger').on('click', function() {
     });
   });
   var $form = $('form');
+  var $table = $form.find('tbody');
   var droppedFiles = false;
-  var name;
   var fileSelect = document.getElementById('file');
   $form.on('submit', function (e) {
     e.preventDefault();
+    $table.html('');
     $('.box__uploading').css('display', 'block');
     $('.box__success').css('display', 'none');
     var ajaxData = new FormData();
@@ -219,12 +228,19 @@ $('.trigger').on('click', function() {
       var reader = new FileReader();
       reader.onload = (function(theFile) {
         var file = theFile.name;
+        var $fileStatus;
+        var name;
         var regex = /(..\_..)+/gi;
         var m = file.match(regex);
-        
         file.replace(regex, function(match, g1, g2) { 
           name = g1.toLowerCase();
         });
+        $table.append("<tr class='file-"+i+"'><td>"+
+                      file + 
+                      "</td><td>" +
+                      name + 
+                      "</td><td class='file-status'>Uploading...</td></tr>");
+        $fileStatus = $('.file-'+i).find('.file-status');
         return function(e) {
           var p = JSON.parse(e.target.result);
           p.locale = name;
@@ -241,10 +257,10 @@ $('.trigger').on('click', function() {
             data: JSON.stringify(p),
             success: function(data) {
               if (data.status == 200) {
-                $('.box__uploading').css('display', 'none');
-                $('.box__success').css('display', 'block');
+                $fileStatus.html('Done!');
                 console.log(data);
               } else {
+                $fileStatus.html('Error!');
                 console.log('error', data);
               }
             },
