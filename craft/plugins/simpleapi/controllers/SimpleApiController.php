@@ -694,7 +694,4 @@ class SimpleApiController extends BaseController
       $this->handleGetRequest($variables);
     }
   }
-}bles);
-    }
-  }
 }
