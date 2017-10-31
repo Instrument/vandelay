@@ -251,6 +251,7 @@ class SimpleApiController extends BaseController
     $matrices = [];
     $neos = [];
     $structures = [];
+    $fruits = [];
     $entry = craft()->entries->getEntryById($data->id, $locale);
     $english_entry = craft()->entries->getEntryById($data->id);
     //Exit if entry is not available in target locale
@@ -289,7 +290,9 @@ class SimpleApiController extends BaseController
             $blockIds = [];
             foreach ($results as $key => $result) {
               $result = craft()->matrix->getBlockById($result->id, $locale);
-              $matrices[] = $this->saveMatrix($result, $data->$loc_handle[$key]);
+              if (isset($data->$loc_handle[$key])) {
+                $matrices[] = $this->saveMatrix($result, $data->$loc_handle[$key]);
+              }
               $blockIds[] = [$result, $data->$loc_handle];
             }
           }
@@ -300,8 +303,20 @@ class SimpleApiController extends BaseController
               $og_link = $english_entry->$handle;
             }
             $link = $this->saveFruitLink($og_link, $data->$loc_handle);
-            $entry->getContent()->setAttribute($handle, $link);
+            $entry->getContent()->setAttribute($handle, (array) $english_entry->$handle);
+          } elseif (gettype($data->$loc_handle) === 'object') {
+            $newLink = [
+              'customText' => $data->$loc_handle->customTextLoc,
+              'value' => $data->$loc_handle->value,
+              'type' => $data->$loc_handle->type,
+              'defaultText' => '',
+              'custom' => $english_entry->$handle->custom,
+              'target' => '_blank'
+            ];
+            $entry->getContent()->setAttribute($handle, $newLink);
           }
+        } elseif ($type === 'RichText') {
+          $entry->getContent()->setAttribute($handle, $data->$loc_handle);
         }
       } elseif ($type === 'Assets') {
         $image = $english_entry->$handle->first();
@@ -310,15 +325,15 @@ class SimpleApiController extends BaseController
         } elseif (!isset($entry->$handle[0])) {
           $entry->getContent()->setAttribute($handle, [$image->id]);
         }
-      } elseif ($type === 'RichText') {
-        $entry->getContent()->setAttribute($handle, $data->$loc_handle);
-      }
+      } 
     }
     $saved = craft()->entries->saveEntry($entry);
     if ($saved) {
-      return [$entry, $matrices, $structures];
+      return [$entry, $matrices, $fruits];
     } else {
-      return $data;
+      return [
+        'not_saved' => $data
+      ];
     }
   }
   public function saveFruitLink($link, $data) {
@@ -625,11 +640,13 @@ class SimpleApiController extends BaseController
       }
     } elseif (isset($data->title) && $data->title == 'globals') {
       $updated = $this->localizeGlobals($data);
+    } elseif (isset($data->id)) {
+      $updated = $this->localizeEntry($data);
     }
-    $this->returnJson(array(
+    $this->returnJson([
       'status' => 200,
       'data' => $updated,
-    ));
+    ]);
   }
   public function handlePostRequest($variables) {
     if (isset($variables['id'])) {

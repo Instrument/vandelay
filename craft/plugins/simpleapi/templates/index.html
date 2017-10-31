@@ -248,6 +248,9 @@ $('.trigger').on('click', function() {
                 console.log('error', data);
               }
             },
+            error: function(err) {
+              console.log('errrr', err);
+            }
           });
         };
       })(f);
