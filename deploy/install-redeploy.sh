@@ -29,6 +29,10 @@ mysql -h $GCLOUD_DB_IP -P 3306 -sfu $GCLOUD_DB_USER -p$GCLOUD_DB_PASSWORD < "/tm
 
 ### INSTALL CRAFT FILES  ###
 sleep 1
+echo "Saving backup files"
+mkdir -p /tmp/crafttmp/backups
+cp /var/www/craft/storage/backups/* /tmp/crafttmp/backups/
+
 echo "Updating website files"
 rm -r craftfiles
 unzip craftfiles.zip 1>/dev/null
@@ -44,7 +48,8 @@ sed -i "s/DB_ROOT_PASSWORD/$GCLOUD_DB_PASSWORD/g" db.php
 cp db.php /var/www/craft/config/db.php
 cp general.php /var/www/craft/config/general.php
 
-mkdir -p /var/www/craft/storage
+mkdir -p /var/www/craft/storage/backups
+mv /tmp/crafttmp/backups/* /var/www/craft/storage/backups/
 
 chown -R  www-data:www-data /var/www/craft/app
 chown -R  www-data:www-data /var/www/craft/config
