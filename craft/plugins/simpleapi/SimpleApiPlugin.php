@@ -51,11 +51,21 @@ class SimpleApiPlugin extends BasePlugin
             $oldPath = craft()->path->getTemplatesPath();      
             $newPath = craft()->path->getPluginsPath().'simpleapi/templates';     
             craft()->path->setTemplatesPath($newPath);        
-            $html = craft()->templates->render('upload');     
+            $upload = craft()->templates->render('upload');     
             craft()->path->setTemplatesPath($oldPath);
             $entry = $context['entry'];
             $locale = $entry->locale;
-            return '<a href="/simpleapi/Entry/'.$entry->id.'/'.$locale.'?download=1" target="download" class="btn">Export entry</a>'.$html;
+            $html = '<a href="/simpleapi/Entry/';
+            $html .= $entry->id;
+            $html .= '/'.$locale;
+            $html .= '?download=1';
+            if (isset($context['draftId'])) { 
+                $html .= '&draftId='.$context['draftId']; 
+            }
+            $html .= '" target="download" class="btn">Export entry</a>';
+            $copy = '<a class="btn submit" id="copy-trigger" data-entry-id="'.$entry->id.'">';
+            $copy .= 'Copy English to All</a>';
+            return $html . $upload . $copy;
         });
     }
     public function hasCpSection()
@@ -86,6 +96,7 @@ class SimpleApiPlugin extends BasePlugin
             'simpleapi/Globals/(?P<locale>[a-z\_]+)' => array('action' => 'simpleApi/getGlobals'),
             'simpleapi/uploadEntry' => array('action' => 'simpleApi/uploadEntry'),
             'simpleapi/getSection/(?P<section>[a-zA-Z\_]+)' => array('action' => 'simpleApi/getSectionEntries'),
+            'simpleapi/copyToAll/(?P<id>[0-9]+)' => array('action' => 'simpleApi/copyEnglishToAll'),
         ];
     }
 }

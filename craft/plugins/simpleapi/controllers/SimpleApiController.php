@@ -143,6 +143,9 @@ class SimpleApiController extends BaseController
   public function getEntryDetails($entry) {
     $page = array();
     $fields = $entry->getFieldLayout()->getFields();
+    if (isset($entry->draftId)) {
+      $page['draftId'] = $entry->draftId;
+    }
     $page['id'] = $entry->id;
     $page['title'] = $entry->title;
     $page['slug'] = $entry->slug;
@@ -163,6 +166,26 @@ class SimpleApiController extends BaseController
   public function returnEntry($id, $locale = null) {
     $entry = craft()->entries->getEntryById($id, $locale);
     return $this->getEntryDetails($entry);
+  }
+  public function returnDraft($draftId, $locale) {
+    $draft = craft()->entryRevisions->getDraftById($draftId);
+    return $this->getEntryDetails($draft);
+  }
+  public function actionCopyEnglishToAll(array $variables = array()) {
+    $id = $variables['id'];
+    $saved = [];
+    $entry = craft()->entries->getEntryById($id);
+    $details = $this->returnEntry($id);
+    $section = $entry->getSection();
+    foreach ($section->locales as $locale) {
+      $details['locale'] = $locale->locale;
+      $valid = $this->localizeEntry((object)$details);
+      $saved[] = [
+        'entry' => $details,
+        'state' => $valid
+      ];
+    }
+    $this->returnJson($saved);
   }
   public function saveTag($data) {
     // First check if the tag already exists
@@ -250,7 +273,13 @@ class SimpleApiController extends BaseController
     $locale = $data->locale;
     $matrices = [];
     $neos = [];
-    $entry = craft()->entries->getEntryById($data->id, $locale);
+    $is_draft = isset($data->draftId);
+    if ($is_draft) {
+      $entry = craft()->entryRevisions->getDraftById($data->draftId);
+      SimpleApiPlugin::Log('is draft '. $data->draftId);
+    } else {
+      $entry = craft()->entries->getEntryById($data->id, $locale);
+    }
     $english_entry = craft()->entries->getEntryById($data->id);
     //Exit if entry is not available in target locale
     if (empty($entry)) { return $data; }
@@ -266,7 +295,7 @@ class SimpleApiController extends BaseController
           $neoblocks = $this->saveNeo($field_val, $locale, $entry, $data->$loc_handle);
           $neos[$handle] = $neoblocks;
         } elseif ($type === 'PlainText') {
-            $entry->getContent()->setAttribute($handle, $data->$loc_handle);
+          $entry->getContent()->setAttribute($handle, $data->$loc_handle);
         } elseif ($type === 'Categories') {
           $cats = [];
           foreach ($data->$loc_handle as $category) {
@@ -328,9 +357,16 @@ class SimpleApiController extends BaseController
         }
       } 
     }
-    $saved = craft()->entries->saveEntry($entry);
+    if ($is_draft) {
+      $entry->parentId = $english_entry->parentId;
+      $entry->typeId = $english_entry->typeId;
+      $entry->sectionId = $english_entry->sectionId;
+      $saved = craft()->entryRevisions->saveDraft($entry);
+    } else {
+      $saved = craft()->entries->saveEntry($entry);
+    }
     if ($saved) {
-      return [$entry, $matrices, $neos];
+      return [$entry, $entry->validators, $neos];
     } else {
       return [
         'not_saved' => $data
@@ -658,9 +694,19 @@ class SimpleApiController extends BaseController
   }
   public function handleGetRequest($variables) {
     if (isset($variables['id'])) {
-      $result = $this->returnEntry($variables['id'], $variables['locale']);
+      $is_draft = craft()->request->getParam('draftId');
+      if ($is_draft) {
+        $result = $this->returnDraft(craft()->request->getParam('draftId'), $variables['locale']);
+      } else {
+        $result = $this->returnEntry($variables['id'], $variables['locale']);
+      }
       if (craft()->request->getParam('download')) {
-        $fname = CRAFT_STORAGE_PATH . "/" . $result['type'] . '-'. $result['slug'] . '-'. $variables['locale'] .'.json';
+        $fname = CRAFT_STORAGE_PATH . "/" . $result['type'] . '-'. $result['slug'];
+        if ($is_draft) {
+          $fname .= '-draft';
+        }
+        $fname .= '-'. $variables['locale'];
+        $fname .= '.json';
         $handle = fopen($fname,'w');
         fwrite($handle, json_encode($result));
         fclose($handle);
