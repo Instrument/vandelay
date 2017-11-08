@@ -87,7 +87,7 @@
   }
 {% endset %}
 {% includeCss css%}
-<form class="box" method="post" action="/actions/simpleApi/uploadEntry" enctype="multipart/form-data">
+<div class="box">
   <div class="box__input">
     <input class="box__file btn" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
     <a class="btn submit" id="upload-trigger">Upload</a>
@@ -96,10 +96,11 @@
   <div class="box__uploading">Uploading&hellip;</div>
   <div class="box__success">Done!</div>
   <div class="box__error">Error! <span></span>.</div>
-</form>
+</div>
 {% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
 {% set js %}
   var $form = $('#upload-trigger');
+  var $copy = $('#copy-trigger');
   var droppedFiles = false;
   var name;
   var fileSelect = document.getElementById('file');
@@ -129,7 +130,7 @@
             });
           }
           $.post({
-            url: '{{ siteUrl }}/simpleApi/uploadEntry',
+            url: '{{ siteUrl }}simpleapi/uploadEntry',
             dataType: 'json',
             contentType: 'application/json; charset=UTF-8',
             processData: false,
@@ -148,6 +149,17 @@
       })(f);
       reader.readAsText(f);
     }
-  })
+  });
+  $copy.on('click', function(e) {
+    var id = $copy.attr('data-entry-id');
+    $copy.text('Copying...');
+    e.preventDefault();
+    $.post({
+      url: '{{ siteUrl }}simpleapi/copyToAll/' + id,
+      success: function(data) {
+        $copy.text('Copied!');
+      },
+    });
+  });
 {% endset %}
 {% includeJs js %}
