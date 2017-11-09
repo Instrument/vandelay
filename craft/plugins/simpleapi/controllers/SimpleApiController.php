@@ -298,11 +298,10 @@ class SimpleApiController extends BaseController
           $entry->getContent()->setAttribute($handle, $data->$loc_handle);
         } elseif ($type === 'Categories') {
           $cats = [];
-          foreach ($data->$loc_handle as $category) {
+          foreach ($english_entry->$handle as $category) {
             $cats[] = $category->id;
           }
           $entry->getContent()->setAttribute($handle, $cats);
-          $matrices[$handle] = $data->$loc_handle;
         } elseif ($type === 'Matrix') {
           if (sizeof($data->$loc_handle) > 0) {
             $criteria = craft()->elements->getCriteria(ElementType::MatrixBlock);
