@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --harmony ./devServer"
+    "start": "node --harmony ./devServer",
+    "build": "NODE_ENV=PROD webpack --config ./index.js "
   },
   "keywords": [],
   "author": "",
