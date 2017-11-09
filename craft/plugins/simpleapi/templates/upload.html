@@ -154,10 +154,25 @@
     var id = $copy.attr('data-entry-id');
     $copy.text('Copying...');
     e.preventDefault();
-    $.post({
-      url: '{{ siteUrl }}simpleapi/copyToAll/' + id,
+    $.get({
+      url: '{{ siteUrl }}simpleapi/Entry/' + id + '/en_us',
       success: function(data) {
         $copy.text('Copied!');
+        var p = data.entry;
+        $.post({
+          url: '{{ siteUrl }}actions/simpleApi/copyEnglishToAll',
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            processData: false,
+            data: JSON.stringify(p),
+            success: function(data) {
+              if (data.status == 200) {
+                console.log(data);
+              } else {
+                console.log('error', data);
+              }
+            },
+        })
       },
     });
   });

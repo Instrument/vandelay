@@ -171,21 +171,24 @@ class SimpleApiController extends BaseController
     $draft = craft()->entryRevisions->getDraftById($draftId);
     return $this->getEntryDetails($draft);
   }
-  public function actionCopyEnglishToAll(array $variables = array()) {
-    $id = $variables['id'];
+  public function actionCopyEnglishToAll() {
+    $raw_data = craft()->request->rawBody;
+    $data = json_decode($raw_data);
+    $id = $data->id;
     $saved = [];
     $entry = craft()->entries->getEntryById($id);
-    $details = $this->returnEntry($id);
     $section = $entry->getSection();
     foreach ($section->locales as $locale) {
-      $details['locale'] = $locale->locale;
-      $valid = $this->localizeEntry((object)$details);
+      $valid = $this->localizeEntry($data, $locale->locale);
       $saved[] = [
-        'entry' => $details,
-        'state' => $valid
+        'entry' => $data,
+        'loc' => $valid
       ];
     }
-    $this->returnJson($saved);
+    $this->returnJson([
+      'status' => 200,
+      'updated' => $saved
+    ]);
   }
   public function saveTag($data) {
     // First check if the tag already exists
@@ -269,17 +272,13 @@ class SimpleApiController extends BaseController
     }
     return [$raw, $matrices, $neos];
   }
-  public function localizeEntry($data) {
-    $locale = $data->locale;
+  public function localizeEntry($data, $locale = null) {
+    if (!$locale) {
+      $locale = $data->locale;
+    }
     $matrices = [];
     $neos = [];
-    $is_draft = isset($data->draftId);
-    if ($is_draft) {
-      $entry = craft()->entryRevisions->getDraftById($data->draftId);
-      SimpleApiPlugin::Log('is draft '. $data->draftId);
-    } else {
-      $entry = craft()->entries->getEntryById($data->id, $locale);
-    }
+    $entry = craft()->entries->getEntryById($data->id, $locale);
     $english_entry = craft()->entries->getEntryById($data->id);
     //Exit if entry is not available in target locale
     if (empty($entry)) { return $data; }
@@ -340,7 +339,7 @@ class SimpleApiController extends BaseController
               'target' => '_blank'
             ];
             if ($data->$loc_handle->type == 'entry') {
-              $newLink['entry'] = $data->$loc_handle->value;
+              $newLink['entry'] = $english_entry->$handle->value;
             } 
             $entry->getContent()->setAttribute($handle, $newLink);
           }
@@ -356,14 +355,7 @@ class SimpleApiController extends BaseController
         }
       } 
     }
-    if ($is_draft) {
-      $entry->parentId = $english_entry->parentId;
-      $entry->typeId = $english_entry->typeId;
-      $entry->sectionId = $english_entry->sectionId;
-      $saved = craft()->entryRevisions->saveDraft($entry);
-    } else {
-      $saved = craft()->entries->saveEntry($entry);
-    }
+    $saved = craft()->entries->saveEntry($entry);
     if ($saved) {
       return [$entry, $entry->validators, $neos];
     } else {
