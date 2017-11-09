@@ -91,9 +91,9 @@ class VandelayPlugin extends BasePlugin
             'simpleapi/Entry/(?P<id>[0-9]+)/(?P<locale>[a-z\_]+)' => array('action' => 'vandelay/handleEntry'),
             'simpleapi/Entry' => array('action' => 'vandelay/handleEntry'),
             'simpleapi/Singles' => array('action' => 'vandelay/getSingles'),
-            'simpleapi/Globals/(?P<locale>[a-z\_]+)' => array('action' => 'vandelay/getGlobals'),
-            'simpleapi/uploadEntry' => array('action' => 'vandelay/uploadEntry'),
-            'simpleapi/getSection/(?P<section>[a-zA-Z\_]+)' => array('action' => 'vandelay/getSectionEntries'),
+            'vandelay/Globals/(?P<locale>[a-z\_]+)' => array('action' => 'vandelay/getGlobals'),
+            'vandelay/uploadEntry' => array('action' => 'vandelay/uploadEntry'),
+            'vandelay/getSection/(?P<section>[a-zA-Z\_]+)' => array('action' => 'vandelay/getSectionEntries'),
         ];
     }
 }
