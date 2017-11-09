@@ -1,2 +1,28 @@
-node_modules
+# Craft runtime and backups folders
+# ----------------------------------------------------------------------
+/craft/storage/runtime/*
+/craft/storage/backups/*
+deploy/xfr/*
+bashrc
 
+# Uploaded files
+# ----------------------------------------------------------------------
+node_modules/
+public/imager
+
+# Misc files
+# ----------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+.cache
+.project
+.settings
+.tmproj
+*.esproj
+data/#archive/*
+
+libs
+craft/config/general.php
+craft/config/db.php

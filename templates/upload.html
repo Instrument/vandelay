@@ -9,7 +9,7 @@
     color: red;
   }
   input#file {
-    display: block;
+    display: none;
     margin: 1em 0;
   }
   .box__dragndrop,
@@ -17,6 +17,22 @@
   .box__success,
   .box__error {
     display: none;
+  }
+  .upload-box {
+    outline: 2px dashed black;
+    outline-offset: -10px;
+    font-size: 1.25rem;
+    background-color: #c8dadf;
+    position: relative;
+    padding: 100px 20px;
+    text-align: center;
+    margin: 1rem 0;
+  }
+  .upload-box .btn {
+    margin: 1rem 0;
+  }
+  .upload-box .box__dragndrop {
+    display: inline;
   }
   .fa-spinner{
     animation: animationFrames linear 1s;
@@ -87,27 +103,42 @@
   }
 {% endset %}
 {% includeCss css%}
-<div class="box">
+<div class="upload-box">
   <div class="box__input">
     <input class="box__file btn" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
+    <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
     <a class="btn submit" id="upload-trigger">Upload</a>
   </div>
   <br/>
   <div class="box__uploading">Uploading&hellip;</div>
   <div class="box__success">Done!</div>
-  <div class="box__error">Error! <span></span>.</div>
+  <div class="box__error">Error! Import unsuccessful :( <span></span>.</div>
 </div>
 {% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
 {% set js %}
-  var $form = $('#upload-trigger');
-  var $copy = $('#copy-trigger');
+  var $form = $('.upload-box');
+  var $submit = $('#upload-trigger');
+  var fileSelect = document.getElementById('file');
   var droppedFiles = false;
   var name;
-  var fileSelect = document.getElementById('file');
-  $form.on('click', function (e) {
+  var $input  = $form.find('input[type="file"]'),
+    $label    = $form.find('label'),
+    showFiles = function(files) {
+      $label.text(files.length > 1 ? ($input.attr('data-multiple-caption') || '').replace( '{count}', files.length ) : files[ 0 ].name);
+    };
+  $form.on('drop', function(e) {
+    droppedFiles = e.originalEvent.dataTransfer.files; 
+    showFiles( droppedFiles );
+  });
+
+  $input.on('change', function(e) {
+    showFiles(e.target.files);
+  });
+  $submit.on('click', function (e) {
     e.preventDefault();
     $('.box__uploading').css('display', 'block');
     $('.box__success').css('display', 'none');
+    $('.box__error').css('display', 'none');
     var ajaxData = new FormData();
     var files = fileSelect.files;
     for (var i = 0, f; f = files[i]; i++) {
@@ -130,7 +161,7 @@
             });
           }
           $.post({
-            url: '{{ siteUrl }}simpleapi/uploadEntry',
+            url: '{{ siteUrl }}vandelay/uploadEntry',
             dataType: 'json',
             contentType: 'application/json; charset=UTF-8',
             processData: false,
@@ -141,7 +172,8 @@
                 $('.box__success').css('display', 'block');
                 console.log(data);
               } else {
-                console.log('error', data);
+                $('.box__uploading').css('display', 'none');
+                $('.box__error').css('display', 'block');
               }
             },
           });
@@ -149,17 +181,6 @@
       })(f);
       reader.readAsText(f);
     }
-  });
-  $copy.on('click', function(e) {
-    var id = $copy.attr('data-entry-id');
-    $copy.text('Copying...');
-    e.preventDefault();
-    $.post({
-      url: '{{ siteUrl }}simpleapi/copyToAll/' + id,
-      success: function(data) {
-        $copy.text('Copied!');
-      },
-    });
-  });
+  })
 {% endset %}
 {% includeJs js %}

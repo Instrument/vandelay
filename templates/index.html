@@ -1,209 +1,65 @@
 {% extends "_layouts/cp" %}
 {% set centered = true %}
-{% set title = 'SimpleApi' %}
+{% set title = 'Vandelay' %}
 {% set sections = craft.sections.getAllSections() %}
 {% set categories = craft.categories.getAllCategories() %}
 {% set locales = craft.i18n.getSiteLocaleIds()%}
 {% set handles = [] %}
-{% set css %}
-  td, th {
-    padding: 10px 20px 10px 0px;
-  }
-  .green {
-    color: green;
-  }
-  .red {
-    color: red;
-  }
-  .box__dragndrop,
-  .box__uploading,
-  .box__success,
-  .box__error {
-    display: none;
-  }
-  .fa-spinner{
-    animation: animationFrames linear 1s;
-    animation-iteration-count: infinite;
-    transform-origin: 50% 50%;
-    animation-fill-mode:forwards; /*when the spec is finished*/
-    -webkit-animation: animationFrames linear 1s;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-transform-origin: 50% 50%;
-    -webkit-animation-fill-mode:forwards; /*Chrome 16+, Safari 4+*/ 
-    -moz-animation: animationFrames linear 1s;
-    -moz-animation-iteration-count: infinite;
-    -moz-transform-origin: 50% 50%;
-    -moz-animation-fill-mode:forwards; /*FF 5+*/
-    -o-animation: animationFrames linear 1s;
-    -o-animation-iteration-count: infinite;
-    -o-transform-origin: 50% 50%;
-    -o-animation-fill-mode:forwards; /*Not implemented yet*/
-    -ms-animation: animationFrames linear 1s;
-    -ms-animation-iteration-count: infinite;
-    -ms-transform-origin: 50% 50%;
-    -ms-animation-fill-mode:forwards; /*IE 10+*/
-  }
-
-  @keyframes animationFrames{
-    0% {
-      transform:  rotate(0deg) ;
-    }
-    100% {
-      transform:  rotate(360deg) ;
-    }
-  }
-
-  @-moz-keyframes animationFrames{
-    0% {
-      -moz-transform:  rotate(0deg) ;
-    }
-    100% {
-      -moz-transform:  rotate(360deg) ;
-    }
-  }
-
-  @-webkit-keyframes animationFrames {
-    0% {
-      -webkit-transform:  rotate(0deg) ;
-    }
-    100% {
-      -webkit-transform:  rotate(360deg) ;
-    }
-  }
-
-  @-o-keyframes animationFrames {
-    0% {
-      -o-transform:  rotate(0deg) ;
-    }
-    100% {
-      -o-transform:  rotate(360deg) ;
-    }
-  }
-
-  @-ms-keyframes animationFrames {
-    0% {
-      -ms-transform:  rotate(0deg) ;
-    }
-    100% {
-      -ms-transform:  rotate(360deg) ;
-    }
-  }
-{% endset %}
 {% includeCssFile 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' %}
-{% includeCss css %}
+{% for style in craft.vandelay.stylesheets %}
+  {% includeCssFile style %}
+{% endfor %}
 {% set content %}
     <h1>An importer! An exporter!</h1>
-    <button class="trigger">Export sections</button>
-    <h2>All Sections</h2>
-    <table>
-      <thead>
-      <tr>
-        <th>Section</th>
-        <th>Status</th>
-        {% for locale in locales %}
-            <th>{{ locale }}</th>
-        {% endfor %}
-      </tr>
-      </thead>
-      <tbody>
-        {% for section in sections %}
-        <tr>
-          <td>{{ section.name }}</td>
-          <td id="section-{{section.handle}}">
-            Not exported
-          </td>
-          {% set sectionLocales = section.getLocales() %}
-           {% for locale in locales %}
-              <td class="{{ locale in sectionLocales|keys ? 'green' : 'red'}}">
-                <span class="fa {{ locale in sectionLocales|keys ? 'fa-check' : 'fa-close'}}"></span>
-              </td>
-           {% endfor %}
-        </tr>
-      {% endfor %}
-      <tr>
-        <td>Globals</td>
-        <td id="globals">
-          Not exported
-        </td>
-         {% for locale in locales %}
-            <td class="green">
-              <span class="fa fa-check"></span>
-            </td>
-         {% endfor %}
-      </tr>
-      </tbody>
-    </table>
-    <h2>Categories</h2>
-    <table>
-      <thead>
-      <tr>
-        <th>Category</th>
-        <th>Status</th>
-        {% for locale in locales %}
-            <th>{{ locale }}</th>
-        {% endfor %}
-      </tr>
-      </thead>
-      <tbody>
-        {% for category in categories %}
-        <tr>
-          <td>{{ category.title }}</td>
-          <td id="cat-{{ category.id }}">
-            Not exported
-          </td>
-          {% set catLocales = category.getLocales() %}
-           {% for locale in locales %}
-              <td class="{{ locale in catLocales|keys ? 'green' : 'red'}}">
-                <span class="fa {{ locale in catLocales|keys ? 'fa-check' : 'fa-close'}}"></span>
-              </td>
-           {% endfor %}
-        </tr>
-      {% endfor %}
-      
-      </tbody>
-    </table>
-    <h2>Import localized files</h2>
-    <form class="box" method="post" action="/actions/simpleApi/uploadEntry" enctype="multipart/form-data">
-      <div class="box__input">
-        <input class="box__file" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
-        <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
-        <button class="box__button" type="submit">Upload</button>
-      </div>
-      <br/>
-      <table>
-        <thead>
-          <tr>
-            <th>Filename</th>
-            <th>Locale</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-        </tbody>
-      </table>
-    </form>
+    <div id="vandelay"></div>
+{% set sectionsObj = [
+{name: 'Globals', locales: locales }
+] %}
+{% for section in sections %}
+  {% if section.name == 'Pages' %}
+    {% for page in craft.entries.section(section.handle) %}
+      {% set sectionLocales = page.getLocales() %}
+      {% set sectionsObj = sectionsObj|merge([{
+        name: page.title,
+        locales: sectionLocales|keys
+      }]) %}
+    {% endfor %}
+  {% else %}
+    {% set sectionLocales = section.getLocales() %}
+    {% set sectionsObj = sectionsObj|merge([{
+      name: section.name,
+      locales: sectionLocales|keys
+    }]) %}
+  {% endif %}
+{% endfor %}
+<script type="application/json" id="props">
+  {"locales": {{ locales|json_encode|raw }},
+    "sections": {{ sectionsObj|json_encode|raw }}}
+</script>
 {% endset %}
-{% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
+{% for script in craft.vandelay.scripts %}
+  {% includeJsFile script %}
+{% endfor %}
 {% set js %}
 $('.trigger').on('click', function() {
     $('[id^=section-]').html('<span class="fa fa-spinner"></span>');
     $('[id^=cat-]').html('<span class="fa fa-spinner"></span>');
     $('#globals').html('<span class="fa fa-spinner"></span>');
     {% for section in sections %}
-      $.get( "/simpleapi/getSection/{{ section.handle }}?download=1", function( data ) {
+      $.get( "/vandelay/getSection/{{ section.handle }}?download=1", function( data ) {
         var filename = '{{section.handle}}-{{craft.locale}}';
         var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
         saveAs(blob, filename+".json");
         $('#section-{{section.handle}}').text('exported');
       });
     {% endfor %}
-    $.get( "/actions/simpleApi/getGlobals", function( data ) {
+    $.get( "/actions/vandelay/getGlobals", function( data ) {
         var filename = data.title + '-' + data.locale;
         var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
         saveAs(blob, filename+".json");
         $('#globals').text('exported');
     });
-    $.get( "/actions/simpleApi/getCategories", function( data ) {
+    $.get( "/actions/vandelay/getCategories", function( data ) {
       var filename = 'categories-{{craft.locale}}';
       var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
       saveAs(blob, filename+".json");
