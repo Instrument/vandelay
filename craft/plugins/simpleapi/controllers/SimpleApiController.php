@@ -564,6 +564,8 @@ class SimpleApiController extends BaseController
             $cats[] = $category->id;
           }
           $block->getContent()->setAttribute($handle, $cats);
+        } elseif ($field_data->type === 'RichText') {
+          $block->getContent()->setAttribute($handle, $data->$loc_handle);
         } elseif (($required && sizeof($data->$loc_handle) > 0) || !$required){
           $block->getContent()->setAttribute($handle, $data->$loc_handle);
         }
@@ -573,8 +575,10 @@ class SimpleApiController extends BaseController
         $blockImage = $block->$handle->first();
         if (!$image) {
         } elseif(!$blockImage) {
+          SimpleApiPlugin::Log('matrix orig: ' . $image->id . $type->handle);
           $block->getContent()->setAttribute($handle, [$image->id]);
         } else {
+          SimpleApiPlugin::Log('matrix block: ' . $blockImage->id . $type->handle);
           $block->getContent()->setAttribute($handle, [$blockImage->id]);
         }
       }
