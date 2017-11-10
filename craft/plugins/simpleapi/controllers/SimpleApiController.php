@@ -408,16 +408,25 @@ class SimpleApiController extends BaseController
     $criteria->locale = $locale;
     $criteria->limit = null;
     $blocks = $criteria->find();
-    $newBlocks = [];
-    return $blocks;
+    $criteria = craft()->elements->getCriteria(Neo_ElementType::NeoBlock);
+    $criteria->fieldId = $field->id;
+    $criteria->ownerId = $owner->id;
+    $criteria->locale = 'en_us';
+    $criteria->limit = null;
+    $eng_blocks = $criteria->find();
+    return [
+      'blocks' => $blocks,
+      'english' => $eng_blocks
+    ];
   }
   public function saveNeo($field, $locale, $owner, $data) {
     // Delete blocks in locale and create copies of english versions
-    $blocks = $this->cleanNeos($field, $owner, $locale);
+    $block_data = $this->cleanNeos($field, $owner, $locale);
+    $eng_blocks = $block_data['english'];
     $neoblocks = [];
     
     $pattern = '/(_loc)/';
-    foreach ($blocks as $key => $block) {
+    foreach ($block_data['blocks'] as $key => $block) {
       if (isset($data[$key])) {
         $neo_matrix = [];
         $fruitlinks = [];
@@ -467,6 +476,16 @@ class SimpleApiController extends BaseController
               $link = $this->saveFruitLink($og_link, $data[$key]->$neo_loc_handle);
               $block->getContent()->setAttribute($neohandle, $link);
               $fruitlinks[$neo_loc_handle] = [$link, $og_link];
+            }
+          } elseif ($neoblock_val->type === 'Assets'){
+            $original = $eng_blocks[$key];
+            $image = $original->$neohandle->first();
+            $blockImage = $block->$neohandle->first();
+            if (!$image) {
+            } elseif(!$blockImage) {
+              $block->getContent()->setAttribute($neohandle, [$image->id]);
+            } else {
+              $block->getContent()->setAttribute($neohandle, [$blockImage->id]);
             }
           }
         }
@@ -531,7 +550,9 @@ class SimpleApiController extends BaseController
           if (sizeof($original) < 1) {
             $original = craft()->matrix->getBlockById($block->id);
           }
+          $original = craft()->matrix->getBlockById($block->id);
           $image = $original->$handle->first();
+          $blockImage = $block->$handle->first();
           if (!isset($block->$handle[0])) {
             $block->getContent()->setAttribute($handle, [$image->id]);
           }
@@ -551,7 +572,6 @@ class SimpleApiController extends BaseController
         $image = $original->$handle->first();
         $blockImage = $block->$handle->first();
         if (!$image) {
-          SimpleApiPlugin::Log('error: ' . $handle . $block->id);
         } elseif(!$blockImage) {
           $block->getContent()->setAttribute($handle, [$image->id]);
         } else {
