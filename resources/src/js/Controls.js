@@ -72,13 +72,13 @@ export default class Controls extends Component {
           <Toolbar>
           <ToolbarGroup>
           <RaisedButton
+            onClick={this.props.handleExport}
             className="trigger"
             label="Export"/>
           <RaisedButton 
             onClick={::this.openModal}
             label="Import"/>
           </ToolbarGroup>
-          <ToolbarSeparator/>
           <ToolbarGroup>
           <RaisedButton
             label={`${!this.props.showLocales ? 'Show' : 'Hide'} Locales`}

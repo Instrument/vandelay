@@ -28,6 +28,7 @@
     {% set sectionLocales = section.getLocales() %}
     {% set sectionsObj = sectionsObj|merge([{
       name: section.name,
+      handle: section.handle,
       locales: sectionLocales|keys
     }]) %}
   {% endif %}
@@ -41,33 +42,6 @@
   {% includeJsFile script %}
 {% endfor %}
 {% set js %}
-$('.trigger').on('click', function() {
-    $('[id^=section-]').html('<span class="fa fa-spinner"></span>');
-    $('[id^=cat-]').html('<span class="fa fa-spinner"></span>');
-    $('#globals').html('<span class="fa fa-spinner"></span>');
-    {% for section in sections %}
-      $.get( "/vandelay/getSection/{{ section.handle }}?download=1", function( data ) {
-        var filename = '{{section.handle}}-{{craft.locale}}';
-        var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
-        saveAs(blob, filename+".json");
-        $('#section-{{section.handle}}').text('exported');
-      });
-    {% endfor %}
-    $.get( "/actions/vandelay/getGlobals", function( data ) {
-        var filename = data.title + '-' + data.locale;
-        var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
-        saveAs(blob, filename+".json");
-        $('#globals').text('exported');
-    });
-    $.get( "/actions/vandelay/getCategories", function( data ) {
-      var filename = 'categories-{{craft.locale}}';
-      var blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
-      saveAs(blob, filename+".json");
-      {% for cat in categories %}
-        $('#cat-{{ cat.id }}').text('exported');
-      {% endfor %}
-    });
-  });
   var $form = $('form');
   var $table = $form.find('tbody');
   var droppedFiles = false;
