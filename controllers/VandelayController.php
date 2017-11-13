@@ -164,6 +164,29 @@ class VandelayController extends BaseController
     $entry = craft()->entries->getEntryById($id, $locale);
     return $this->getEntryDetails($entry);
   }
+  public function returnDraft($draftId, $locale) {
+    $draft = craft()->entryRevisions->getDraftById($draftId);
+    return $this->getEntryDetails($draft);
+  }
+  public function actionCopyEnglishToAll() {
+    $raw_data = craft()->request->rawBody;
+    $data = json_decode($raw_data);
+    $id = $data->id;
+    $saved = [];
+    $entry = craft()->entries->getEntryById($id);
+    $section = $entry->getSection();
+    foreach ($section->locales as $locale) {
+      $valid = $this->localizeEntry($data, $locale->locale);
+      $saved[] = [
+        'entry' => $data,
+        'loc' => $valid
+      ];
+    }
+    $this->returnJson([
+      'status' => 200,
+      'updated' => $saved
+    ]);
+  }
   public function saveTag($data) {
     // First check if the tag already exists
     $criteria = craft()->elements->getCriteria(ElementType::Tag);
@@ -246,8 +269,10 @@ class VandelayController extends BaseController
     }
     return [$raw, $matrices, $neos];
   }
-  public function localizeEntry($data) {
-    $locale = $data->locale;
+  public function localizeEntry($data, $locale = null) {
+    if (!$locale) {
+      $locale = $data->locale;
+    }
     $matrices = [];
     $neos = [];
     $entry = craft()->entries->getEntryById($data->id, $locale);
@@ -269,11 +294,10 @@ class VandelayController extends BaseController
             $entry->getContent()->setAttribute($handle, $data->$loc_handle);
         } elseif ($type === 'Categories') {
           $cats = [];
-          foreach ($data->$loc_handle as $category) {
+          foreach ($english_entry->$handle as $category) {
             $cats[] = $category->id;
           }
           $entry->getContent()->setAttribute($handle, $cats);
-          $matrices[$handle] = $data->$loc_handle;
         } elseif ($type === 'Matrix') {
           if (sizeof($data->$loc_handle) > 0) {
             $criteria = craft()->elements->getCriteria(ElementType::MatrixBlock);
@@ -312,7 +336,7 @@ class VandelayController extends BaseController
               'target' => '_blank'
             ];
             if ($data->$loc_handle->type == 'entry') {
-              $newLink['entry'] = $data->$loc_handle->value;
+              $newLink['entry'] = $english_entry->$handle->value;
             } 
             $entry->getContent()->setAttribute($handle, $newLink);
           }
@@ -381,16 +405,25 @@ class VandelayController extends BaseController
     $criteria->locale = $locale;
     $criteria->limit = null;
     $blocks = $criteria->find();
-    $newBlocks = [];
-    return $blocks;
+    $criteria = craft()->elements->getCriteria(Neo_ElementType::NeoBlock);
+    $criteria->fieldId = $field->id;
+    $criteria->ownerId = $owner->id;
+    $criteria->locale = 'en_us';
+    $criteria->limit = null;
+    $eng_blocks = $criteria->find();
+    return [
+      'blocks' => $blocks,
+      'english' => $eng_blocks
+    ];
   }
   public function saveNeo($field, $locale, $owner, $data) {
     // Delete blocks in locale and create copies of english versions
-    $blocks = $this->cleanNeos($field, $owner, $locale);
+    $block_data = $this->cleanNeos($field, $owner, $locale);
+    $eng_blocks = $block_data['english'];
     $neoblocks = [];
     
     $pattern = '/(_loc)/';
-    foreach ($blocks as $key => $block) {
+    foreach ($block_data['blocks'] as $key => $block) {
       if (isset($data[$key])) {
         $neo_matrix = [];
         $fruitlinks = [];
@@ -440,6 +473,16 @@ class VandelayController extends BaseController
               $link = $this->saveFruitLink($og_link, $data[$key]->$neo_loc_handle);
               $block->getContent()->setAttribute($neohandle, $link);
               $fruitlinks[$neo_loc_handle] = [$link, $og_link];
+            }
+          } elseif ($neoblock_val->type === 'Assets'){
+            $original = $eng_blocks[$key];
+            $image = $original->$neohandle->first();
+            $blockImage = $block->$neohandle->first();
+            if (!$image) {
+            } elseif(!$blockImage) {
+              $block->getContent()->setAttribute($neohandle, [$image->id]);
+            } else {
+              $block->getContent()->setAttribute($neohandle, [$blockImage->id]);
             }
           }
         }
@@ -504,7 +547,9 @@ class VandelayController extends BaseController
           if (sizeof($original) < 1) {
             $original = craft()->matrix->getBlockById($block->id);
           }
+          $original = craft()->matrix->getBlockById($block->id);
           $image = $original->$handle->first();
+          $blockImage = $block->$handle->first();
           if (!isset($block->$handle[0])) {
             $block->getContent()->setAttribute($handle, [$image->id]);
           }
@@ -516,6 +561,8 @@ class VandelayController extends BaseController
             $cats[] = $category->id;
           }
           $block->getContent()->setAttribute($handle, $cats);
+        } elseif ($field_data->type === 'RichText') {
+          $block->getContent()->setAttribute($handle, $data->$loc_handle);
         } elseif (($required && sizeof($data->$loc_handle) > 0) || !$required){
           $block->getContent()->setAttribute($handle, $data->$loc_handle);
         }
@@ -524,10 +571,11 @@ class VandelayController extends BaseController
         $image = $original->$handle->first();
         $blockImage = $block->$handle->first();
         if (!$image) {
-          VandelayPlugin::Log('error: ' . $handle . $block->id);
         } elseif(!$blockImage) {
+          SimpleApiPlugin::Log('matrix orig: ' . $image->id . $type->handle);
           $block->getContent()->setAttribute($handle, [$image->id]);
         } else {
+          SimpleApiPlugin::Log('matrix block: ' . $blockImage->id . $type->handle);
           $block->getContent()->setAttribute($handle, [$blockImage->id]);
         }
       }
