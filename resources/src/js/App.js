@@ -64,15 +64,17 @@ export default class App extends Component {
             });
           });
       } else if (section.name === 'Categories') {
-        axios.get(`/actions/vandelay/getCategories?download=1`, data => {
-          const filename = `categories-en_us`;
-          const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
-          saveAs(blob, filename+".json");
-          sections[section.sectionIndex].exported = true;
-          this.setState({
-            sections
+        axios.get(`/actions/vandelay/getCategories?download=1`)
+          .then(res => {
+            const { data } = res;
+            const filename = `categories-en_us`;
+            const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+            saveAs(blob, filename+".json");
+            sections[section.sectionIndex].exported = true;
+            this.setState({
+              sections
+            });
           });
-        });
       } else if (section.id) {
         axios.get(`/vandelay/Entry/${section.id}/en_us?download=1`)
           .then(res => {

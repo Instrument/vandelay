@@ -13,7 +13,8 @@
     <h1>An importer! An exporter!</h1>
     <div id="vandelay"></div>
 {% set sectionsObj = [
-{name: 'Globals', locales: locales }
+  { name: 'Globals', locales: locales },
+  { name: 'Categories', locales: locales }
 ] %}
 {% for section in sections %}
   {% if section.name == 'Pages' %}
