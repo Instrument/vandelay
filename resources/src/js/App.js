@@ -27,10 +27,57 @@ export default class App extends Component {
       [e.target.name]: !this.state[e.target.name],
     });
   };
+  handleUpload(files) {
+    const { endpoint } = this.props;
+    for (var i = 0, f; f=files[i]; i++) {
+      var reader = new FileReader();
+      reader.onload = (function(theFile) {
+        var fileName = theFile.name;
+        var name;
+        var regex = /(..\_..)+/gi;
+        var m = fileName.match(regex);
+        fileName.replace(regex, function(match, g1, g2) {
+          if (g1.toLowerCase() === 'es_00') {
+            name = 'es_es';
+          } else {
+            name = g1.toLowerCase();
+          }
+        });
+        return function(e) {
+          var p = JSON.parse(e.target.result);
+          p.locale = name;
+          if (p[0]) {
+            [].slice.call(p).forEach(function(item) {
+              item.locale = name;
+            });
+          }
+          $.post({
+            url: endpoint,
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            processData: false,
+            data: JSON.stringify(p),
+            success: function(data) {
+              if (data.status == 200) {
+                console.log(data);
+              } else {
+                console.log('error', data);
+              }
+            },
+            error: function(err) {
+              console.log('errrr', err);
+            }
+          });
+        };
+      })(f);
+      reader.readAsText(f);
+    }
+  }
   render() {
     return (
       <div>
         <Controls
+          handleFileUpload={::this.handleUpload}
           handleToggle={::this.handleToggle}
           showLocales={this.state.showLocales}
         />

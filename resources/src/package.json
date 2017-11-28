@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --harmony ./devServer",
-    "build": "NODE_ENV=PROD webpack --config ./index.js "
+    "clean": "rm -rf ../dist && mkdir ../dist",
+    "build": "npm run clean && NODE_ENV=PROD webpack --config ./index.js "
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     ]
   },
   "dependencies": {
+    "axios": "0.17.1",
     "classnames": "2.2.5",
     "material-ui": "0.19.4",
     "react": "16.0.0",

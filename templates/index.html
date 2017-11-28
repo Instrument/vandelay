@@ -34,7 +34,9 @@
 {% endfor %}
 <script type="application/json" id="props">
   {"locales": {{ locales|json_encode|raw }},
-    "sections": {{ sectionsObj|json_encode|raw }}}
+    "sections": {{ sectionsObj|json_encode|raw }},
+    "endpoint": "{{ siteUrl }}vandelay/uploadEntry"
+  }
 </script>
 {% endset %}
 {% for script in craft.vandelay.scripts %}

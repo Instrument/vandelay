@@ -12,6 +12,7 @@ import {
 import { findDOMNode } from 'react-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import './controls.styl';
+import axios from 'axios';
 
 export default class Controls extends Component {
   constructor(props) {
@@ -66,6 +67,13 @@ export default class Controls extends Component {
       files: currentFiles
     });
   }
+  handleUpload(e) {
+    e.preventDefault();
+    const input = findDOMNode(this.refs.fileInput);
+    const files = input.files;
+    console.log(files);
+    this.props.handleFileUpload(files);
+  }
   render() {
     return (
       <MuiThemeProvider>
@@ -96,7 +104,8 @@ export default class Controls extends Component {
             open={this.state.modalOpen}
             onRequestClose={::this.handleClose}
           >
-            <form className="box" onClick={::this.addFile}>
+            <form className="box" onClick={::this.addFile}
+                  onSubmit={::this.handleUpload}>
               <div className="box__input">
                 {this.state.files.map(file => 
                   file.upload && <Chip
