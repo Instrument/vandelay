@@ -71,7 +71,6 @@ export default class Controls extends Component {
     e.preventDefault();
     const input = findDOMNode(this.refs.fileInput);
     const files = input.files;
-    console.log(files);
     this.props.handleFileUpload(files);
   }
   render() {
@@ -80,6 +79,7 @@ export default class Controls extends Component {
           <Toolbar>
           <ToolbarGroup>
           <RaisedButton
+            onClick={this.props.handleExport}
             className="trigger"
             label="Export"/>
           <RaisedButton 

@@ -1,17 +1,7 @@
 import React, { Component } from 'react';
-import {
-  Table,
-  TableHeader,
-  TableHeaderColumn,
-  TableFooter,
-  TableRow,
-  TableRowColumn,
-  TableBody,
-  FontIcon,
-  CircularProgress,
-  Paper
-} from 'material-ui';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import saveAs from './fetch';
+import axios from 'axios';
+import SectionSelector from './SectionSelector';
 import Controls from './Controls';
 
 export default class App extends Component {
@@ -19,14 +9,66 @@ export default class App extends Component {
     super(props);
     this.state = {
       showLocales: true,
+      selectedSections: [],
+      sections: this.props.sections,
+      imports: [],
     };
   }
   handleToggle = (e) => {
-    console.log('toggled', e);
     this.setState({
       [e.target.name]: !this.state[e.target.name],
     });
   };
+  handleSelect = (rows) => {
+    console.log(rows)
+    const selectedSections = [];
+    if (rows === 'all') {
+      this.setState({
+        selectedSections: this.props.sections
+      });
+    } else if (rows === 'none') {
+      this.setState({
+        selectedSections
+      });
+    } else {
+      [].slice.call(rows).forEach(row => {
+        const item = this.props.sections[row];
+        selectedSections.push(item);
+      });
+      this.setState({
+        selectedSections
+      });
+    }
+  }
+  handleExport(e) {
+    e.preventDefault();
+    const { selectedSections } = this.state;
+    [].slice.call(selectedSections).forEach(section => {
+      if (section.name === 'Globals') {
+        axios.get(`/actions/vandelay/getGlobals?download=1`)
+          .then(res => {
+            const { data } = res;
+            const filename = `globals-en_us`;
+            const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+            saveAs(blob, filename+".json");
+          });
+      } else if (section.name === 'Categories') {
+        axios.get(`/actions/vandelay/getCategories?download=1`, data => {
+          const filename = `categories-en_us`;
+          const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+          saveAs(blob, filename+".json");
+        });
+      } else {
+        axios.get(`/vandelay/getSection/${section.handle}?download=1`)
+        .then(res => {
+          const { data } = res;
+          const filename = `${section.handle}-en_us`;
+          const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+          saveAs(blob, filename+".json");
+        });
+      }
+    });
+  }
   handleUpload(files) {
     const { endpoint } = this.props;
     for (var i = 0, f; f=files[i]; i++) {
@@ -77,66 +119,17 @@ export default class App extends Component {
     return (
       <div>
         <Controls
+          handleExport={::this.handleExport}
           handleFileUpload={::this.handleUpload}
           handleToggle={::this.handleToggle}
           showLocales={this.state.showLocales}
         />
-        <MuiThemeProvider>
-          <Paper style={{
-            padding: '2em'
-          }}>
-            <Table multiSelectable>
-              <TableHeader enableSelectAll>
-                <TableRow>
-                  <TableHeaderColumn>Section name</TableHeaderColumn>
-                  <TableHeaderColumn>Status</TableHeaderColumn>
-                  { this.state.showLocales && this.props.locales.map((loc) => 
-                    <TableHeaderColumn key={loc}>
-                      {loc}
-                    </TableHeaderColumn>
-                  )}
-                </TableRow>
-              </TableHeader>
-              <TableBody deselectOnClickaway={false}>
-              { this.props.sections.map(section => 
-                <TableRow key={section.name}>
-                  <TableRowColumn>{section.name}</TableRowColumn>
-                  <TableRowColumn>
-                    <FontIcon 
-                      color={(section.exported) ?
-                          '#2196F3' : '#DA5B4C'
-                        }
-                      title={(section.exported) ?
-                          'Exported' : 'Not exported'
-                        }
-                      className='material-icons'>
-                      {(section.exported) ?
-                          'cloud_done' : 'cloud_off'
-                        }
-                      </FontIcon>
-                      {section.exporting && 
-                        <CircularProgress/>
-                      }
-                  </TableRowColumn>
-                  { this.state.showLocales && this.props.locales.map(loc => 
-                    <TableRowColumn key={`${section.name}-${loc}`}>
-                      <FontIcon 
-                      color={(section.locales.indexOf(loc) > -1) ?
-                          '#2196F3' : 'red'
-                        }
-                      className='material-icons'>
-                      {(section.locales.indexOf(loc) > -1) ?
-                          'thumb_up' : 'thumb_down'
-                        }
-                      </FontIcon>
-                    </TableRowColumn>
-                  )}
-                </TableRow>
-              )}
-              </TableBody>
-            </Table>
-          </Paper>
-        </MuiThemeProvider>
+        <SectionSelector
+          showLocales={this.state.showLocales}
+          locales={this.props.locales}
+          selectedSections={this.state.selectedSections}
+          sections={this.state.sections}
+          handleSelect={::this.handleSelect}/>
       </div>
     );
   }
