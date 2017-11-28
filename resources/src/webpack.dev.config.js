@@ -60,7 +60,7 @@ module.exports = {
       loader: 'style!css',
     }, {
       test: /\.styl$/,
-      loader: stylusLoader
+      loader: stylusLoader,
     }, {
       test: /\.js$/,
       exclude: /node_modules/,
@@ -80,5 +80,13 @@ module.exports = {
       '/dist/'
     ),
     new webpack.HotModuleReplacementPlugin(),
+    new webpack.LoaderOptionsPlugin({
+      test: /\.styl$/,
+      stylus: {
+        default: {
+          use: [require('nib')()],
+        },
+      },
+    })
   ]
 };

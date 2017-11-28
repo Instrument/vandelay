@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const argv = require('yargs').argv;
+const path = require('path');
 const resolve = require('path').resolve;
 const extname = require('path').extname;
 const fs = require('fs');
@@ -11,24 +12,53 @@ const PUBLIC_PATH = '/';
 const DIST = resolve('public');
 const ENTRY = resolve('js');
 
-function WriteStatsPlugin() {
-  const args = [].slice.call(arguments);
-  const destination = args.shift();
+// function WriteStatsPlugin() {
+//   const args = [].slice.call(arguments);
+//   const destination = args.shift();
 
+//   return function writeStats() {
+//     this.plugin('done', stats => {
+//       const assets = {
+//         'js': [PUBLIC_PATH + 'bundle.js'],
+//         'css': []
+//       };
+
+//       fs.writeFileSync(
+//         destination,
+//         JSON.stringify(assets)
+//       );
+//     });
+//   };
+// };
+function WriteStatsPlugin({publicPath, target}) {
   return function writeStats() {
-    this.plugin('done', stats => {
-      const assets = {
-        'js': [PUBLIC_PATH + 'bundle.js'],
-        'css': []
-      };
+    this.plugin('done', (stats) => {
+      const json = stats.toJson();
+      let chunks = json.assetsByChunkName['bundle'];
+
+      if (!Array.isArray(chunks)) {
+        chunks = [chunks];
+      }
+
+      const assets = chunks.filter((chunk) => {
+        return ['.js', '.css'].indexOf(path.extname(chunk) > -1);
+      }).reduce((memo, chunk) => {
+        const ext = path.extname(chunk).match(/\.(.+)$/)[1];
+
+        memo[ext] = memo[ext] || [];
+        memo[ext].push(publicPath + chunk);
+
+        return memo;
+      }, {css: [], js: []});
 
       fs.writeFileSync(
-        destination,
-        JSON.stringify(assets)
+        target,
+        JSON.stringify(assets, null, 2)
       );
     });
   };
-};
+}
+
 
 module.exports = {
   name: 'Site Client',
@@ -38,7 +68,7 @@ module.exports = {
     ],
   },
   output: {
-    path: '/public',
+    path: resolve('../js'),
     publicPath: PUBLIC_PATH,
     filename: '[name].js',
   },
@@ -57,8 +87,7 @@ module.exports = {
       loader: 'style!css',
     }, {
       test: /\.styl$/,
-      use:ExtractTextPlugin.extract({fallback:"style-loader", use:["css-loader?minimize","stylus-loader"]}),
-      // include:path.join(__dirname,"client/src"),
+      use: ExtractTextPlugin.extract({fallback:"style-loader", use:["css-loader?minimize","stylus-loader"]}),
     }, {
       test: /\.js$/,
       exclude: /node_modules/,
@@ -72,11 +101,10 @@ module.exports = {
     tls: 'empty'
   },
   plugins: [
-    // new webpack.NoErrorsPlugin(),
-    new WriteStatsPlugin(
-      `config/webpack-stats.json`,
-      '/public/'
-    ),
     new ExtractTextPlugin('/styles/[hash].css'),
+    new WriteStatsPlugin({
+      publicPath: PUBLIC_PATH,
+      target: `config/webpack-stats.json`,
+    }),
   ]
 };
