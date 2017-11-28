@@ -7,7 +7,7 @@
 {% set handles = [] %}
 {% includeCssFile 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' %}
 {% for style in craft.vandelay.stylesheets %}
-  {% includeCssResource('vandelay/js' ~ style)  %}
+  {% includeCssResource('vandelay/dist' ~ style)  %}
 {% endfor %}
 {% set content %}
     <h1>An importer! An exporter!</h1>
@@ -40,7 +40,7 @@
 {% for script in craft.vandelay.scripts %}
   {% includeJsFile script %}
 {% endfor %}
-{% includeJsResource('vandelay/js/bundle.js') %}
+{% includeJsResource('vandelay/dist/bundle.js') %}
 {% set js %}
 $('.trigger').on('click', function() {
     $('[id^=section-]').html('<span class="fa fa-spinner"></span>');
