@@ -8,7 +8,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showLocales: true,
+      showLocales: false,
       selectedSections: [],
       sections: this.props.sections,
       imports: [],
@@ -33,7 +33,10 @@ export default class App extends Component {
     } else {
       [].slice.call(rows).forEach(row => {
         const item = this.props.sections[row];
-        selectedSections.push(item);
+        selectedSections.push({
+          ...item,
+          sectionIndex: row,
+        });
       });
       this.setState({
         selectedSections
@@ -42,8 +45,12 @@ export default class App extends Component {
   }
   handleExport(e) {
     e.preventDefault();
-    const { selectedSections } = this.state;
+    const { selectedSections, sections } = this.state;
     [].slice.call(selectedSections).forEach(section => {
+      sections[section.sectionIndex].exported = 'pending';
+      this.setState({
+        sections
+      });
       if (section.name === 'Globals') {
         axios.get(`/actions/vandelay/getGlobals?download=1`)
           .then(res => {
@@ -51,13 +58,33 @@ export default class App extends Component {
             const filename = `globals-en_us`;
             const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
             saveAs(blob, filename+".json");
+            sections[section.sectionIndex].exported = true;
+            this.setState({
+              sections
+            });
           });
       } else if (section.name === 'Categories') {
         axios.get(`/actions/vandelay/getCategories?download=1`, data => {
           const filename = `categories-en_us`;
           const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
           saveAs(blob, filename+".json");
+          sections[section.sectionIndex].exported = true;
+          this.setState({
+            sections
+          });
         });
+      } else if (section.id) {
+        axios.get(`/vandelay/Entry/${section.id}/en_us?download=1`)
+          .then(res => {
+            const { data } = res;
+            const filename = `${section.slug}-en_us`;
+            const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
+            saveAs(blob, filename+".json");
+            sections[section.sectionIndex].exported = true;
+            this.setState({
+              sections
+            });
+          });
       } else {
         axios.get(`/vandelay/getSection/${section.handle}?download=1`)
         .then(res => {
@@ -65,6 +92,10 @@ export default class App extends Component {
           const filename = `${section.handle}-en_us`;
           const blob = new Blob([JSON.stringify(data)], {type: "application/json;charset=utf-8"});
           saveAs(blob, filename+".json");
+          sections[section.sectionIndex].exported = true;
+          this.setState({
+            sections
+          });
         });
       }
     });

@@ -21,7 +21,9 @@
       {% set sectionLocales = page.getLocales() %}
       {% set sectionsObj = sectionsObj|merge([{
         name: page.title,
-        locales: sectionLocales|keys
+        locales: sectionLocales|keys,
+        id: page.id,
+        slug: page.slug
       }]) %}
     {% endfor %}
   {% else %}

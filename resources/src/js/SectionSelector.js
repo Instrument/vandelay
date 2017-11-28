@@ -23,6 +23,15 @@ export default class SectionSelector extends Component {
     });
     return selected;
   }
+  getColor(section) {
+    if (section.exported === 'pending') {
+      return '#2196F3';
+    } else if (section.exported) {
+      return '#3cad49';
+    }  else {
+      return '#DA5B4C';
+    }
+  }
   render() {
     return (
       <MuiThemeProvider>
@@ -46,27 +55,26 @@ export default class SectionSelector extends Component {
                 <TableRow key={section.name} selected={this.isSelected(section)}>
                   <TableRowColumn>{section.name}</TableRowColumn>
                   <TableRowColumn>
-                    <FontIcon 
-                      color={(section.exported) ?
-                          '#2196F3' : '#DA5B4C'
-                        }
-                      title={(section.exported) ?
-                          'Exported' : 'Not exported'
-                        }
-                      className='material-icons'>
-                      {(section.exported) ?
-                          'cloud_done' : 'cloud_off'
-                        }
-                      </FontIcon>
-                      {section.exporting && 
-                        <CircularProgress/>
-                      }
+                    {section.exported === 'pending' && 
+                      <CircularProgress/>
+                    }
+                    {section.exported !== 'pending' && 
+                      <span><FontIcon 
+                        color={this.getColor(section)}
+                        title={(section.exported) ?
+                            'Exported' : 'Not exported'
+                          }
+                        className='material-icons'>
+                        import_export
+                        </FontIcon>
+                        </span>
+                    }
                   </TableRowColumn>
                   { this.props.showLocales && this.props.locales.map(loc => 
                     <TableRowColumn key={`${section.name}-${loc}`}>
                       <FontIcon 
                       color={(section.locales.indexOf(loc) > -1) ?
-                          '#2196F3' : 'red'
+                          '#3cad49' : '#DA5B4C'
                         }
                       className='material-icons'>
                       {(section.locales.indexOf(loc) > -1) ?
