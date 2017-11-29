@@ -63,7 +63,9 @@ class VandelayPlugin extends BasePlugin
                 $html .= '&draftId='.$context['draftId']; 
             }
             $html .= '" target="download" class="btn">Export entry</a>';
-            return $html . $upload;
+            $copy = '<a class="btn submit" id="copy-trigger" data-entry-id="'.$entry->id.'">';
+            $copy .= 'Copy English to All</a>';
+            return $html . $copy . $upload;
         });
     }
     public function hasCpSection()
