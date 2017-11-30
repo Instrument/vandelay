@@ -44,5 +44,5 @@
 </script>
 {% endset %}
 {% for script in craft.vandelay.scripts %}
-  {% includeJsFile script %}
+  {% includeJsResource('vandelay/dist' ~ script) %}
 {% endfor %}
