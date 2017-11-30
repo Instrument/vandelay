@@ -38,13 +38,16 @@ export default class Controls extends Component {
       const form = findDOMNode(this.refs.formWrapper);
       form.addEventListener('dragenter', e => {
         this.handleDrag(e);
-      })
+      });
       form.addEventListener('dragover', e => {
         this.handleDrag(e);
-      })
+      });
+      form.addEventListener('drop', e => {
+        this.handleDrop(e);
+      });
       form.addEventListener('dragleave', e => {
         this.handleEndDrag(e);
-      })
+      });
     }, 500);
   }
   handleClose() {
@@ -52,12 +55,23 @@ export default class Controls extends Component {
       modalOpen: false,
     });
   }
+  setFiles(dropFiles) {
+    const files = [];
+    for( var i=0; i < dropFiles.length; i++) {
+      files.push({
+        name: dropFiles[i].name
+      });
+    }
+    this.setState({
+      files,
+      dragging: false
+    });
+  }
   handleFile(e) {
     const files = [];
     for( var i=0; i < e.target.files.length; i++) {
       files.push({
-        name: e.target.files[i].name,
-        upload: (this.state.files[i] ? this.state.files[i].upload : true),
+        name: e.target.files[i].name
       });
     }
     this.setState({
@@ -66,7 +80,6 @@ export default class Controls extends Component {
   }
   handleDrag(e) {
     e.preventDefault();
-    console.log(e);
     this.setState({
       dragging: true,
     });
@@ -79,9 +92,19 @@ export default class Controls extends Component {
   }
   handleDrop(e) {
     e.preventDefault();
-    this.refs.fileInput.files = e.originalEvent.dataTransfer.files;
-    this.setState({
-      dragging: false
+    console.log(e);
+    const files = e.dataTransfer.files;
+    const fileBuffer = [];
+    this.setFiles(files);
+    Array.prototype.push.apply(fileBuffer, files);
+    for( var i=0; i < fileBuffer.length; i++) {
+      this.setStatus({
+        name: fileBuffer[i].name,
+        status: 100
+      });
+    }
+    const response = this.props.handleFileUpload(files, (res) => {
+      this.setStatus(res);
     });
   }
   addFile(e) {
