@@ -55,17 +55,17 @@ class VandelayPlugin extends BasePlugin
             craft()->path->setTemplatesPath($oldPath);
             $entry = $context['entry'];
             $locale = $entry->locale;
-            $html = '<div class="ui-wrapper"><a href="/vandelay/Entry/';
+            $html = '<div class="ui-wrapper"><div class="field"><a href="/vandelay/Entry/';
             $html .= $entry->id;
             $html .= '/'.$locale;
             $html .= '?download=1';
             if (isset($context['draftId'])) { 
                 $html .= '&draftId='.$context['draftId']; 
             }
-            $html .= '" target="download" class="btn">Export entry</a>';
-            $copy = '<a class="btn submit" id="copy-trigger" data-entry-id="'.$entry->id.'">';
+            $html .= '" target="download" class="btn big">Export entry</a></div>';
+            $copy = '<div class="field"><a class="btn submit big" id="copy-trigger" data-entry-id="'.$entry->id.'">';
             $copy .= 'Copy English to All</a></div>';
-            return $html . $copy . $upload;
+            return $html . $copy . $upload . '</div>';
         });
     }
     public function hasCpSection()

@@ -11,15 +11,6 @@
   .box__error {
     display: none;
   }
-  .upload-box {
-    margin: 1em;
-  }
-  .upload-box .btn {
-    margin: 2rem 0 0;
-  }
-  .upload-box .box__dragndrop {
-    display: inline;
-  }
   .fa-spinner{
     animation: animationFrames linear 1s;
     animation-iteration-count: infinite;
@@ -42,10 +33,20 @@
     -ms-transform-origin: 50% 50%;
     -ms-animation-fill-mode:forwards; /*IE 10+*/
   }
+  .ui-wrapper {
+    background-color: #f4f5f6;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #e2e2e2;
+  }
   .ui-wrapper .btn {
+    width: 100%;
+  }
+  .ui-wrapper .import-btn {
+    width: 50%;
     display: inline-block;
-    clear: both;
-    margin-right: 1rem;
+    font-size: .8rem;
+    text-align: center;
   }
   @keyframes animationFrames{
     0% {
@@ -93,19 +94,20 @@
   }
 {% endset %}
 {% includeCss css%}
-<div class="upload-box">
-  <h4>Import JSON</h4>
+<div class="btngroup big previewbtns upload-box">
   <div class="box__input">
     <input class="box__file btn" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
-    <label for="file">
-      <a class="btn">Select a file</a>
+    <label for="file" class="import-btn">
+      <a class="btn big livepreview">Import JSON file</a>
     </label>
-    <a class="btn submit" id="upload-trigger">Upload</a>
+    <a class="import-btn btn big livepreview submit" id="upload-trigger">
+      <span class="box__default">Upload</span>
+      <span class="box__uploading">Uploading&hellip;</span>
+      <span class="box__success">Done!</span>
+      <span class="box__error">Error! Import unsuccessful :(</span>
+    </a>
   </div>
   <br/>
-  <div class="box__uploading">Uploading&hellip;</div>
-  <div class="box__success">Done!</div>
-  <div class="box__error">Error! Import unsuccessful :( <span></span></div>
 </div>
 {% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
 {% set js %}
@@ -119,10 +121,6 @@
     showFiles = function(files) {
       $label.text(files.length > 1 ? ($input.attr('data-multiple-caption') || '').replace( '{count}', files.length ) : files[ 0 ].name);
     };
-  $form.on('drop', function(e) {
-    droppedFiles = e.originalEvent.dataTransfer.files; 
-    showFiles( droppedFiles );
-  });
 
   $input.on('change', function(e) {
     showFiles(e.target.files);
@@ -132,6 +130,7 @@
     $('.box__uploading').css('display', 'block');
     $('.box__success').css('display', 'none');
     $('.box__error').css('display', 'none');
+    $('.box__default').css('display', 'none');
     var ajaxData = new FormData();
     var files = fileSelect.files;
     for (var i = 0, f; f = files[i]; i++) {
@@ -162,15 +161,18 @@
             success: function(data) {
               if (data.status == 200) {
                 $('.box__uploading').css('display', 'none');
+                $('.box__default').css('display', 'none');
                 $('.box__success').css('display', 'block');
                 console.log(data);
               } else {
                 $('.box__uploading').css('display', 'none');
+                $('.box__default').css('display', 'none');
                 $('.box__error').css('display', 'block');
               }
             },
             error: function (data) {
               $('.box__uploading').css('display', 'none');
+              $('.box__default').css('display', 'none');
               $('.box__error').css('display', 'block');
             }
           });
