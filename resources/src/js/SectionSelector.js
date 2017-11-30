@@ -29,7 +29,7 @@ export default class SectionSelector extends Component {
     } else if (section.exported) {
       return '#3cad49';
     }  else {
-      return '#DA5B4C';
+      return '#CCCCCC';
     }
   }
   render() {
@@ -56,25 +56,26 @@ export default class SectionSelector extends Component {
                   <TableRowColumn>{section.name}</TableRowColumn>
                   <TableRowColumn>
                     {section.exported === 'pending' && 
-                      <CircularProgress/>
+                      <CircularProgress size={20}/>
                     }
                     {section.exported !== 'pending' && 
-                      <span><FontIcon 
-                        color={this.getColor(section)}
-                        title={(section.exported) ?
-                            'Exported' : 'Not exported'
-                          }
-                        className='material-icons'>
-                        import_export
+                      <span>
+                        <FontIcon 
+                          color={this.getColor(section)}
+                          title={(section.exported) ?
+                              'Exported' : 'Not exported'
+                            }
+                          className='material-icons'>
+                          import_export
                         </FontIcon>
-                        </span>
+                      </span>
                     }
                   </TableRowColumn>
                   { this.props.showLocales && this.props.locales.map(loc => 
                     <TableRowColumn key={`${section.name}-${loc}`}>
                       <FontIcon 
                       color={(section.locales.indexOf(loc) > -1) ?
-                          '#3cad49' : '#DA5B4C'
+                          '#2196F3' : 'red'
                         }
                       className='material-icons'>
                       {(section.locales.indexOf(loc) > -1) ?

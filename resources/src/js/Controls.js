@@ -3,10 +3,16 @@ import {
   RaisedButton,
   Paper,
   Toolbar,
-  ToolbarSeparator,
+  Table,
+  TableHeader,
+  TableHeaderColumn,
+  TableFooter,
+  TableRow,
+  TableRowColumn,
+  TableBody,
   ToolbarGroup,
   FontIcon,
-  Chip,
+  CircularProgress,
   Dialog
 } from 'material-ui';
 import { findDOMNode } from 'react-dom';
@@ -19,7 +25,8 @@ export default class Controls extends Component {
     super(props);
     this.state = {
       modalOpen: false,
-      files: []
+      files: [],
+      dragging: false,
     };
   }
   openModal(e) {
@@ -27,6 +34,18 @@ export default class Controls extends Component {
     this.setState({
       modalOpen: true,
     });
+    setTimeout(() => {
+      const form = findDOMNode(this.refs.formWrapper);
+      form.addEventListener('dragenter', e => {
+        this.handleDrag(e);
+      })
+      form.addEventListener('dragover', e => {
+        this.handleDrag(e);
+      })
+      form.addEventListener('dragleave', e => {
+        this.handleEndDrag(e);
+      })
+    }, 500);
   }
   handleClose() {
     this.setState({
@@ -45,24 +64,52 @@ export default class Controls extends Component {
       files
     });
   }
+  handleDrag(e) {
+    e.preventDefault();
+    console.log(e);
+    this.setState({
+      dragging: true,
+    });
+  }
+  handleEndDrag(e) {
+    e.preventDefault();
+    this.setState({
+      dragging: false
+    });
+  }
+  handleDrop(e) {
+    e.preventDefault();
+    this.refs.fileInput.files = e.originalEvent.dataTransfer.files;
+    this.setState({
+      dragging: false
+    });
+  }
   addFile(e) {
     const inputs = e.target.querySelectorAll('input');
     [].slice.call(inputs).forEach(input => {
       input.click();
     });
   }
-  removeFile(e) {
-    const input = findDOMNode(this.refs.fileInput);
-    const files = input.files;
-    const fileName = e.target.parentNode.parentNode.getAttribute('name');
-    const fileBuffer = [];
-    const currentFiles = this.state.files;
-    Array.prototype.push.apply( fileBuffer, files );
-    for( var i=0; i < fileBuffer.length; i++) {
-      if (fileBuffer[i].name !== fileName) {
-        currentFiles[i].upload = false;
-      }
+  getLocale(name) {
+    let locale;
+    let regex = /(..\_..)+/gi;
+    let m = name.match(regex);
+    
+    name.replace(regex, function(match, g1, g2) { 
+      locale = g1.toLowerCase();
+    });
+    if (locale == 'es_00') {
+      locale = 'es_es';
     }
+    return locale;
+  }
+  setStatus(file) {
+    const currentFiles = this.state.files;
+    currentFiles.map((currFile, i) => {
+      if (currFile.name === file.name) {
+        currentFiles[i].status = file.status;
+      }
+    })
     this.setState({
       files: currentFiles
     });
@@ -71,7 +118,26 @@ export default class Controls extends Component {
     e.preventDefault();
     const input = findDOMNode(this.refs.fileInput);
     const files = input.files;
-    this.props.handleFileUpload(files);
+    const fileBuffer = [];
+    Array.prototype.push.apply(fileBuffer, files);
+    for( var i=0; i < fileBuffer.length; i++) {
+      this.setStatus({
+        name: fileBuffer[i].name,
+        status: 100
+      });
+    }
+    const response = this.props.handleFileUpload(files, (res) => {
+      this.setStatus(res);
+    });
+  }
+  getColor(file) {
+    if (file.status == 200) {
+      return '#3cad49';
+    } else if (file.status == 500) {
+      return '#cc0000';
+    }  else {
+      return '#CCCCCC';
+    }
   }
   render() {
     return (
@@ -102,15 +168,66 @@ export default class Controls extends Component {
             modal={false}
             open={this.state.modalOpen}
             onRequestClose={::this.handleClose}
+            contentClassName={'dialog-content'}
           >
-            <form className="box" onClick={::this.addFile}
+            <form 
+                  style={{
+                    backgroundColor: this.state.dragging && 'navy'
+                  }}
+                  ref="formWrapper" className="box" onClick={::this.addFile}
                   onSubmit={::this.handleUpload}>
               <div className="box__input">
-                {this.state.files.map(file => 
-                  file.upload && <Chip
-                    name={file.name}
-                    key={file.name}>{file.name}</Chip>
-                )}
+                {(this.state.files.length > 0) &&
+                  <div>
+                  <Table selectable={false}>
+                    <TableHeader
+                      adjustForCheckbox={false}
+                      displaySelectAll={false}>
+                      <TableHeaderColumn>
+                        Filename
+                      </TableHeaderColumn>
+                      <TableHeaderColumn>
+                        Target Locale
+                      </TableHeaderColumn>
+                      <TableHeaderColumn>
+                        Status
+                      </TableHeaderColumn>
+                    </TableHeader>
+                    <TableBody displayRowCheckbox={false}>
+                    {this.state.files.map((file, index) => 
+                      <TableRow
+                        key={`file-${index}`}>
+                        <TableRowColumn>
+                          {file.name}
+                        </TableRowColumn>
+                        <TableRowColumn>
+                          {this.getLocale(file.name)}
+                        </TableRowColumn>
+                        <TableRowColumn>
+                        {(file.status !== 100) &&
+                          <FontIcon 
+                            color={this.getColor(file)}
+                            title={(file.status) ?
+                                'Exported' : 'Not exported'
+                              }
+                            className='material-icons'>
+                            import_export
+                          </FontIcon>
+                        }
+                        {(file.status === 100) &&
+                          <CircularProgress size={20}/>
+                        }
+                        </TableRowColumn>
+                      </TableRow>
+                    )}
+                    </TableBody>
+                  </Table>
+                  <RaisedButton
+                      label="Upload"
+                      className="box__button"
+                      type="submit"/>
+                  </div>
+                }
                 <input
                   ref="fileInput"
                   onChange={::this.handleFile}
@@ -131,10 +248,6 @@ export default class Controls extends Component {
                     </span>
                   }
                 </label>
-                <RaisedButton
-                  label="Upload"
-                  className="box__button"
-                  type="submit"/>
               </div>
             </form>
           </Dialog>

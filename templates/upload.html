@@ -112,7 +112,7 @@
   <br/>
   <div class="box__uploading">Uploading&hellip;</div>
   <div class="box__success">Done!</div>
-  <div class="box__error">Error! Import unsuccessful :( <span></span>.</div>
+  <div class="box__error">Error! Import unsuccessful :( <span></span></div>
 </div>
 {% includeJsFile 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/14082/FileSaver.js' %}
 {% set js %}
@@ -176,6 +176,10 @@
                 $('.box__error').css('display', 'block');
               }
             },
+            error: function (data) {
+              $('.box__uploading').css('display', 'none');
+              $('.box__error').css('display', 'block');
+            }
           });
         };
       })(f);

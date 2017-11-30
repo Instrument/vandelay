@@ -20,7 +20,6 @@ export default class App extends Component {
     });
   };
   handleSelect = (rows) => {
-    console.log(rows)
     const selectedSections = [];
     if (rows === 'all') {
       this.setState({
@@ -102,8 +101,9 @@ export default class App extends Component {
       }
     });
   }
-  handleUpload(files) {
+  handleUpload(files, cb) {
     const { endpoint } = this.props;
+    let status = {};
     for (var i = 0, f; f=files[i]; i++) {
       var reader = new FileReader();
       reader.onload = (function(theFile) {
@@ -134,13 +134,19 @@ export default class App extends Component {
             data: JSON.stringify(p),
             success: function(data) {
               if (data.status == 200) {
-                console.log(data);
-              } else {
-                console.log('error', data);
+                cb({
+                  ...data,
+                  name: fileName
+                });
               }
             },
             error: function(err) {
               console.log('errrr', err);
+              cb({
+                status: 500,
+                ...err,
+                name: fileName
+              });
             }
           });
         };

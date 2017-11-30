@@ -572,10 +572,10 @@ class VandelayController extends BaseController
         $blockImage = $block->$handle->first();
         if (!$image) {
         } elseif(!$blockImage) {
-          SimpleApiPlugin::Log('matrix orig: ' . $image->id . $type->handle);
+          VandelayPlugin::Log('matrix orig: ' . $image->id . $type->handle);
           $block->getContent()->setAttribute($handle, [$image->id]);
         } else {
-          SimpleApiPlugin::Log('matrix block: ' . $blockImage->id . $type->handle);
+          VandelayPlugin::Log('matrix block: ' . $blockImage->id . $type->handle);
           $block->getContent()->setAttribute($handle, [$blockImage->id]);
         }
       }
