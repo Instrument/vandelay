@@ -5,6 +5,17 @@
   padding 5em
   border .5em dashed #eee
   text-align center
+  position relative
+  &:before
+    content ''
+    position absolute
+    top 1em
+    left 1em
+    right 1em
+    bottom 1em
+  &.dragging
+    &:before
+      background-color #f7f7f7
   .box__file
     visibility hidden
     position absolute
@@ -15,3 +26,5 @@
   label
     margin-bottom 1em
     display block
+    position relative
+    z-index 1

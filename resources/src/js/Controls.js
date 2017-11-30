@@ -18,6 +18,7 @@ import {
 import { findDOMNode } from 'react-dom';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import './controls.styl';
+import classNames from 'classnames';
 import axios from 'axios';
 
 export default class Controls extends Component {
@@ -194,10 +195,11 @@ export default class Controls extends Component {
             contentClassName={'dialog-content'}
           >
             <form 
-                  style={{
-                    backgroundColor: this.state.dragging && 'navy'
-                  }}
-                  ref="formWrapper" className="box" onClick={::this.addFile}
+                  className={classNames(['box', {
+                    dragging: this.state.dragging
+                  }])}
+                  ref="formWrapper"
+                  onClick={::this.addFile}
                   onSubmit={::this.handleUpload}>
               <div className="box__input">
                 {(this.state.files.length > 0) &&

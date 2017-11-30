@@ -4,7 +4,6 @@
   }
   input#file {
     display: none;
-    margin: 1em 0;
   }
   .box__dragndrop,
   .box__uploading,
@@ -13,14 +12,7 @@
     display: none;
   }
   .upload-box {
-    outline: 2px dashed black;
-    outline-offset: -10px;
-    font-size: 1.25rem;
-    background-color: #c8dadf;
-    position: relative;
-    padding: 50px 20px;
-    text-align: center;
-    margin: 1rem 0;
+    margin: 1em;
   }
   .upload-box .btn {
     margin: 2rem 0 0;
@@ -102,9 +94,12 @@
 {% endset %}
 {% includeCss css%}
 <div class="upload-box">
+  <h4>Import JSON</h4>
   <div class="box__input">
     <input class="box__file btn" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
-    <label for="file">Click here to choose a file</label>
+    <label for="file">
+      <a class="btn">Select a file</a>
+    </label>
     <a class="btn submit" id="upload-trigger">Upload</a>
   </div>
   <br/>

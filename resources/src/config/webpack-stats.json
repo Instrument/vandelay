@@ -1,1 +1,8 @@
-{"js":["http://localhost:4001/dist/bundle.js"],"css":[]}
+{
+  "css": [
+    "//styles/fd37f2f22b3d9e234687.css"
+  ],
+  "js": [
+    "/bundle.js"
+  ]
+}
