@@ -55,7 +55,7 @@ class VandelayPlugin extends BasePlugin
             craft()->path->setTemplatesPath($oldPath);
             $entry = $context['entry'];
             $locale = $entry->locale;
-            $html = '<a href="/vandelay/Entry/';
+            $html = '<div class="ui-wrapper"><a href="/vandelay/Entry/';
             $html .= $entry->id;
             $html .= '/'.$locale;
             $html .= '?download=1';
@@ -64,7 +64,7 @@ class VandelayPlugin extends BasePlugin
             }
             $html .= '" target="download" class="btn">Export entry</a>';
             $copy = '<a class="btn submit" id="copy-trigger" data-entry-id="'.$entry->id.'">';
-            $copy .= 'Copy English to All</a>';
+            $copy .= 'Copy English to All</a></div>';
             return $html . $copy . $upload;
         });
     }

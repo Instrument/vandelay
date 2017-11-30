@@ -2,12 +2,6 @@
   td, th {
     padding: 10px 20px 10px 0px;
   }
-  .green {
-    color: green;
-  }
-  .red {
-    color: red;
-  }
   input#file {
     display: none;
     margin: 1em 0;
@@ -24,15 +18,19 @@
     font-size: 1.25rem;
     background-color: #c8dadf;
     position: relative;
-    padding: 100px 20px;
+    padding: 50px 20px;
     text-align: center;
     margin: 1rem 0;
   }
   .upload-box .btn {
-    margin: 1rem 0;
+    margin: 2rem 0 0;
   }
   .upload-box .box__dragndrop {
     display: inline;
+  }
+  label {
+    display: block;
+    text-align: center;
   }
   .fa-spinner{
     animation: animationFrames linear 1s;
@@ -56,7 +54,11 @@
     -ms-transform-origin: 50% 50%;
     -ms-animation-fill-mode:forwards; /*IE 10+*/
   }
-
+  .ui-wrapper .btn {
+    display: inline-block;
+    clear: both;
+    margin-right: 1rem;
+  }
   @keyframes animationFrames{
     0% {
       transform:  rotate(0deg) ;
@@ -106,7 +108,7 @@
 <div class="upload-box">
   <div class="box__input">
     <input class="box__file btn" type="file" name="files[]" id="file" data-multiple-caption="{count} files selected" multiple />
-    <label for="file"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
+    <label for="file">Click here to choose a file</label>
     <a class="btn submit" id="upload-trigger">Upload</a>
   </div>
   <br/>
