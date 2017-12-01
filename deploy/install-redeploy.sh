@@ -9,29 +9,29 @@ then
 fi
 
 
-### DB IMPORT ###
-sleep 1
-mkdir -p /tmp/crafttmp
-echo "Updating the 'craftcms' database"
-cp /tmp/crafttmp/craft_db.sql /tmp/crafttmp/craft_db.bak
+# ### DB IMPORT ###
+# sleep 1
+# mkdir -p /tmp/crafttmp
+# echo "Updating the 'craftcms' database"
+# cp /tmp/crafttmp/craft_db.sql /tmp/crafttmp/craft_db.bak
 
-unzip craft_db.zip
-sed -i "/SET NAMES utf8;/a-- \n\
--- Create and use the DB; \n\
--- \n\
-CREATE DATABASE IF NOT EXISTS craftcms CHARACTER SET utf8; \n\
-USE craftcms; \n\
-" craft_db.sql
+# unzip craft_db.zip
+# sed -i "/SET NAMES utf8;/a-- \n\
+# -- Create and use the DB; \n\
+# -- \n\
+# CREATE DATABASE IF NOT EXISTS craftcms CHARACTER SET utf8; \n\
+# USE craftcms; \n\
+# " craft_db.sql
 
-mv craft_db.sql /tmp/crafttmp/
-# import fresh stuff
-mysql -h $GCLOUD_DB_IP -P 3306 -sfu $GCLOUD_DB_USER -p$GCLOUD_DB_PASSWORD < "/tmp/crafttmp/craft_db.sql"
+# mv craft_db.sql /tmp/crafttmp/
+# # import fresh stuff
+# mysql -h $GCLOUD_DB_IP -P 3306 -sfu $GCLOUD_DB_USER -p$GCLOUD_DB_PASSWORD < "/tmp/crafttmp/craft_db.sql"
 
-### INSTALL CRAFT FILES  ###
-sleep 1
-echo "Saving backup files"
-mkdir -p /tmp/crafttmp/backups
-cp /var/www/craft/storage/backups/* /tmp/crafttmp/backups/
+# ### INSTALL CRAFT FILES  ###
+# sleep 1
+# echo "Saving backup files"
+# mkdir -p /tmp/crafttmp/backups
+# cp /var/www/craft/storage/backups/* /tmp/crafttmp/backups/
 
 echo "Updating website files"
 rm -r craftfiles
@@ -58,4 +58,4 @@ chown -R  www-data:www-data /var/www/craft/storage
 # CLEANUP
 echo "Cleaning up."
 rm craftfiles.zip
-rm craft_db.zip
+# rm craft_db.zip
