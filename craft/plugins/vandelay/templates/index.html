@@ -1,0 +1,48 @@
+{% extends "_layouts/cp" %}
+{% set centered = true %}
+{% set title = 'Vandelay' %}
+{% set sections = craft.sections.getAllSections() %}
+{% set categories = craft.categories.getAllCategories() %}
+{% set locales = craft.i18n.getSiteLocaleIds()%}
+{% set handles = [] %}
+{% includeCssFile 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css' %}
+{% for style in craft.vandelay.stylesheets %}
+  {% includeCssResource('vandelay/dist' ~ style)  %}
+{% endfor %}
+{% set content %}
+    <h1>An importer! An exporter!</h1>
+    <div id="vandelay"></div>
+{% set sectionsObj = [
+  { name: 'Globals', locales: locales },
+  { name: 'Categories', locales: locales }
+] %}
+{% for section in sections %}
+  {% if section.name == 'Pages' %}
+    {% for page in craft.entries.section(section.handle) %}
+      {% set sectionLocales = page.getLocales() %}
+      {% set sectionsObj = sectionsObj|merge([{
+        name: page.title,
+        locales: sectionLocales|keys,
+        id: page.id,
+        slug: page.slug
+      }]) %}
+    {% endfor %}
+  {% else %}
+    {% set sectionLocales = section.getLocales() %}
+    {% set sectionsObj = sectionsObj|merge([{
+      name: section.name,
+      handle: section.handle,
+      locales: sectionLocales|keys
+    }]) %}
+  {% endif %}
+{% endfor %}
+<script type="application/json" id="props">
+  {"locales": {{ locales|json_encode|raw }},
+    "sections": {{ sectionsObj|json_encode|raw }},
+    "endpoint": "{{ siteUrl }}vandelay/uploadEntry"
+  }
+</script>
+{% endset %}
+{% for script in craft.vandelay.scripts %}
+  {% includeJsResource('vandelay/dist' ~ script) %}
+{% endfor %}

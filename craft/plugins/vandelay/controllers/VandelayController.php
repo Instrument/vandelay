@@ -2,7 +2,7 @@
 
 namespace Craft;
 
-class SimpleApiController extends BaseController
+class VandelayController extends BaseController
 {
   protected $allowAnonymous = true;
 
@@ -143,9 +143,6 @@ class SimpleApiController extends BaseController
   public function getEntryDetails($entry) {
     $page = array();
     $fields = $entry->getFieldLayout()->getFields();
-    if (isset($entry->draftId)) {
-      $page['draftId'] = $entry->draftId;
-    }
     $page['id'] = $entry->id;
     $page['title'] = $entry->title;
     $page['slug'] = $entry->slug;
@@ -294,7 +291,7 @@ class SimpleApiController extends BaseController
           $neoblocks = $this->saveNeo($field_val, $locale, $entry, $data->$loc_handle);
           $neos[$handle] = $neoblocks;
         } elseif ($type === 'PlainText') {
-          $entry->getContent()->setAttribute($handle, $data->$loc_handle);
+            $entry->getContent()->setAttribute($handle, $data->$loc_handle);
         } elseif ($type === 'Categories') {
           $cats = [];
           foreach ($english_entry->$handle as $category) {
@@ -349,7 +346,7 @@ class SimpleApiController extends BaseController
       } elseif ($type === 'Assets') {
         $image = $english_entry->$handle->first();
         if (!$image) {
-          SimpleApiPlugin::Log('No image exists: ' . $entry->title . $entry->id);
+          VandelayPlugin::Log('No image exists: ' . $entry->title . $entry->id);
         } elseif (!isset($entry->$handle[0])) {
           $entry->getContent()->setAttribute($handle, [$image->id]);
         }
@@ -357,7 +354,7 @@ class SimpleApiController extends BaseController
     }
     $saved = craft()->entries->saveEntry($entry);
     if ($saved) {
-      return [$entry, $entry->validators, $neos];
+      return [$entry, $matrices, $neos];
     } else {
       return [
         'not_saved' => $data
@@ -575,10 +572,10 @@ class SimpleApiController extends BaseController
         $blockImage = $block->$handle->first();
         if (!$image) {
         } elseif(!$blockImage) {
-          SimpleApiPlugin::Log('matrix orig: ' . $image->id . $type->handle);
+          VandelayPlugin::Log('matrix orig: ' . $image->id . $type->handle);
           $block->getContent()->setAttribute($handle, [$image->id]);
         } else {
-          SimpleApiPlugin::Log('matrix block: ' . $blockImage->id . $type->handle);
+          VandelayPlugin::Log('matrix block: ' . $blockImage->id . $type->handle);
           $block->getContent()->setAttribute($handle, [$blockImage->id]);
         }
       }
@@ -709,19 +706,9 @@ class SimpleApiController extends BaseController
   }
   public function handleGetRequest($variables) {
     if (isset($variables['id'])) {
-      $is_draft = craft()->request->getParam('draftId');
-      if ($is_draft) {
-        $result = $this->returnDraft(craft()->request->getParam('draftId'), $variables['locale']);
-      } else {
-        $result = $this->returnEntry($variables['id'], $variables['locale']);
-      }
+      $result = $this->returnEntry($variables['id'], $variables['locale']);
       if (craft()->request->getParam('download')) {
-        $fname = CRAFT_STORAGE_PATH . "/" . $result['type'] . '-'. $result['slug'];
-        if ($is_draft) {
-          $fname .= '-draft';
-        }
-        $fname .= '-'. $variables['locale'];
-        $fname .= '.json';
+        $fname = CRAFT_STORAGE_PATH . "/" . $result['type'] . '-'. $result['slug'] . '-'. $variables['locale'] .'.json';
         $handle = fopen($fname,'w');
         fwrite($handle, json_encode($result));
         fclose($handle);
