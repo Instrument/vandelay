@@ -114,6 +114,7 @@
   var $form = $('.upload-box');
   var $submit = $('#upload-trigger');
   var fileSelect = document.getElementById('file');
+  var $copy = $('#copy-trigger');
   var droppedFiles = false;
   var name;
   var $input  = $form.find('input[type="file"]'),
@@ -186,12 +187,12 @@
     $copy.text('Copying...');
     e.preventDefault();
     $.get({
-      url: '{{ siteUrl }}simpleapi/Entry/' + id + '/en_us',
+      url: '{{ siteUrl }}vandelay/Entry/' + id + '/en_us',
       success: function(data) {
         $copy.text('Copied!');
         var p = data.entry;
         $.post({
-          url: '{{ siteUrl }}actions/simpleApi/copyEnglishToAll',
+          url: '{{ siteUrl }}actions/vandelay/copyEnglishToAll',
             dataType: 'json',
             contentType: 'application/json; charset=UTF-8',
             processData: false,
