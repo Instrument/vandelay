@@ -94,6 +94,7 @@ class VandelayPlugin extends BasePlugin
             'vandelay/Entry/(?P<id>[0-9]+)/(?P<locale>[a-z\_]+)' => array('action' => 'vandelay/handleEntry'),
             'simpleapi/Entry' => array('action' => 'vandelay/handleEntry'),
             'vandelay/Entry' => array('action' => 'vandelay/handleEntry'),
+            'actions/simpleapi/getLocales' => array('action' => 'vandelay/getLocales'),
             'simpleapi/Singles' => array('action' => 'vandelay/getSingles'),
             'vandelay/Singles' => array('action' => 'vandelay/getSingles'),
             'vandelay/Globals/(?P<locale>[a-z\_]+)' => array('action' => 'vandelay/getGlobals'),
